@@ -3,6 +3,7 @@
 ### Example user template template
 ### Example user template
 
+
 # IntelliJ project files
 .idea/**/*
 *.iml
@@ -91,3 +92,4 @@ typings/
 # Serverless directories
 .serverless
 
+key.json.enc

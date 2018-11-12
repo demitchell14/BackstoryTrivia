@@ -13,7 +13,11 @@
 /.idea
 
 .npmrc
+/src/css
 # misc
+
+**/*.css.map
+
 .DS_Store
 .env.local
 .env.development.local
