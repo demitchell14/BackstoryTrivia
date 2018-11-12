@@ -1,0 +1,14 @@
+{
+
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "allowJs": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "moduleResolution": "node"
+  },
+  "include": [
+    "bin", "routes", "app.ts", "config.ts", "www"
+  ]
+}
