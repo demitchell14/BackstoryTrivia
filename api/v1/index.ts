@@ -4,7 +4,7 @@ import * as _ from "lodash";
 import {MiddlewareReq} from "../../www/trivia";
 import Team from "../../trivia/game/Team";
 import Player from "../../trivia/game/Player";
-import Game from "../../trivia/bin/game/Game";
+import Game from "../../trivia/game/Game";
 
 import GameRoutes from "./game";
 import UserRoutes from "./user";
