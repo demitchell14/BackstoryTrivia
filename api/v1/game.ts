@@ -5,6 +5,7 @@ import {MiddlewareReq} from "../../www/trivia";
 import Game from "../../trivia/game/Game";
 import Question from "../../trivia/game/Question";
 import SocketHandler from "../../www/SocketHandler";
+import {log} from "../../util/logger";
 
 const router = express.Router();
 
@@ -31,7 +32,7 @@ router.get("/question", async function(req:MiddlewareReq, res, next) {
         game = req.trivia.game,
         response = {} as any;
 
-    //console.log(game);
+    //log(game);
 
     if (game.hasTeam(teamAuth)) {
         //let currentQuestionIndex, currentQuestion:Question;
@@ -68,7 +69,7 @@ router.post("/question/answer", async function(req:MiddlewareReq, res, next) {
         game = req.trivia.game,
         response = {} as any;
 
-    console.log(sock)
+    log(sock)
     if (game.hasTeam(teamAuth)) {
         const team = game.getTeam(teamAuth);
         let question = game.question().current();
@@ -80,7 +81,7 @@ router.post("/question/answer", async function(req:MiddlewareReq, res, next) {
             console.error(err);
         }
 
-        console.log(team);
+        log(team);
         sock.broadcast(`a-${game.token}`, "team answered", {team: team.name, answer: response.answer});
     } else {
         response.error = "Invalid team";
@@ -103,7 +104,7 @@ router.options("/authorize", async function(req:MiddlewareReq, res, next) {
     } else {
         res.sendStatus(403);
     }
-    //console.log(game, game.hasTeam(req.headers.token), req.headers.token);
+    //log(game, game.hasTeam(req.headers.token), req.headers.token);
 
 });
 
@@ -121,7 +122,7 @@ router.get("/sockettest", function(req:MiddlewareReq, res, next) {
     const socket = req.trivia.socket.socket;
     if (socket) {
         let test = socket.of("/game/game123");
-        console.log(req.trivia.socket);
+        log(req.trivia.socket);
         test.emit("test", "hello world");
     }
     res.send("OK");

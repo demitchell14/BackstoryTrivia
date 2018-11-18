@@ -4,6 +4,7 @@ import * as _ from "lodash";
 import {MiddlewareReq} from "../../www/trivia";
 import Game from "../../trivia/game/Game";
 import Question from "../../trivia/game/Question";
+import {log} from "../../util/logger";
 
 
 const router = express.Router();
@@ -34,9 +35,9 @@ router.post("/game/save", async function(req:SaveRequest, res, next) {
         })
     }
 
-    //console.log(req.trivia);
-    console.log(game)
-    //console.log(req.body)
+    //log(req.trivia);
+    log(game)
+    //log(req.body)
     res.send("ok");
 });
 

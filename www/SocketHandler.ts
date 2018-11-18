@@ -4,6 +4,7 @@ import {games} from "./trivia"
 import {Server} from "http";
 import Game from "../trivia/game/Game";
 import Team from "../trivia/game/Team";
+import {log} from "../util/logger";
 
 export class SocketHandler {
     gamerooms:SocketIO.Namespace[];
@@ -36,10 +37,10 @@ export class SocketHandler {
 
 
     private connection(socket:SocketIO.Socket) {
-        console.log("Connected to Socket.IO");
+        log("Connected to Socket.IO");
         let connection = new Connection(socket);
 
-        //console.log(this);
+        //log(this);
 
         ///socket.emit("test", "Message here");
         socket.on("ready",
@@ -65,12 +66,12 @@ export class SocketHandler {
 
             }
         }
-        //console.log(this, socket, opts);
+        //log(this, socket, opts);
     }
 
     static disconnect(connection:Connection) {
         connection.disconnect();
-        console.log("Disconnected from Socket.IO");
+        log("Disconnected from Socket.IO");
     }
 
     broadcast(token, event, data) {
@@ -283,16 +284,16 @@ class SocketHandlerBACK {
         this.gamerooms = [];
 
         this.socket.on("connection", this.connection.bind(this));
-        //console.log(this.connection);
+        //log(this.connection);
     }
 
     private ready(socket:SocketIO.Socket, opts:ReadyOpts) {
 
-        console.log(this, socket, opts);
+        log(this, socket, opts);
     }
 
     private connection(socket:SocketIO.Socket) {
-        console.log("Connected to Socket.IO");
+        log("Connected to Socket.IO");
         this.connected = true;
 
         ///socket.emit("test", "Message here");
@@ -306,6 +307,6 @@ class SocketHandlerBACK {
         this.connected = false;
         // -- Cleanup all functions that require a connection
         //delete this.join;
-        console.log("Disconnected from Socket.IO");
+        log("Disconnected from Socket.IO");
     }
 }
