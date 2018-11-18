@@ -5,6 +5,7 @@ import {Socket} from "socket.io";
 import SocketHandler, {SocketHandler as SocketClass} from "./SocketHandler";
 import * as fs from "fs";
 import Authorization from "./authorization";
+import {log} from "../util/logger";
 
 
 export let games = {};
@@ -42,15 +43,16 @@ const middleware = function(opts?:any) {
         }
 
         req.trivia.user = new Authorization(req);
+        await req.trivia.user.session();
 
         let a,
             game:Game;
-        //console.log(req);
+        //log(req);
 
         let func = u => {
             let url = req.url;
             url = "/" + url.split("/").filter(a => a.trim().length > 0).join("/")
-            //console.log(u, req.url, req.baseUrl, req.originalUrl);
+            //log(u, req.url, req.baseUrl, req.originalUrl);
 
             return u === url;
 
@@ -98,7 +100,7 @@ const middleware = function(opts?:any) {
         await next();
 
         // -- TODO Save game to database afterwards
-        //console.log(game.getTeam("Josh"));
+        //log(game.getTeam("Josh"));
     }
 };
 

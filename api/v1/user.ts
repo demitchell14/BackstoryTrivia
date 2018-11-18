@@ -14,30 +14,36 @@ router.post("/authorize", async function(req:MiddlewareReq, res, next) {
         req.body as {email?:string, authorized?:string, password?:string};
 
     if (email && (password || authorized)) {
-
+        const user = req.trivia.user;
         // -- ***** ---------
         // -- This assumes we found a use with the email correct email
         // -- TODO add database search algorithm above
         // -- ***** ---------
 
         if (password) {
-            res.sendStatus(504);
 
+            await user.login(req.body);
+            if (user.authorized) {
+                res.json(user.user());
+            } else {
+                res.status(403).json({error: user.error})
+            }
 
         }
         else if (authorized) {
 
-            if (req.trivia.user)
-                res.json(req.trivia.user.user());
-            else
-                res.sendStatus(403);
+            await user.session(req.body)
 
-
+            if (user.authorized) {
+                res.json(user.user());
+            } else {
+                res.status(403).json({error: user.error});
+            }
 
         }
     } else {
         // error
-        res.sendStatus(403);
+        res.sendStatus(400);
     }
 
 });
