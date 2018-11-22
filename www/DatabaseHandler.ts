@@ -1,6 +1,7 @@
 import * as mongo from "mongodb";
 import {MongoDetails} from "../config"
 import {Collection, Cursor, FilterQuery, MongoClient, ObjectID, UpdateQuery} from "mongodb";
+import {GameOptions} from "../trivia/game/Game";
 
 export class Database {
 
@@ -24,13 +25,13 @@ export class Database {
         this._collection = collection;
         return this;
     }
-    public find(query:FilterQuery<UserObject|SessionObject>):Cursor<UserObject|SessionObject> {
+    public find(query:FilterQuery<UserObject|SessionObject|GameOptions>):Cursor<UserObject|SessionObject|GameOptions> {
         this.resetTimeout();
         const col = this.collection;
         return col.find(query);
     }
 
-    public async update(query:FilterQuery<UserObject|SessionObject>, update:UpdateQuery<UserObject|SessionObject>) {
+    public async update(query:FilterQuery<UserObject|SessionObject|GameOptions>, update:UpdateQuery<UserObject|SessionObject|GameOptions>) {
         this.resetTimeout();
         const col = this.collection;
 

@@ -43,8 +43,12 @@ class Authorization {
 
     public user() {
         if (this.rawUser) {
-            const {name, email, games, session} = this.rawUser;
+            let {name, email, games, session} = this.rawUser;
+            if (this.key)
+                session = this.key;
+
             //TODO add token expiration and token replacement
+
             return {name, email, games, session, _isAuthorized: true};
         }
         return {error: "authorization failed"};
@@ -85,6 +89,12 @@ class Authorization {
 
                     const authorization = u.authorization;
                     authorization.unshift(newUserToken);
+                    if (authorization.length > 15) {
+                        while (authorization.length > 15)
+                            authorization.pop();
+                        //authorization.pop()
+                    }
+
                     await db.update(queryParams, {
                         $set: {authorization: authorization}
                     });
@@ -149,7 +159,9 @@ class Authorization {
                     const {authorization, _id} = found[0];
                     authorization.unshift(newUserToken);
                     if (authorization.length > 15) {
-                        authorization.pop()
+                        while (authorization.length > 15)
+                            authorization.pop();
+                        //authorization.pop()
                     }
 
                     const updateUsers = async () => {
@@ -168,7 +180,7 @@ class Authorization {
                         //await
                     };
 
-                    //await updateUsers();
+                    await updateUsers();
                     //await updateSessions();
                 } else {
                         this.rawUser = found[0];

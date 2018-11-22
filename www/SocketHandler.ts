@@ -1,6 +1,6 @@
 import * as SocketIO from "socket.io"
 import * as moment from "moment";
-import {games} from "./trivia"
+import {loadGame} from "./trivia"
 import {Server} from "http";
 import Game from "../trivia/game/Game";
 import Team from "../trivia/game/Team";
@@ -50,10 +50,10 @@ export class SocketHandler {
             () => SocketHandler.disconnect(connection));
     }
 
-    static ready(connection:Connection, opts:ReadyOpts) {
-        let token = Object.keys(games).find(game => game === opts.game);
+    static async ready(connection:Connection, opts:ReadyOpts) {
+        let token = opts.game;//Object.keys(games).find(game => game === opts.game);
         if (token) {
-            let game = games[token] as Game;
+            let game = await loadGame(token) as Game; // games[token] as Game;
             connection.join(`g-${game.token}`);
 
             if (opts.key === "something else") {
@@ -74,7 +74,7 @@ export class SocketHandler {
         log("Disconnected from Socket.IO");
     }
 
-    broadcast(token, event, data) {
+    broadcast(token, event, data?) {
         if (this.socket) {
             this.socket.in(token).emit(event, data);
         }
@@ -84,7 +84,7 @@ export class SocketHandler {
 class Connection {
     readonly socket:SocketIO.Socket;
     private connected:boolean;
-    private game:Game;
+    private game:string;
 
     constructor(socket:SocketIO.Socket) {
         this.socket = socket;
@@ -92,6 +92,7 @@ class Connection {
     }
 
     join(game:string) {
+        this.game = game;
         this.socket.join(game);
     }
 
@@ -106,7 +107,7 @@ class Connection {
 
     manageHandlers(token:string) {
         const socket = this.socket;
-        this.game = games[token];
+        this.game = token;
         if (this.isConnected()) {
             socket.emit("authorized", "success");
             socket.emit("game state", )
@@ -118,33 +119,35 @@ class Connection {
         }
     }
 
-    private startGame(callback?:Function) {
+    private async startGame(callback?:Function) {
         if (this.game) {
-            const game = this.game;
-            let response = {
-                util: responseUtil()
-            } as SocketResponse;
+            const game = await loadGame(this.game) as Game;
+            //console.log(game, this.game)
+                let response = {
+                    util: responseUtil()
+                } as SocketResponse;
 
-            if (game.started) {
-                response.error = "Game is already started.";
-            } else {
-                game.question().reset();
-                game.setStarted(true);
-                game.paused = true;
-                response.data = {started: game.started}
+                if (game.started) {
+                    response.error = "Game is already started.";
+                } else {
+                    game.question().reset();
+                    game.setStarted(true);
+                    game.paused = true;
+                    response.data = {started: game.started}
+                }
+
+                if (callback) {
+                    callback(response)
+                } else {
+                    handler.broadcast(`a-${game.token}`, "game start", response);
+                    handler.broadcast(`g-${game.token}`, "reload");
+                }
             }
-            if (callback) {
-                callback(response)
-            } else {
-                handler.broadcast(`a-${game.token}`, "game start", response);
-                handler.broadcast(`g-${game.token}`, "reload", undefined);
-            }
-        }
     }
 
-    private endGame(callback?:Function) {
+    private async endGame(callback?:Function) {
         if (this.game) {
-            const game = this.game;
+            const game = await loadGame(this.game) as Game;
             let response = {
                 util: responseUtil()
             } as SocketResponse;
@@ -160,14 +163,14 @@ class Connection {
                 callback(response)
             } else {
                 handler.broadcast(`a-${game.token}`, "game stop", response);
-                handler.broadcast(`g-${game.token}`, "reload", undefined);
+                handler.broadcast(`g-${game.token}`, "reload");
             }
         }
     }
 
-    private resetGame(callback?:Function) {
+    private async resetGame(callback?:Function) {
         if (this.game) {
-            const game = this.game;
+            const game = await loadGame(this.game) as Game;
             let response = {
                 util: responseUtil(),
             } as SocketResponse;
@@ -178,23 +181,24 @@ class Connection {
                 callback(response);
             } else {
                 handler.broadcast(`a-${game.token}`, "game toggle", response);
-                handler.broadcast(`g-${game.token}`, "reload", undefined);
+                handler.broadcast(`g-${game.token}`, "reload");
             }
         }
     }
 
-    private toggleGame(callback?:Function) {
+    private async toggleGame(callback?:Function) {
         if (this.game) {
-            const game = this.game;
+            const game = await loadGame(this.game) as Game;
             let response = {
                 util: responseUtil()
             } as SocketResponse;
 
             if (game.started) {
 
-                if (game.paused)
+                if (game.paused) {
                     game.question().resume();
-                else
+                    Connection.beginQuestion(game.token);
+                } else
                     game.question().pause();
 
                 response.data = {
@@ -209,20 +213,20 @@ class Connection {
                 callback(response);
             } else {
                 handler.broadcast(`a-${game.token}`, "game toggle", response);
-                handler.broadcast(`g-${game.token}`, "reload", undefined);
+                handler.broadcast(`g-${game.token}`, "reload");
             }
         }
     }
 
-    private nextQuestion(callback?:Function) {
+    private async nextQuestion(callback?:Function) {
         //game next question
         if (this.game) {
-            const game = this.game;
+            const game = await loadGame(this.game) as Game;
             let response = {
                 util: responseUtil()
             } as SocketResponse;
 
-            if (game.started && !game.paused) {
+            if (game.started) {
                 game.question().next();
                 response.data = {
                     t: game.question().current()
@@ -235,8 +239,43 @@ class Connection {
                 callback(response);
             } else {
                 handler.broadcast(`a-${game.token}`, "game toggle", response);
-                handler.broadcast(`g-${game.token}`, "reload", undefined);
+
+                if (!game.paused) {
+                    Connection.beginQuestion(game.token);
+                }
             }
+        }
+    }
+
+    private static beginQuestion(game) {
+
+        //return;
+        if (game) {
+            const promise = loadGame(game);
+            promise.then((game:Game) => {
+                let question = game.question().current();
+                if (typeof question === "undefined")
+                    throw Error("Game is over, or there was an error.");
+                let runner = question.start();
+                let state = runner.next();
+                let interval = setInterval(() => {
+                    if (state.done) {
+                        let response = {t: question};
+                        clearInterval(interval);
+                        game.question().pause();
+                        handler.broadcast(`a-${game.token}`, "game toggle", response);
+                        handler.broadcast(`g-${game.token}`, "reload");
+                    } else {
+                        state = runner.next();
+                        //console.log(state);
+                        handler.broadcast(`g-${game.token}`, "question timer", state);
+                        //handler.broadcast(`g-${game.token}`, "reload");
+                    }
+                }, 1000);
+            }).catch(err => console.error(err));
+            promise.catch(err =>{
+                console.log("Error occurred");
+            })
         }
     }
 }
