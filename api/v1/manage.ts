@@ -27,13 +27,19 @@ router.post("/game/save", async function(req:SaveRequest, res, next) {
                 case "questions":
                     let questions = value as Array<Question>;
                     game.questions = [];
-                    questions.map(q => game.addQuestion(q));
+                    questions.map(q => {
+                        if (q.type === "Open Ended")
+                            delete q.choices;
+                        game.addQuestion(q)
+                    });
                     break;
                 default:
                     game[key] = value;
             }
         })
     }
+
+    req.forceUpdate();
 
     //log(req.trivia);
     log(game)

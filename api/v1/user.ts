@@ -1,6 +1,9 @@
 import * as uuidv1 from "uuid/v1";
 import * as express from "express";
 import * as _ from "lodash";
+import * as debug from "debug";
+const log = debug("user");
+
 import {MiddlewareReq} from "../../www/trivia";
 
 
@@ -33,14 +36,13 @@ router.post("/authorize", async function(req:MiddlewareReq, res, next) {
         else if (authorized) {
 
             await user.session(req.body)
-
             if (user.authorized) {
                 res.json(user.user());
             } else {
                 res.status(403).json({error: user.error});
             }
-
         }
+
     } else {
         // error
         res.sendStatus(400);
