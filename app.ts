@@ -15,7 +15,7 @@ import {log} from "./util/logger";
 import ApiV1 from "./api/v1/index";
 import React from "./www/React";
 // -- End Routes
-
+import * as compression from "compression";
 
 
 /**
@@ -25,13 +25,13 @@ import React from "./www/React";
 const app = express();
 
 app.use(logger("dev"));
-
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(compression());
 if (process.env.NODE_ENV && process.env.NODE_ENV.trim() === "production") {
     app.use(express.static(path.join(process.cwd(), "./react/build")));
 }
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
 app.use(cookieParser());
 
 //log(path.join(process.cwd(), "./react/build"))
