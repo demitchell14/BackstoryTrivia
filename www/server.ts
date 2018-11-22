@@ -1,7 +1,7 @@
 import {config} from "dotenv";
 config();
 
-import _debug from "debug";
+import * as _debug from "debug";
 const debug = _debug("*");
 
 import * as http from "http";
