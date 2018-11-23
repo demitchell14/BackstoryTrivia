@@ -24,7 +24,8 @@
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
-    "scss": "sass --watch src/scss:src/css"
+    "scss": "sass --watch src/scss:src/css",
+    "analyze": "source-map-explorer build/static/js/main.*"
   },
   "devDependencies": {
     "@fortawesome/fontawesome-pro": "^5.5.0",
@@ -38,6 +39,7 @@
     "@types/socket.io-client": "^1.4.32",
     "http-traffic-simulator": "0.0.8",
     "reactstrap": "^6.5.0",
+    "source-map-explorer": "^1.6.0",
     "typescript": "^3.1.6"
   }
 }
