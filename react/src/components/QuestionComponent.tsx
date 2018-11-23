@@ -1,5 +1,8 @@
 import * as React from "react";
+
+import {FormEvent, RefObject} from "react";
 import {QuestionResponseBody} from "../store/api";
+import InputGroupComponent from "./InputGroupComponent";
 
 class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
 
@@ -9,7 +12,6 @@ class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
             isAnswered: false,
         } as QuestionState;
 
-        console.log(props.data);
     }
 
     componentDidUpdate() {
@@ -44,7 +46,14 @@ class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
         let data = this.props.data;
 
         if (this.state.isAnswered) {
-            return "You already answered this question.";
+            return (
+                <li className={"list-group-item list-group-item-success"}>
+                    <div>
+                        <h6>Question Answered!</h6>
+                        <p className={"mb-0"}>You answered: <u>{this.state.selectedAnswer}</u></p>
+                    </div>
+                </li>
+            );
         }
         switch (data.type) {
             case "Multiple Choice":
@@ -55,8 +64,12 @@ class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
                             answer={answer}
                             onClick={this.choicePicked.bind(this)}/>
                     ))
-                } else return "No answer choices available"
+                } else return (<li className={"list-group-item"}>There are no choices! Please notify the administrator of the game!</li>)
 
+            case "Open Ended":
+
+                console.log(data)
+                return <AnswerOpenComponent onAnswer={this.choicePicked.bind(this)} />;
             default:
                 return "TODO";
 
@@ -68,9 +81,43 @@ class QuestionComponent extends React.Component<QuestionProps, QuestionState> {
         if (this.props.onAnswer) {
             this.props.onAnswer(choice).then(success => {
                 if (success)
-                    this.setState({isAnswered: true});
+                    this.setState({isAnswered: true, selectedAnswer: choice});
             })
         }
+    }
+}
+
+class AnswerOpenComponent extends React.Component<{onAnswer?:any}> {
+    answerRef: RefObject<HTMLInputElement>;
+
+    public constructor(props) {
+        super(props);
+        this.answerRef = React.createRef();
+    }
+
+    private answered(evt:FormEvent) {
+        evt.preventDefault();
+
+        if (this.answerRef.current) {
+            let ref = this.answerRef.current
+            if (this.props.onAnswer) {
+                this.props.onAnswer(ref.value);
+            }
+        }
+    }
+
+    public render() {
+        return (
+            <li className={"list-group-item list-group-item-info"}>
+                <form onSubmit={this.answered.bind(this)}>
+                    <InputGroupComponent type={"block"}>
+                        <label className={"d-block"}>Enter Your Answer:</label>
+                        <input ref={this.answerRef} className={"form-control"} name={"haha"}/>
+                    </InputGroupComponent>
+                    <button className={"btn btn-block btn-success mt-3"}>Submit</button>
+                </form>
+            </li>
+        )
     }
 }
 
@@ -105,6 +152,7 @@ interface QuestionProps {
 }
 interface QuestionState {
     isAnswered:boolean;
+    selectedAnswer?:string;
 }
 
 export default QuestionComponent;

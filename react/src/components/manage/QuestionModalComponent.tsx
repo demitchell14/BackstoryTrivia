@@ -3,12 +3,12 @@ import * as _ from "lodash";
 import {Question} from "../../routes/GameList";
 import InputGroupComponent from "../InputGroupComponent";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {ChangeEvent} from "react";
+import {ChangeEvent, RefObject} from "react";
 
 import "../../css/ManageModal.css"
 
 class QuestionModalComponent extends React.Component<QuestionModalProps, QuestionModalState> {
-
+    typeRef: RefObject<HTMLSelectElement>;
     public constructor(props) {
         super(props);
 
@@ -24,6 +24,7 @@ class QuestionModalComponent extends React.Component<QuestionModalProps, Questio
             },
         } as QuestionModalState;
 
+        this.typeRef = React.createRef();
     }
 
     private close(evt:any) {
@@ -80,8 +81,8 @@ class QuestionModalComponent extends React.Component<QuestionModalProps, Questio
         let points = this.state.question ? this.state.question.points : 3;
         let choices = this.state.question ? this.state.question.choices ? this.state.question.choices : [] : [] as any;
         let timeLimit = this.state.question ? this.state.question.timeLimit : 0;
+        let answer = this.state.question.answer ? this.state.question.answer : "";
 
-        console.log(choices)
         return (
             <div className={`manage-modal modal fade ${isOpen ? `d-block show` : ``}`}>
                 <div className={"modal-dialog modal-lg"}>
@@ -129,6 +130,7 @@ class QuestionModalComponent extends React.Component<QuestionModalProps, Questio
                                     <select
                                         className={"form-control"}
                                         name={"type"}
+                                        ref={this.typeRef}
                                         onChange={this.questionChanged.bind(this)}
                                         defaultValue={`${type}`}>
                                         <option value={"Multiple Choice"}>Multiple Choice</option>
@@ -138,12 +140,27 @@ class QuestionModalComponent extends React.Component<QuestionModalProps, Questio
                             </fieldset>
 
                             <hr/>
+                            {this.state.question.type === "Multiple Choice" ? (
+                                <fieldset>
+                                    <legend>Choices</legend>
 
-                            <fieldset>
-                                <legend>Choices</legend>
-
-                                {this.answerChoicesEl(choices)}
-                            </fieldset>
+                                    {this.answerChoicesEl(choices)}
+                                </fieldset>
+                            ) : (
+                                <fieldset>
+                                    <legend>Answer</legend>
+                                    <p>Notice: This is only a reference answer. You will be responsible for determining whether or not the answer the teams provide are correct.
+                                    This is because otherwise, the teams would be required to enter the answer exactly as you enter it.</p>
+                                    <InputGroupComponent>
+                                        <label className={"col-form-label"}>Answer:</label>
+                                        <input
+                                            className={"form-control"}
+                                            name={"answer"}
+                                            defaultValue={`${answer}`}
+                                            onChange={this.questionChanged.bind(this)} />
+                                    </InputGroupComponent>
+                                </fieldset>
+                            )}
 
 
 

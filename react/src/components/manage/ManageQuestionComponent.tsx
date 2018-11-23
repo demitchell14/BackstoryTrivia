@@ -72,11 +72,22 @@ class ManageQuestionComponent extends React.Component<ManageQuestionProps, Manag
         }
 
         let elements = teams.map((team, id) => {
+            console.log(team);
             if (typeof team.correct === "boolean") {
                 return (
-                    <li key={`${this.props.questionid}-${id}`} className={`${classBase} ${team.correct ? "list-group-item-success" : "list-group-item-danger"}`}>
+                    <li key={`${this.props.questionid}-${id}`}
+                        className={`${classBase} ${team.correct ? "list-group-item-success" : "list-group-item-danger"}`}>
                         <span>{team.name}</span>
-                        <span className={`badge align-self-center ${team.correct ? "badge-success" : "badge-danger"}`}>{team.correct ? "correct" : "incorrect"}</span>
+                        <span
+                            className={`badge align-self-center ${team.correct ? "badge-success" : "badge-danger"}`}>{team.correct ? "correct" : "incorrect"}</span>
+                    </li>
+                )
+            } else if (team.correct === "Judgement Required") {
+                // -- TODO Add open ended handlers (is the answer correct or wrong buttons)
+                return (
+                    <li key={`${this.props.questionid}-${id}`} className={`${classBase} list-group-item-list`}>
+                        <span>{team.name}</span>
+                        <span>{team.selected ? team.selected : ""}</span>
                     </li>
                 )
             } else {

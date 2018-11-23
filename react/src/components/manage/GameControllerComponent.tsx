@@ -41,6 +41,7 @@ class GameControllerComponent extends React.Component<GameControllerProps, GameC
 
                 const genericSocketFunction = (response:SocketResponse) => {
                     if (response.error) {
+                        console.error("ERROR");
                         alert(response.error)
                     } else {
                         if (this.props.controller) {
@@ -114,13 +115,13 @@ class GameControllerComponent extends React.Component<GameControllerProps, GameC
                                     <p className={"mb-0 lead"}>Game is Paused!</p>
                                 </div>
                             ) : ""}
-                            {data.question && !this.props.game.paused && this.props.game.started ? (
-                                <div className={"alert alert-info"}>
-                                    <h5 className={"alert-heading"}>Current Question</h5>
-                                    <p className={"mb-0"}>{data.question ? data.question : "Unknown."}</p>
-                                    <hr/>
-                                    <p className={"mb-0"}><b>Correct Answer:</b> {data.choices ? data.choices.find(c => c.correct).answer : "Unknown"}</p>
-                                </div>
+                            {data.question && this.props.game.started ? (
+                                    <div className={"alert alert-info"}>
+                                        <h5 className={"alert-heading"}>Current Question</h5>
+                                        <p className={"mb-0"}>{data.question ? data.question : "Unknown."}</p>
+                                        <hr/>
+                                        <p className={"mb-0"}><b>Correct Answer:</b> {data.choices ? data.choices.length > 0 ? data.choices.find(c => c.correct).answer : data.answer : data.answer}</p>
+                                    </div>
                             ) : ""}
                             <div className={"row mt-3"}>
                                 {this.props.game.started ? (
