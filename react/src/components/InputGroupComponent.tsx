@@ -10,6 +10,7 @@ class InputGroupComponent extends React.Component<InputProps, InputState> {
             prepend: [],
             inputs: [],
             append: [],
+            type: props.type ? props.type : "inline"
         } as InputState;
 
         if (typeof this.props.children !== "undefined") {
@@ -36,12 +37,15 @@ class InputGroupComponent extends React.Component<InputProps, InputState> {
     }
 
     public render() {
+        let labelClass = this.state.type === "inline" ? "col-auto" : "col-12";
+        let inputClass = this.state.type === "inline" ? "col" : "col-12";
+
         return (
             <div className="form-row my-1">
-                <div className="col-auto">
+                <div className={labelClass}>
                     {this.state.label}
                 </div>
-                <div className="col">
+                <div className={inputClass}>
                     <div className="input-group">
                         {this.state.prepend.length > 0 ? (
                             <div className={"input-group-prepend"}>
@@ -74,6 +78,7 @@ interface InputState {
     inputs?:any;
     prepend?:any;
     append?:any;
+    type:"inline"|"block";
 }
 
 export default InputGroupComponent;

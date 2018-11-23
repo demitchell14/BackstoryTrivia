@@ -30,7 +30,6 @@ class GameListItem extends React.Component<ItemProps, ItemState> {
 
     async componentDidMount() {
 
-
     }
 
     actions() {
@@ -126,6 +125,7 @@ class GameListItem extends React.Component<ItemProps, ItemState> {
 
 interface ItemProps {
     image?:string;
+    description?:string;
     name:string;
     token:string;
     teams?:number;
