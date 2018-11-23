@@ -16,7 +16,16 @@ class TimeBarComponent extends React.Component<TimeBarProps, TimeBarState> {
 
     public render() {
         let x = this.state.max >= 100 ? (this.state.max - this.state.min) / 100 : this.state.max - this.state.min;
-        let styleWidth = (this.props.current - this.state.min) / x;
+
+        let styleWidth = (this.props.current - this.state.min) / x * 100;
+
+
+        console.log(
+            `(max >= 100) = ${(this.state.max - this.state.min) / 100}\n`,
+            `(max < 100)  = ${this.state.max - this.state.min}\n`,
+            `styleWidth   = ${(this.props.current - this.state.min)} / ${x} = ${styleWidth}`,
+        );
+
         if (this.props.current >= this.state.max)
             styleWidth = 100;
 
@@ -36,7 +45,7 @@ class TimeBarComponent extends React.Component<TimeBarProps, TimeBarState> {
                          aria-valuemin={this.state.min}
                          aria-valuemax={this.state.max}
                          style={{width: `${styleWidth}%`}}>
-                        {this.props.children || `${this.props.current}%`}
+                        {this.props.children || `${this.props.current || ""} seconds`}
                     </div>
                 </div>
             </div>
