@@ -4,10 +4,12 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 import ContainerComponent from "../components/ContainerComponent";
 import InputGroupComponent from "../components/InputGroupComponent";
-import {SyntheticEvent} from "react";
+import {ReactElement, SyntheticEvent} from "react";
 import {Api} from "../store/api";
 import {RegistrationResponse} from "../store/register";
 import {Redirect} from "react-router";
+import GameGate from "../store/GameGate";
+import {GameOptions} from "./GameList";
 //import Api from "../store/api";
 
 
@@ -108,9 +110,10 @@ class RegisterRoute extends React.Component<RegisterProps, RegisterState> {
             remove={this.removeMember.bind(this)}
             update={this.updateMember.bind(this)}
             key={this.state.memberKey+1}/>);
-
-        this.state.memberElements.push(ele)
-        this.setState({memberKey: this.state.memberKey + 1});
+        let elements = this.state.memberElements;
+        elements.push(ele)
+        //console.log(elements)
+        this.setState({memberKey: this.state.memberKey + 1, memberElements: elements});
         //console.log(this);
     }
 
@@ -164,6 +167,13 @@ class RegisterRoute extends React.Component<RegisterProps, RegisterState> {
         //console.log(target, value)
     }
 
+
+    private ready(data:{game: GameOptions}) {
+        let game = data.game;
+
+        this.setState({game: game});
+    }
+
     public render() {
         //console.log(this.state);
         if (this.state.registered) {
@@ -171,55 +181,66 @@ class RegisterRoute extends React.Component<RegisterProps, RegisterState> {
                 <Redirect to={'/list'}/>
             )
         }
+        let game = this.state.game;
+
         return (
-            <ContainerComponent type={"row"}>
-                <div className="col-md-4">
-                    <img className="img-thumbnail img-fluid" src="images/halloween.jpg" />
-                    <h4 className="text-capitalize text-center mb-4">Spooky Halloween Trivia</h4>
-                </div>
-                <div className={"col"}>
-                    <form onSubmit={this.createTeam.bind(this)}>
-                        <fieldset name={"team"}>
-                            <legend>Team Details</legend>
-                            <p className="text-muted d-none d-md-block">You are registering to join
-                                <span className="text-capitalize text-primary"> Spooky Halloween Trivia</span>.&nbsp;</p>
+            <GameGate gameToken={this.props.match.params.token} onLoad={this.ready.bind(this)}>
+                {game ? (
+                    <ContainerComponent type={"row"}>
+                        <div className="col-md-4">
+                            <img className="img-thumbnail img-fluid" src={game.image ? game.image : ""} />
+                            <h4 className="text-capitalize text-center mb-4">{game.name}</h4>
+                        </div>
+                        <div className={"col"}>
+                            <form onSubmit={this.createTeam.bind(this)}>
+                                <fieldset name={"team"}>
+                                    <legend>Team Details</legend>
+                                    <p className="text-muted d-none d-md-block">You are registering to join
+                                        <span className="text-capitalize text-primary pl-1">{game.name}</span>.&nbsp;</p>
 
-                            <InputGroupComponent>
-                                <label className="col-form-label" htmlFor="teamName">Team Name:</label>
-                                <input
-                                    className="form-control"
-                                    type="text"
-                                    name="name"
-                                    onChange={this.store.bind(this)}
-                                />
-                            </InputGroupComponent>
+                                    <InputGroupComponent>
+                                        <label className="col-form-label" htmlFor="teamName">Team Name:</label>
+                                        <input
+                                            className="form-control"
+                                            type="text"
+                                            name="name"
+                                            onChange={this.store.bind(this)}
+                                        />
+                                    </InputGroupComponent>
 
-                        </fieldset>
+                                </fieldset>
 
-                        <fieldset name={"members"}>
-                            <legend>Member Names</legend>
+                                <fieldset name={"members"}>
+                                    <legend>Member Names</legend>
 
-                            {this.state.memberElements.map(el => el)}
+                                    {this.state.memberElements.map(el => el)}
 
-                            <div className={"d-flex my-2"}>
-                                <button
-                                    type={"button"}
-                                    className={"btn btn-info"}
-                                    onClick={this.addMember.bind(this)}>Add Member</button>
-                                <button
-                                    className={"btn btn-success flex-fill mx-3"}
-                                    type={"submit"}>Create Team</button>
-                            </div>
-                        </fieldset>
-                    </form>
-                </div>
-            </ContainerComponent>
+                                    <div className={"d-flex my-2"}>
+                                        <button
+                                            type={"button"}
+                                            className={"btn btn-info"}
+                                            onClick={this.addMember.bind(this)}>Add Member</button>
+                                        <button
+                                            className={"btn btn-success flex-fill mx-3"}
+                                            type={"submit"}>Create Team</button>
+                                    </div>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </ContainerComponent>
+                ) : <div></div>}
+            </GameGate>
         )
     }
 }
 
 interface RegisterProps {
     state?: RegisterState;
+    match: {
+        params: {
+            token:string;
+        }
+    }
 }
 interface RegisterState {
     token?:string;
@@ -231,6 +252,8 @@ interface RegisterState {
         name:string;
     };
     registered:boolean;
+    html:ReactElement<any>;
+    game:Partial<GameOptions>;
 }
 
 export default RegisterRoute

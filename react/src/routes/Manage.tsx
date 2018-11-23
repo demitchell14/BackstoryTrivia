@@ -13,6 +13,7 @@ import * as _ from "lodash";
 
 import "../css/Manage.css";
 import GameControllerComponent from "../components/manage/GameControllerComponent";
+import UserGate from "../store/UserGate";
 
 const api = Api();
 class ManageRoute extends React.Component<ManageProps, ManageState> {
@@ -30,7 +31,8 @@ class ManageRoute extends React.Component<ManageProps, ManageState> {
     }
 
     public componentDidMount() {
-        this.loadGame()
+        //console.log(api.session.user)
+        //this.loadGame()
     }
 
     componentWillUnmount() {
@@ -53,7 +55,7 @@ class ManageRoute extends React.Component<ManageProps, ManageState> {
             this.setState({error: json.error})
         } else {
             if (json.game) {
-                this.setState({data: json.game});
+                this.setState({data: json.game, authorized: true});
             } else {
                 this.setState({error:"Unknown Error"});
             }
@@ -126,56 +128,74 @@ class ManageRoute extends React.Component<ManageProps, ManageState> {
         })
     }
 
+    private body(isStarted, data) {
+        if (this.state.redirect) {
+            return (<Redirect to={this.state.redirect}/>)
+        }
+
+        if (this.state.error) {
+            // -- TODO Error Component
+            return (<div>{this.state.error}</div>)
+        }
+
+        if (typeof data === "undefined") {
+            // -- TODO Loading Component
+            return (<div>Loading...</div>)
+        }
+
+        return (
+            <ContainerComponent type={`row mb-extended ${this.state.saveChanges ? "" : ""}`}>
+                {this.state.saveChanges ? (
+                    <div className={"save-changes-alert alert alert-warning"}>
+                        <p>You have unsaved changes! Save your changes before you leave this page!</p>
+                        <button
+                            onClick={this.gameSave.bind(this)}
+                            className={"btn btn-success"}>Save</button>
+                    </div>
+                ) : ""}
+
+                <div className={"col-12"}>
+                    <GameControllerComponent
+                        controller={this.controller.bind(this)}
+                        game={data}
+                        authorized={this.state.authorized}
+                    />
+                </div>
+
+                {!isStarted ? (
+                    <div className={"col-md-6"}>
+                        <QuestionListComponent
+                            onChange={this.gameChanged.bind(this)}
+                            questions={_.cloneDeep(data.questions)}/>
+                    </div>
+                ) : ""}
+
+                {!isStarted ? (
+                    <div className={"col-md-6"}>
+                        <GameOptionsComponent
+                            onChange={this.gameChanged.bind(this)}
+                            game={_.cloneDeep(data)} />
+                    </div>
+                ) : ""}
+
+            </ContainerComponent>
+        )
+    }
+
+    private unauthorized() {
+        this.setState({redirect: "/manage"})
+        console.log("LOL")
+    }
+
     public render() {
         const isStarted = typeof this.state.data !== "undefined" && this.state.data.started
-        if (!this.state.authorized || this.state.saved) {
-            return (<Redirect to={"/manage"}/>)
-        } else {
-            if (this.state.data) {
-                return (
-                    <ContainerComponent type={`row mb-extended ${this.state.saveChanges ? "" : ""}`}>
-                        {this.state.saveChanges ? (
-                            <div className={"save-changes-alert alert alert-warning"}>
-                                <p>You have unsaved changes! Save your changes before you leave this page!</p>
-                                <button
-                                    onClick={this.gameSave.bind(this)}
-                                    className={"btn btn-success"}>Save</button>
-                            </div>
-                        ) : ""}
-
-                        <div className={"col-12"}>
-                            <GameControllerComponent
-                                controller={this.controller.bind(this)}
-                                game={this.state.data}
-                                authorized={this.state.authorized}
-                            />
-                        </div>
-
-                        {!isStarted ? (
-                            <div className={"col-md-6"}>
-                                <QuestionListComponent
-                                    onChange={this.gameChanged.bind(this)}
-                                    questions={_.cloneDeep(this.state.data.questions)}/>
-                            </div>
-                        ) : ""}
-
-                        {!isStarted ? (
-                            <div className={"col-md-6"}>
-                                <GameOptionsComponent
-                                    onChange={this.gameChanged.bind(this)}
-                                    game={_.cloneDeep(this.state.data)} />
-                            </div>
-                        ) : ""}
-
-                    </ContainerComponent>
-                )
-            } else {
-                return (
-                    <div>Loading...</div>
-                )
-            }
-        }
+        return (
+            <UserGate onSuccess={this.loadGame.bind(this)} onError={this.unauthorized.bind(this)}>
+                {this.body(isStarted, this.state.data)}
+            </UserGate>
+        )
     }
+
 }
 
 interface ManageProps {
@@ -196,6 +216,7 @@ interface ManageState {
     paused?:boolean;
     saveChanges:boolean;
     saved: boolean;
+    redirect?:string;
 }
 
 export default ManageRoute;

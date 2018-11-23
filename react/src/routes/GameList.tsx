@@ -3,9 +3,8 @@ import * as React from "react";
 
 import ContainerComponent from "../components/ContainerComponent";
 import GameListItem from "../components/GameListItem";
-import {Api} from "../store/api";
 
-import halloween from "../images/halloween.jpg";
+import {apiRequest} from "../store/fetch";
 //console.log(bsdata);
 
 class ListRouter extends React.Component<ListProps, ListState> {
@@ -14,17 +13,25 @@ class ListRouter extends React.Component<ListProps, ListState> {
         this.state = {
 
         };
-
     }
 
     async componentDidMount() {
+        if (this.props.managed) {
+            
+        }
         await this.setItems()
     }
 
     async setItems() {
-        this.setState({
-            items: await Api().games()
+        const response = await apiRequest("game", {
+            path: "list",
         });
+
+        if (response.status === 200) {
+            this.setState({
+                items: await response.json()
+            })
+        }
 
     }
 
@@ -38,17 +45,32 @@ class ListRouter extends React.Component<ListProps, ListState> {
         if (displayItemsBool) {
             // @ts-ignore
             return this.state.items.map(item => {
-                const {name, token, started, startTime, questions, teams} = item;
+                const {name, token, started, startTime, questions, teams, _id, image, description } = item;
+                let questionCount = 0;
+                let teamCount = 0;
+                if (!(questions instanceof Array)) {
+                    questionCount = questions;
+                } else {
+                    questionCount = questions.length;
+                }
+
+                if (!(teams instanceof Array)) {
+                    teamCount = teams;
+                } else {
+                    teamCount = teams.length;
+                }
+
                 return (
                     <GameListItem
-                        key={item["_id"]}
-                        image={`${halloween}`}
+                        key={_id}
+                        image={image}
+                        description={description}
                         name={name}
                         token={token}
                         started={started}
                         startTime={startTime}
-                        questions={questions ? questions.length : 0}
-                        teams={teams ? teams.length : 0}
+                        questions={questionCount}
+                        teams={teamCount}
                         managed={managed && (games ? games.findIndex(g => g === token) !== -1 : false)}
                     />
                 )
