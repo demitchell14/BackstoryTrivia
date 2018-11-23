@@ -142,6 +142,7 @@ export interface QuestionResponseBody {
     questionDetails?:string;
     questionImage?:string;
     timeLimit:number;
+    timeLeft:number;
     type:string;
     choices?: {
         answer:string;
