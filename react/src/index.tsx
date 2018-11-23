@@ -12,6 +12,25 @@ library.add(faTrashAlt, faCaretDown, faCaretUp, faCaretCircleDown, faCaretCircle
 //import registerServiceWorker from './registerServiceWorker';
 
 import Router from "./Router";
+import HeadingComponent from "./components/HeadingComponent";
+import NavigationComponent from "./components/NavigationComponent";
+
+
+
+ReactDOM.render(
+    <HeadingComponent
+        title={"Backstory Trivia"}
+        subtitle={"Every Sunday Night"}
+    />,
+    document.getElementById("header")
+);
+
+ReactDOM.render(
+    <NavigationComponent
+
+    />,
+    document.getElementById("navigation")
+);
 
 ReactDOM.render(
   <Router />,
