@@ -10,7 +10,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 //import logo from './images/logo.svg';
 import {Link} from "react-router-dom";
 
-class App extends React.Component {
+class Main extends React.Component {
   public render() {
     return (
       <Container className={"mt-3"}>
@@ -18,6 +18,7 @@ class App extends React.Component {
               <Col sm={{size: 6}} className={"mx-auto"}>
                   <Link to={'/manage'} className={"btn btn-block btn-info"}>Manage Games</Link>
                   <Link to={'/list'} className={"btn btn-block btn-success"}>Game List</Link>
+                  <Link to={'/test/game123'} className={"btn btn-block btn-warning"}>Testing</Link>
               </Col>
               <Col>
               </Col>
@@ -27,4 +28,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default Main;
