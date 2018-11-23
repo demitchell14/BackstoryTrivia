@@ -11,7 +11,7 @@ export class Session {
         props = props || {};
         this.team = props.team || {};
         this.game = props.game || {};
-        this.user = new User(props.user);
+        this.user = new User(props.user || {});
 
     }
     setTeam(opts) {
@@ -49,54 +49,55 @@ export class Session {
 export class User {
     name:string;
 
-    private authorization:string;
+     _session:string;
+     email:string;
     private _isAuthorized:boolean;
 
     games:Array<string>;
 
     public constructor(props?:UserResponseProps) {
         this._isAuthorized = false;
+
         if (props) {
             this.name = props.name;
             this.games = props.games || [];
-            this.authorization = props.authorization;
         }
     }
 
-    public async authorize(opts:UserAuthenticationBody) {
-        if (opts.password) {
-            // -- TODO login with HTML Form
-            return false;
+    public async session(opts:UserAuthenticationBody) {
+        //let {email, password, authorized} = opts;
+        if (this.isAuthorized())
+            return this;
+
+        console.log(opts)
+        let response = await apiRequest("user", {
+            path: "authorize",
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(opts)
+        });
+
+        if (response.status === 200) {
+            let json = await response.json() as UserResponseProps;
+            json._session = json.session;
+            delete json.session;
+            Object.assign(this, json);
+            return this;
         } else {
-            // -- login with saved authorization code
-            let {email, authorized} = opts;
-            let response = await apiRequest("user", {
-                path: "authorize",
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({email, authorized}),
-            }) as Response;
-            if (response.status === 200) {
-                let json = await response.json() as UserResponseProps;
-                Object.assign(this, json);
-
-                return this;
-            } else {
-                throw Error(response.statusText);
-            }
-            //return this._isAuthorized;
+            throw Error(response.statusText)
         }
     }
+
 
     public getAuthToken() {
-        return this.authorization;
+        return this._session;
     }
 
     public isAuthorized(token?:string):boolean {
         if (typeof token === "string") {
-            if (this.authorization) {
+            if (this._session) {
                 return this.games.findIndex(g => g === token) !== -1
             }// else
             //this._isAuthorized = bool;
@@ -114,7 +115,8 @@ export interface UserAuthenticationBody {
 export interface UserResponseProps {
     name:string;
     email:string;
-    authorization:string;
+    session:string;
+    _session?:string;
     games: Array<string>;
 }
 
