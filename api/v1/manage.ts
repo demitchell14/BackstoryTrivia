@@ -1,10 +1,14 @@
 import * as uuidv1 from "uuid/v1";
 import * as express from "express";
 import * as _ from "lodash";
-import {MiddlewareReq} from "../../www/trivia";
+
+import * as RandExp from "randexp";
+
+import {getAllGames, MiddlewareReq} from "../../www/trivia";
 import Game from "../../trivia/game/Game";
 import Question from "../../trivia/game/Question";
 import {log} from "../../util/logger";
+import {Database} from "../../www/DatabaseHandler";
 
 
 const router = express.Router();
@@ -47,6 +51,73 @@ router.post("/game/save", async function(req:SaveRequest, res, next) {
     res.send("ok");
 });
 
+router.post("/game/create", async function(req:CreateRequest, res, next) {
+    const user = req.trivia.user;
+    let response = {
+        error:[],
+        data: {} as any,
+    };
+    if (user.authorized) {
+        let token = req.body.token;
+        if (req.body.generate) {
+            // Generate a unique game token
+            token = await generate("backstory");
+        } else {
+            const exists = await gameExists(token);
+            if (exists)
+                response.error.push("Game already exists with the token you entered.");
+        }
+
+        let status = await Promise.all([
+            user.addGame(token),
+            insertGame(token)
+        ]);
+
+        if (status[1] && status[0].user().games.findIndex(a => a === token) !== -1) {
+            getAllGames(true).then(res => {
+                log(res);
+            })
+        }
+        res.send(response.error.length > 0 ? {error: response.error} : {data: response.data});
+    } else {
+        res.sendStatus(403);
+    }
+});
+
+
+const insertGame = async function(token:string) {
+    const db = new Database();
+    await db.openCollection("games");
+    const game = new Game({token: token, name: "Please name me!"});
+    let insertion = await db.insert(game);
+    const res = insertion.insertedCount === 1;
+    db.close();
+    return res;
+};
+
+let gameExists = async function(token) {
+    const db = new Database();
+    await db.openCollection("games");
+    let x = await db.find({token: token});
+    const res = (await x.count()) > 0;
+    db.close();
+    return res;
+};
+
+const generate = async function(str?:string) {
+    const generation = new RandExp(`${str ? str : "game"}-[a-zA-Z0-9]{10}`);
+    let token = generation.gen();
+    while (await gameExists(token))
+        token = generation.gen();
+    return token;
+};
+
+interface CreateRequest extends MiddlewareReq {
+    body: {
+        token?:string;
+        generate?:boolean;
+    }
+}
 interface SaveRequest extends MiddlewareReq {
     body: Array<{key:string, value: any}>;
 }

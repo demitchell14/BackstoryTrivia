@@ -41,6 +41,31 @@ class Authorization {
 
     }
 
+    public async addGame(token:string) {
+        let userData = this.user();
+        const db = new Database();
+        await db.openCollection("users");
+        if (this.authorized) {
+            let games = userData.games;
+            if (games.findIndex(g => g === token) === -1) {
+                games.push(token);
+
+                let updated = await db.update({email: userData.email}, {
+                    $set: {games: games}
+                });
+
+                if (updated.modifiedCount === 1) {
+                    await this.session({
+                        email: userData.email,
+                        authorized: this.key
+                    });
+
+                }
+            }
+        }
+        return this;
+    }
+
     public user() {
         if (this.rawUser) {
             let {name, email, games, session} = this.rawUser;
@@ -134,7 +159,7 @@ class Authorization {
             else
                 return this;
         }
-        //console.log(queryParams, opts)
+        //log(queryParams, opts)
         const db = new Database();
         await db.openCollection("sessions");
         const query = db.find(queryParams) as Cursor<SessionObject>;
