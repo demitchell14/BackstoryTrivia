@@ -1,4 +1,7 @@
-https://socket.io/get-started/chat/
+[Trivia Manager Repository](https://github.com/demitchell14/TriviaGameHandler)
+
+[Socket.IO Examples](https://socket.io/get-started/chat/)
+
 
     /**
     * Deep diff between two object, using lodash
@@ -16,3 +19,9 @@ https://socket.io/get-started/chat/
         }
         return changes(object, base);
     }
+    
+
+
+Find instances of console.log without console.`(?<!console\.)log\((.*)\)`
+
+Find instance of console.log `console\.log\((.*)\)`
