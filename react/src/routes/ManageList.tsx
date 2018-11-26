@@ -6,14 +6,13 @@ import {Api} from "../store/api";
 //import ContainerComponent from "../components/ContainerComponent";
 import ListRouter from "./GameList";
 import UserGate from "../store/UserGate";
+import CreateGameComponent from "../components/manage/CreateGameComponent";
 
 const api = Api();
 class ManageListRoute extends React.Component<ManageListProps, ManageListState> {
 
     public constructor(props) {
         super(props);
-
-        //let user = api.session.user;
 
         this.state = {
             authorized: api.session.user.isAuthorized(),
@@ -47,9 +46,13 @@ class ManageListRoute extends React.Component<ManageListProps, ManageListState> 
         //});
     }
 
+
+
+
     public render() {
         return (
             <UserGate onSuccess={this.authorized.bind(this)}>
+                <CreateGameComponent />
                 <ListRouter managed={true} games={this.state.games}/>
             </UserGate>
         )

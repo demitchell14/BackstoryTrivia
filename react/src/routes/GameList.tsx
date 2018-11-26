@@ -5,8 +5,10 @@ import ContainerComponent from "../components/ContainerComponent";
 import GameListItem from "../components/GameListItem";
 
 import {apiRequest} from "../store/fetch";
+import {Api} from "../store/api";
 //console.log(bsdata);
 
+const api = Api();
 class ListRouter extends React.Component<ListProps, ListState> {
     public constructor(props) {
         super(props);
@@ -17,14 +19,19 @@ class ListRouter extends React.Component<ListProps, ListState> {
 
     async componentDidMount() {
         if (this.props.managed) {
-            
         }
-        await this.setItems()
+        await this.setItems(this.props.managed)
     }
 
-    async setItems() {
+    async setItems(managed?:boolean) {
+        let headers = {} as any;
+        if (managed) {
+            //console.log(api.session.user.getAuthToken())
+            headers.authorized = api.session.user.getAuthToken();
+        }
         const response = await apiRequest("game", {
             path: "list",
+            headers: headers
         });
 
         if (response.status === 200) {

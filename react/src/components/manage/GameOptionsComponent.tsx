@@ -74,7 +74,7 @@ class GameOptionsComponent extends React.Component<GameOptionsProps, GameOptions
                         <input
                             className="form-control"
                             type="text"
-                            name="name"
+                            name="image"
                             placeholder={this.props.game.image ? `current: "${this.props.game.image}"` :  "Enter the name of the game."}
                             defaultValue={this.state.game.image}
                             onChange={this.inputChange.bind(this)}
