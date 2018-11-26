@@ -1,7 +1,7 @@
 import * as uuidv1 from "uuid/v1";
 import * as express from "express";
 import * as _ from "lodash";
-import {MiddlewareReq} from "../../www/trivia";
+import {getAllGames, MiddlewareReq, saveGame} from "../../www/trivia";
 import Game, {GameOptions} from "../../trivia/game/Game";
 import Question from "../../trivia/game/Question";
 import SocketHandler from "../../www/SocketHandler";
@@ -57,8 +57,17 @@ router.get("/", async function(req:MiddlewareReq, res, next) {
 
 router.get("/list", async function(req:MiddlewareReq, res, next) {
     let games = req.trivia.games as any;
+    let user = req.trivia.user;
+
+    games = await getAllGames(true);
 
     if (games) {
+        if (user.authorized) {
+            games = Object.values(games).filter((g:Game) => {
+                return user.user().games.find(token => token === g.token)
+            });
+        }
+
         games = Object.values(games).map((g:Game) => {
             const {teams, questions, name, description, image, paused, started, startTime, token, _id} = g;
 
@@ -69,7 +78,7 @@ router.get("/list", async function(req:MiddlewareReq, res, next) {
 
         res.json(games);
     } else {
-        res.sendStatus(100);
+        res.json([]);
     }
 
 
