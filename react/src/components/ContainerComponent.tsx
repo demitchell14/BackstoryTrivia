@@ -14,7 +14,7 @@ class ContainerComponent extends React.Component<ContainerProps, ContainerState>
 
     public render() {
         return (
-            <div className={"container"}>
+            <div className={`container ${this.props.className ? this.props.className : ""}`}>
                 <div className={this.props.type}>
                     {this.props.children}
                 </div>
@@ -25,6 +25,7 @@ class ContainerComponent extends React.Component<ContainerProps, ContainerState>
 
 interface ContainerProps {
     type:string;
+    className?:string
 }
 
 interface ContainerState {
