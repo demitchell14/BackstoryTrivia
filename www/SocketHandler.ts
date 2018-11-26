@@ -1,6 +1,6 @@
 import * as SocketIO from "socket.io"
 import * as moment from "moment";
-import {loadGame} from "./trivia"
+import {loadGame, saveGame} from "./trivia"
 import {Server} from "http";
 import Game from "../trivia/game/Game";
 import Team from "../trivia/game/Team";
@@ -62,6 +62,8 @@ export class SocketHandler {
                 connection.manageHandlers(game.token);
             } else {
                 let team = game.getTeam(opts.key) as Team;
+                log(game);
+                log(opts);
                 connection.join(`t-${game.token}-${team.cleanName()}`);
 
             }
@@ -122,7 +124,7 @@ class Connection {
     private async startGame(callback?:Function) {
         if (this.game) {
             const game = await loadGame(this.game) as Game;
-            //console.log(game, this.game)
+            //log(game, this.game)
                 let response = {
                     util: responseUtil()
                 } as SocketResponse;
@@ -135,6 +137,8 @@ class Connection {
                     game.paused = true;
                     response.data = {started: game.started}
                 }
+
+                game.update(true);
 
                 if (callback) {
                     callback(response)
@@ -159,6 +163,8 @@ class Connection {
                 response.data = {started: game.started}
             }
 
+            game.update(true);
+
             if (callback) {
                 callback(response)
             } else {
@@ -176,6 +182,8 @@ class Connection {
             } as SocketResponse;
             game.reset();
             response.data = {reset: game.getCurrentQuestionIndex() === 0}
+
+            game.update(true);
 
             if (callback) {
                 callback(response);
@@ -209,6 +217,8 @@ class Connection {
                 response.error = "Game has not started yet."
             }
 
+            game.update(true);
+
             if (callback) {
                 callback(response);
             } else {
@@ -235,6 +245,8 @@ class Connection {
                 response.error = "Game has not started yet."
             }
 
+            game.update(true);
+
             if (callback) {
                 callback(response);
             } else {
@@ -256,6 +268,7 @@ class Connection {
                 let question = game.question().current();
                 if (typeof question === "undefined")
                     throw Error("Game is over, or there was an error.");
+                game.update(true);
                 let runner = question.start();
                 let state = runner.next();
                 let interval = setInterval(() => {
@@ -263,18 +276,19 @@ class Connection {
                         let response = {t: question};
                         clearInterval(interval);
                         game.question().pause();
+                        game.update(true);
                         handler.broadcast(`a-${game.token}`, "game toggle", response);
                         handler.broadcast(`g-${game.token}`, "reload");
                     } else {
                         state = runner.next();
-                        //console.log(state);
+                        //log(state);
                         handler.broadcast(`g-${game.token}`, "question timer", state);
                         //handler.broadcast(`g-${game.token}`, "reload");
                     }
                 }, 1000);
             }).catch(err => console.error(err));
             promise.catch(err =>{
-                console.log("Error occurred");
+                log("Error occurred");
             })
         }
     }
