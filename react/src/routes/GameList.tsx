@@ -108,7 +108,7 @@ export interface GameOptions {
     name: string;
     description?: string;
     image?:string;
-    currentQuestionId?: number;
+    currentQuestionId: number;
     started: boolean;
     paused:boolean;
     startTime?:string;
@@ -123,11 +123,12 @@ export interface Question {
     answer: string;
     choices?: Array<{
         answer:string;
-        correct?:boolean;
+        correct:boolean;
     }>;
     points: number;
     question: string;
     timeLimit: number;
+    timeLeft: number;
     type: string;
 }
 
