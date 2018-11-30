@@ -49,7 +49,7 @@ class GameRouter extends React.Component<GameProps, GameState> {
                 //console.log("Pinged.", data)
                 if (typeof this.state.question !== "undefined") {
                     let question = this.state.question;
-                    question.timeLeft = data.value;
+                    question.timeLeft = data.data.value;
                     this.setState({question: question});
                 }
             })

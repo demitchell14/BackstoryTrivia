@@ -5,7 +5,7 @@ import {Api} from "../store/api";
 import {Redirect} from "react-router";
 import {apiRequest} from "../store/fetch";
 import QuestionListComponent from "../components/manage/QuestionListComponent";
-import {GameOptions} from "./GameList";
+import {GameOptions, Question} from "./GameList";
 import GameOptionsComponent from "../components/manage/GameOptionsComponent";
 import * as _ from "lodash";
 
@@ -123,9 +123,22 @@ class ManageRoute extends React.Component<ManageProps, ManageState> {
     }
 
     private controller(data) {
-        this.loadGame().then(res => {
-            console.log(res)
-        })
+        if (data && data.value) {
+            // -- set timeleft
+            let game = this.state.data as GameOptions;
+            // @ts-ignore
+            let dt = game.questions[game.currentQuestionId] || {} as Question;
+            dt.timeLeft = data.value;
+            game.questions[game.currentQuestionId || -1] = dt;
+            this.setState({
+                data: game
+            })
+
+        } else {
+            this.loadGame().then(res => {
+                console.log(res)
+            })
+        }
     }
 
     private body(isStarted, data) {
