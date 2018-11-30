@@ -13,28 +13,52 @@ class InputGroupComponent extends React.Component<InputProps, InputState> {
             type: props.type ? props.type : "inline"
         } as InputState;
 
-        if (typeof this.props.children !== "undefined") {
-            this.props.children.map((c, idx) => {
+    }
+    componentWillMount(): void {
+        this.prepare(this.props.children);
+    }
+
+    prepare(children) {
+        if (typeof children !== "undefined") {
+            let prepend = [] as any,
+                inputs = [] as any,
+                append = [] as any,
+                label = undefined as any;
+
+            //console.log(this.props.children);
+
+            children.map((c, idx) => {
                 let type = c.type.toLowerCase();
                 if (idx === 0) {
                     // -- First child is required to be a label
                     if (type === "label") {
                         // @ts-ignore
-                        this.state.label = c;
+                        label = c;
                     }
                 } else {
-
-                    if ((type === "button" || type === "span") && this.state.inputs.length === 0) {
-                        this.state.prepend.push(c);
-                    } else if ((type === "button" || type === "span") && this.state.inputs.length > 0) {
-                        this.state.append.push(c);
+                    if ((type === "button" || type === "span") && inputs.length === 0) {
+                        prepend.push(c);
+                    } else if ((type === "button" || type === "span") && inputs.length > 0) {
+                        append.push(c);
                     } else {
-                        this.state.inputs.push(c);
+                        inputs.push(c);
                     }
                 }
             });
+            this.setState({
+                label: label,
+                append: append,
+                inputs: inputs,
+                prepend: prepend,
+            })
         }
     }
+
+    componentWillReceiveProps(nextProps: Readonly<InputProps>, nextContext: any): void {
+        this.prepare(nextProps.children);
+        //console.log(nextProps)
+    }
+
 
     public render() {
         let labelClass = this.state.type === "inline" ? "col-auto" : "col-12";
