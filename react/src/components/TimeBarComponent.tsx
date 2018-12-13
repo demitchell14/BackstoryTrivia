@@ -19,12 +19,15 @@ class TimeBarComponent extends React.Component<TimeBarProps, TimeBarState> {
 
         let styleWidth = (this.props.current - this.state.min) / x * 100;
 
+        let showLabel = typeof this.props.label === "boolean" ? this.props.label : true;
 
         console.log(
             `(max >= 100) = ${(this.state.max - this.state.min) / 100}\n`,
             `(max < 100)  = ${this.state.max - this.state.min}\n`,
             `styleWidth   = ${(this.props.current - this.state.min)} / ${x} = ${styleWidth}`,
         );
+        
+        
 
         if (this.props.current >= this.state.max)
             styleWidth = 100;
@@ -32,13 +35,16 @@ class TimeBarComponent extends React.Component<TimeBarProps, TimeBarState> {
         if (this.props.current <= this.state.min)
             styleWidth = 0;
 
+
         //console.log(x, styleWidth);
         return (
             <div className={this.props.className || "d-flex"}>
-                <small className="text-muted">
-                    <span>Time Left:</span>
-                    <span>{undefined}</span>
-                </small>
+                {showLabel ? (
+                    <small className="text-muted">
+                        <span>Time Left:</span>
+                        <span>{undefined}</span>
+                    </small>
+                ) : ""}
                 <div className="progress">
                     <div className={`progress-bar ${this.state.color} progress-bar-striped progress-bar-animated`}
                          aria-valuenow={this.props.current}
@@ -55,7 +61,7 @@ class TimeBarComponent extends React.Component<TimeBarProps, TimeBarState> {
 
 interface TimeBarProps {
     current:number;
-
+    label?:boolean;
     min?:number;
     max?:number;
     color?:string;
