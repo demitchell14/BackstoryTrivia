@@ -19,7 +19,8 @@ class UserGate extends React.Component<UserGateProps, UserGateState> {
             session: api.session,
             user: api.session.user,
             authorized: false,
-            current: (<div>_</div>)
+            current: (<div>_</div>),
+            error: [],
         };
 
     }
@@ -43,7 +44,8 @@ class UserGate extends React.Component<UserGateProps, UserGateState> {
         } else {
             if (this.props.onError) {
                 // -- TODO
-                this.props.onError("Invalid stored data.")
+                console.log(this.props.onError)
+                //this.props.onError("Invalid stored data.")
             } else {
                 throw Error("Invalid stored data.")
             }
@@ -79,7 +81,7 @@ class UserGate extends React.Component<UserGateProps, UserGateState> {
                 this.props.onSuccess();
             }
         } else {
-            this.setState({current: <LoginComponent onSubmit={this.login.bind(this)} email={email}/>})
+            this.setState({current: <LoginComponent error={this.state.error} onSubmit={this.login.bind(this)} email={email}/>})
         }
         //let promise = this.state.user.session({
         //    email: sessionEmail,
@@ -104,6 +106,7 @@ class UserGate extends React.Component<UserGateProps, UserGateState> {
 interface LoginProps {
     onSubmit?: any;
     email?:string|null;
+    error: Array<any>;
 }
 class LoginComponent extends React.Component<LoginProps> {
     emailRef:RefObject<HTMLInputElement>;
@@ -161,6 +164,13 @@ class LoginComponent extends React.Component<LoginProps> {
                         />
                     </InputGroupComponent>
 
+                    {this.props.error.length > 0 ? (
+                        <div className={"alert alert-danger"}>
+                            <h5 className={"alert-heading"}>Oops! An Error Occurred!</h5>
+                            {this.props.error.map(err => <p>{err}</p>)}
+                        </div>
+                    ) : ""}
+
                     <button type={"submit"} className={"btn btn-success"}>Sign in</button>
                 </form>
             </ContainerComponent>
@@ -184,6 +194,7 @@ interface UserGateState {
     user:User;
     authorized:boolean;
     current:any;
+    error: Array<any>;
 }
 
 export default UserGate;
