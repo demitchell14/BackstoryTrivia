@@ -1,0 +1,65 @@
+@each $color, $value in $theme-colors {
+  .alert-#{$color} {
+    box-shadow: 3px 3px theme-color-level($color, -3);
+  }
+}
+
+
+// -- .btn-{colors from $theme-colors}
+// -- Generates all the btn classes
+@each $color, $value in $theme-colors {
+  .btn-tmp-#{$color} {
+    //transition: .5s all;
+    background-color: theme-color-level($color, -2);
+    border-color: theme-color-level($color, -2);
+    box-shadow: 3px 3px theme-color-level($color, -6);
+
+
+
+    @include hover-focus-active {
+      outline: 0;
+      box-shadow: 3px 3px 3px 0 theme-color-level($color, -3);
+    }
+
+    &:not(:disabled):not(.disabled):active,
+    &:not(:disabled):not(.disabled).active {
+      $shadow: 3px 3px 3px 0 fade_out(theme-color($color), .5);
+      @include box-shadow($shadow);
+
+      &:focus {
+        $focusActive: 0 0 0 3px fade_out(theme-color($color), .5);
+        @include box-shadow($focusActive);
+      }
+    }
+
+  }
+
+  .btn-tmp-outline-#{$color} {
+    color: theme-color-level($color, -2);
+    border-color:theme-color-level($color, -2);
+    box-shadow: 3px 3px theme-color-level($color, -6);
+
+    @include hover-focus-active {
+      outline: 0;
+      box-shadow: 3px 3px 3px 0 theme-color-level($color, -3);
+    }
+
+    &:not(:disabled):not(.disabled):active,
+    &:not(:disabled):not(.disabled).active {
+      $shadow: 3px 3px 3px 0 fade_out(theme-color($color), .5);
+      @include box-shadow($shadow);
+
+      &:focus {
+        $focusActive: 0 0 0 3px fade_out(theme-color($color), .5);
+        @include box-shadow($focusActive);
+      }
+    }
+
+  }
+}
+
+// -- .btn-outline-{colors from $theme-colors}
+// -- Generates all the btn outline classes
+@each $color, $value in $theme-colors {
+
+}
