@@ -22,6 +22,7 @@ const Register = lazy(() => import("./routes/Register"));
 
 
 const TestRoute = lazy(() => import("./routes/Testing"));
+const QuestionStore = lazy(() => import("./routes/questions/Questions"));
 
 
 class RouterComponent extends React.Component {
@@ -39,6 +40,7 @@ class RouterComponent extends React.Component {
                         <Route exact path={"/test/:token"} component={TestRoute} />
                         <Route exact path={"/manage"} component={ManageList} />
                         <Route exact path={"/manage/:token"} component={Manage} />
+                        <Route exact path={"/questions"} component={QuestionStore} />
                     </Switch>
                     </Suspense>
                 </Router>
