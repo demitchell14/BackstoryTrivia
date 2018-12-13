@@ -268,7 +268,7 @@ class QuestionModalComponent extends React.Component<QuestionModalProps, Questio
                 )
             })
         }
-        currentChoices.push(<button onClick={this.addChoice.bind(this)} key={"add-btn"} type={"button"}>Add Choice</button>);
+        currentChoices.push(<button onClick={this.addChoice.bind(this)} className={"btn btn-info"} key={"add-btn"} type={"button"}>Add Choice</button>);
 
         return currentChoices;
     }
