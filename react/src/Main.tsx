@@ -5,7 +5,8 @@ import {
     Col,
 } from "reactstrap";
 import './css/App.css';
-import 'bootstrap/dist/css/bootstrap.css';
+//import 'bootstrap/dist/css/bootstrap.css';
+import "./style/style.css";
 
 //import logo from './images/logo.svg';
 import {Link} from "react-router-dom";
@@ -18,6 +19,7 @@ class Main extends React.Component {
               <Col sm={{size: 6}} className={"mx-auto"}>
                   <Link to={'/manage'} className={"btn btn-block btn-info"}>Manage Games</Link>
                   <Link to={'/list'} className={"btn btn-block btn-success"}>Game List</Link>
+                  <Link to={'/questions'} className={"btn btn-block btn-danger"}>Question List</Link>
                   <Link to={'/test/game123'} className={"btn btn-block btn-warning"}>Testing</Link>
               </Col>
               <Col>
