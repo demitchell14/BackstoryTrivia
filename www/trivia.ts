@@ -6,7 +6,8 @@ import SocketHandler, {SocketHandler as SocketClass} from "./SocketHandler";
 import * as fs from "fs";
 import Authorization from "./authorization";
 import {info, log} from "../util/logger";
-import {Database} from "./DatabaseHandler";
+import {Database} from "../util/db/DatabaseHandler";
+import {Cursor} from "mongodb";
 
 
 export let games = {};
@@ -118,7 +119,7 @@ const middleware = function(opts?:any) {
         let current = req.trivia.game;
         if (current && !doUpdate) {
             games[current.token] = current;
-            log(current.update(), current.needsUpdate)
+            //log(current.update(), current.needsUpdate)
             if (current.update()) {
                 //games[current.token] = current;
                 log(current.token, "needs update:", current.needsUpdate)
@@ -149,7 +150,7 @@ export const getAllGames = async function(forced?:boolean) {
         let tmp = {} as any;
         const db = new Database();
         return db.openCollection("games").then(async () => {
-            let gamesData = db.find({});
+            let gamesData = db.find({}) as Cursor;
             if (await gamesData.count() > 0) {
 
                 await gamesData.forEach((ga: GameOptions) => {
@@ -177,10 +178,10 @@ let stack = [], saveLimiter = {};
  * @param game
  * @returns Promise<boolean>
  */
-export const saveGame = async function(game?:Game, force?:boolean) {
-    force = force || false;
+export const saveGame = async function(game?:Game, _force?:boolean|number) {
+    let force = typeof _force === "boolean" ? _force : false;
+    let timeout = force ? 0 : typeof force === "number" ? force : 5000;
 
-    let timeout = force ? 0 : 5000;
     if (saveLimiter[game.token])
         clearInterval(saveLimiter[game.token]);
 
@@ -192,6 +193,7 @@ export const saveGame = async function(game?:Game, force?:boolean) {
         });
         return response.modifiedCount === 1;
     };
+
     return new Promise((resolve, reject) => {
         if (game) {
             log(games);
@@ -200,7 +202,7 @@ export const saveGame = async function(game?:Game, force?:boolean) {
                 resolve(result);
                 if (!force) {
                     delete games[game.token];
-                    log(games);
+                    //log(games);
                 }
 
                 //await getAllGames(true)
@@ -239,7 +241,7 @@ export const loadGame = async function(token:string):Promise<Game|undefined> {
         const db = new Database();
         await db.openCollection("games");
 
-        let gameQuery = await db.find({token: token} as GameOptions);
+        let gameQuery = await db.find({token: token} as GameOptions) as Cursor;
         //log(token)
         if (await gameQuery.count() > 0) {
             const data = (await gameQuery.toArray())[0] as GameOptions;

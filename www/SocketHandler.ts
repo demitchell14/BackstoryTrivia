@@ -206,8 +206,9 @@ class Connection {
                 if (game.paused) {
                     game.question().resume();
                     Connection.beginQuestion(game.token);
-                } else
-                    game.question().pause();
+                } else {
+                    Connection.stopQuestion(game.token)
+                }
 
                 response.data = {
                     started: game.started,
@@ -236,6 +237,7 @@ class Connection {
                 util: responseUtil()
             } as SocketResponse;
 
+            Connection.stopQuestion(game.token)
             if (game.started) {
                 game.question().next();
                 response.data = {
@@ -259,9 +261,31 @@ class Connection {
         }
     }
 
-    private static beginQuestion(game) {
+    private static stopQuestion(game:string) {
+        const token = game;
+        let interval = questionIntervals[token];
 
-        //return;
+
+        if (game) {
+            const promise = loadGame(game);
+            promise.then((game:Game) => {
+                let question = game.question().current();
+                if (typeof question === "undefined")
+                    throw Error("Game is over, or there was an error.");
+
+                game.update(true);
+                game.question().pause();
+
+                handler.broadcast(`a-${game.token}`, "game toggle", {t: question});
+                handler.broadcast(`g-${game.token}`, "reload");
+                clearInterval(interval);
+                delete questionIntervals[token];
+            })
+        }
+    }
+
+    private static beginQuestion(game) {
+        const token = game;
         if (game) {
             const promise = loadGame(game);
             promise.then((game:Game) => {
@@ -271,18 +295,15 @@ class Connection {
                 game.update(true);
                 let runner = question.start();
                 let state = runner.next();
-                let interval = setInterval(() => {
-                    if (state.done) {
-                        let response = {t: question};
-                        clearInterval(interval);
-                        game.question().pause();
-                        game.update(true);
-                        handler.broadcast(`a-${game.token}`, "game toggle", response);
-                        handler.broadcast(`g-${game.token}`, "reload");
+                questionIntervals[token] = setInterval(() => {
+                //let interval = setInterval(() => {
+                    //game = await loadGame(token);
+                    if (state.done || question.started === false || game.paused || game.started === false) {
+                        this.stopQuestion(token);
                     } else {
                         state = runner.next();
-                        //log(state);
-                        handler.broadcast(`g-${game.token}`, "question timer", state);
+                        game.update(true)
+                        handler.broadcast(`g-${game.token}`, "question timer", {data: state});
                         //handler.broadcast(`g-${game.token}`, "reload");
                     }
                 }, 1000);
@@ -293,6 +314,8 @@ class Connection {
         }
     }
 }
+
+let questionIntervals = {} as any;
 
 const responseUtil = function() {
     return {

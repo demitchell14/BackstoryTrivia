@@ -1,6 +1,6 @@
 import {MiddlewareReq} from "./trivia";
 import {info} from "../util/logger";
-import {Database, SessionObject, UserObject} from "./DatabaseHandler";
+import {Database, SessionObject, UserObject} from "../util/db/DatabaseHandler";
 import {Encryption} from "../config";
 import * as bcrypt from "bcrypt";
 import {v4 as uuid} from "uuid";
@@ -103,7 +103,9 @@ class Authorization {
             }
 
             if (firstTime) {
-                await db.update(query, {
+                //this.error = ["test", "123"];
+                ///return;
+                await db.update(queryParams, {
                     $set: {passwordhash: hash}
                 });
                 this.error = ["First time login successful.", "Please resubmit the form to continue."]
