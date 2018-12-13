@@ -8,7 +8,8 @@ import {getAllGames, MiddlewareReq} from "../../www/trivia";
 import Game from "../../trivia/game/Game";
 import Question from "../../trivia/game/Question";
 import {log} from "../../util/logger";
-import {Database} from "../../www/DatabaseHandler";
+import {Database} from "../../util/db/DatabaseHandler";
+import {Cursor} from "mongodb";
 
 
 const router = express.Router();
@@ -98,7 +99,7 @@ const insertGame = async function(token:string) {
 let gameExists = async function(token) {
     const db = new Database();
     await db.openCollection("games");
-    let x = await db.find({token: token});
+    let x = await db.find({token: token}) as Cursor;
     const res = (await x.count()) > 0;
     db.close();
     return res;

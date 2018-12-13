@@ -1,11 +1,11 @@
 import * as uuidv1 from "uuid/v1";
 import * as express from "express";
 import * as _ from "lodash";
-import {getAllGames, MiddlewareReq, saveGame} from "../../www/trivia";
+import {getAllGames, loadGame, MiddlewareReq, saveGame} from "../../www/trivia";
 import Game, {GameOptions} from "../../trivia/game/Game";
 import Question from "../../trivia/game/Question";
 import SocketHandler from "../../www/SocketHandler";
-import {Database} from "../../www/DatabaseHandler";
+import {Database} from "../../util/db/DatabaseHandler";
 import {log} from "../../util/logger";
 
 const router = express.Router();
@@ -105,16 +105,19 @@ router.get("/list", async function(req:MiddlewareReq, res, next) {
 
 router.get("/question", async function(req:MiddlewareReq, res, next) {
     let teamAuth = req.headers.token,
-        game = req.trivia.game,
+        game = await loadGame(req.headers.game), ///req.trivia.game,
         response = {} as any;
 
-    //log(game);
+    log(game, teamAuth);
 
     if (game.hasTeam(teamAuth)) {
+        let team = game.getTeam(teamAuth);
         //let currentQuestionIndex, currentQuestion:Question;
         let question:Question;
         let qIndex = game.getCurrentQuestionIndex();
 
+        console.log(team)
+        //team.hasAnswer(question.question)
         switch (qIndex) {
             case -100: //Game over
                 response.error = "Game is over.";
@@ -126,6 +129,7 @@ router.get("/question", async function(req:MiddlewareReq, res, next) {
                         response.error = "Waiting for question.";
                         question = undefined;
                     }
+
                 } else {
                     response.error = "Game is over or there was an error.";
                 }
@@ -157,7 +161,7 @@ router.post("/question/answer", async function(req:MiddlewareReq, res, next) {
 
         let choice = question.getChoice(req.body.answer)
 
-        //console.log(choice);
+        //log(choice);
         try {
             let ans = team.answer(question, choice)
             response.answer = ans;
@@ -177,10 +181,13 @@ router.post("/question/answer", async function(req:MiddlewareReq, res, next) {
 
 router.options("/authorize", async function(req:MiddlewareReq, res, next) {
     let game = req.trivia.game;
+
+    log(game, req.headers.token)
     if (req.headers.token) {
         if (game.hasTeam(req.headers.token)) {
             let team = game.getTeam(req.headers.token);
             team.setKey(uuidv1());
+
             res.send(team.key);
         } else {
             res.sendStatus(403);

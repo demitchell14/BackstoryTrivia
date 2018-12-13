@@ -45,7 +45,7 @@ router.post("/authorize", async function(req:MiddlewareReq, res, next) {
 
     } else {
         // error
-        res.sendStatus(400);
+        res.status(400).json({error: "No data sent"});
     }
 
 });

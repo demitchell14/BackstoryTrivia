@@ -1,7 +1,7 @@
 import * as uuidv1 from "uuid/v1";
 import * as express from "express";
 import * as _ from "lodash";
-import {MiddlewareReq} from "../../www/trivia";
+import {MiddlewareReq, saveGame} from "../../www/trivia";
 import Team from "../../trivia/game/Team";
 import Player from "../../trivia/game/Player";
 import Game from "../../trivia/game/Game";
@@ -33,7 +33,7 @@ router.get("/gamelist", async function(req:MiddlewareReq, res, next) {
         })
     });
 
-    //console.log(games);
+    //log(games);
     res.json(games);
 });
 
@@ -55,6 +55,7 @@ router.post("/register/team", async function(req:MiddlewareReq, res, next) {
     });
     if (!game.hasTeam(team.name)) {
         game.addTeam(team);
+
         res.status(201).json({
             game: {
                 token: game.token
