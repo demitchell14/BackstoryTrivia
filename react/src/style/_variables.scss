@@ -1,0 +1,60 @@
+$primary:     #6F5998;
+//$success:     #C1F7DC;
+$secondary:   #F6F7EB;
+$sky:         #DFFDFF;
+$dark:        #464655;
+
+//$enable-rounded:            false;
+
+$theme-colors: (
+        "primary":  $primary,
+        "secondary": $secondary,
+        "success":  $success,
+        "error": theme-color-level(danger, -6),
+        "sky": $sky,
+        "dark": $dark,
+        "info":       $info,
+        "warning":    $warning,
+        "danger":     $danger,
+        "light":      $light
+);
+
+$box-shadow:            0 .5rem 1rem rgba($black, .3);
+$enable-shadows:        true;
+
+$btn-focus-box-shadow:  0;
+$theme-color-interval:  7.5%;
+
+$input-color:           $gray-700;
+$link-color:            theme-color("primary");
+
+$component-active-bg:   theme-color("primary");
+
+$input-btn-focus-color: rgba($component-active-bg, .25);
+$input-btn-focus-box-shadow:  0;
+$input-focus-box-shadow: 0;
+
+$input-btn-focus-width:       .2rem;
+$input-btn-focus-color:       rgba($component-active-bg, .25);
+$input-btn-focus-box-shadow:  0 0 0 $input-btn-focus-width $input-btn-focus-color;
+
+
+
+$input-focus-bg:                        white;
+$input-focus-border-color:              lighten($component-active-bg, 25%);
+$input-focus-color:                     $input-color;
+$input-focus-width:                     $input-btn-focus-width;
+$input-focus-box-shadow:                $input-btn-focus-box-shadow;
+
+/*$theme-colors: (
+        "primary":    $primary,
+        "secondary":  $secondary,
+        "success":    $success,
+        "info":       $info,
+        "warning":    $warning,
+        "danger":     $danger,
+        "light":      $light,
+        "dark":       $dark,
+);*/
+
+$sidebar-width: 260px;
