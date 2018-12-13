@@ -4,6 +4,7 @@ import * as SocketIO from "socket.io-client";
 import {GameOptions, Question} from "../../routes/GameList";
 import {Api} from "../../store/api";
 import ManageQuestionComponent from "./ManageQuestionComponent";
+import TimeBarComponent from "../TimeBarComponent";
 
 let api = Api();
 class GameControllerComponent extends React.Component<GameControllerProps, GameControllerState> {
@@ -53,6 +54,7 @@ class GameControllerComponent extends React.Component<GameControllerProps, GameC
                 socket.on("game stop", genericSocketFunction);
                 socket.on("game toggle", genericSocketFunction)
                 socket.on("team answered", genericSocketFunction);
+                socket.on("question timer", genericSocketFunction);
             })
         }
     }
@@ -61,6 +63,7 @@ class GameControllerComponent extends React.Component<GameControllerProps, GameC
         const socket = this.state.socket;
         socket.disconnect();
     }
+
 
     // @ts-ignore
     private teamAnswered(ans) {
@@ -95,13 +98,13 @@ class GameControllerComponent extends React.Component<GameControllerProps, GameC
     public render() {
         // @ts-ignore
         let data = this.props.game.questions[this.props.game.currentQuestionId] || {} as Question;
-        let answer;
+
+        let correctAnswer = "";
         if (data.choices && data.choices.length > 0) {
-            const tmp = data.choices.find(c => c.correct);
-            if (tmp) answer = tmp.answer;
-        } else {
-            answer = data.answer;
-        }
+            let ans = data.choices.find(c => c.correct)
+            if (ans) correctAnswer = ans.answer;
+        } else correctAnswer = data.answer;
+
 
         return (
             <div className={"card"}>
@@ -118,17 +121,28 @@ class GameControllerComponent extends React.Component<GameControllerProps, GameC
                                 <div className={"col text-center"}>{this.resetBtn()}</div>
                             </div>
                             <hr/>
-                            {this.props.game.started && this.props.game.paused ? (
-                                <div className={"alert alert-danger"}>
-                                    <p className={"mb-0 lead"}>Game is Paused!</p>
+                            {this.props.game.started ? (
+                                <div className={`alert alert-${this.props.game.paused || this.props.game.currentQuestionId < 0 ? "danger" : "success"}`}>
+                                    <h5 className={"alert-heading"}>{this.props.game.paused || this.props.game.currentQuestionId < 0 ? "Game State" : "Time Left"}</h5>
+                                    {this.props.game.paused || this.props.game.currentQuestionId < 0 ? (
+                                        <p className={"mb-0 lead"}>Game is Paused!</p>
+                                    ) : (
+                                        <TimeBarComponent
+                                            className={"d-block my-2"}
+                                            label={false}
+                                            color={"success"}
+                                            current={data.timeLeft}
+                                            max={data.timeLimit}/>
+                                    )}
                                 </div>
                             ) : ""}
                             {data.question && this.props.game.started ? (
                                     <div className={"alert alert-info"}>
+
                                         <h5 className={"alert-heading"}>Current Question</h5>
                                         <p className={"mb-0"}>{data.question ? data.question : "Unknown."}</p>
                                         <hr/>
-                                        <p className={"mb-0"}><b>Correct Answer:</b> {answer}</p>
+                                        <p className={"mb-0"}><b>Correct Answer:</b> {correctAnswer}</p>
                                     </div>
                             ) : ""}
                             <div className={"row mt-3"}>
