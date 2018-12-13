@@ -13,10 +13,10 @@ import {log} from "./util/logger";
 
 // -- Routes
 import ApiV1 from "./api/v1/index";
+import ApiV2 from "./api/v2/index";
 import React from "./www/React";
 // -- End Routes
 import * as compression from "compression";
-
 
 /**
  *
@@ -35,11 +35,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 //log(path.join(process.cwd(), "./react/build"))
-app.use(Middleware());
+// app.use();
 if (process.env.NODE_ENV && process.env.NODE_ENV.trim() === "production") {
     app.use('/', React);
 }
-app.use('/api/v1', ApiV1);
+app.use('/api/v1', Middleware(), ApiV1);
+app.use('/api/v2', ApiV2);
 
 
 export function SocketInit(server:Server) {
