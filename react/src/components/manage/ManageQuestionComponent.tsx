@@ -72,7 +72,7 @@ class ManageQuestionComponent extends React.Component<ManageQuestionProps, Manag
         }
 
         let elements = teams.map((team, id) => {
-            console.log(team);
+            //console.log(team);
             if (typeof team.correct === "boolean") {
                 return (
                     <li key={`${this.props.questionid}-${id}`}
@@ -102,7 +102,7 @@ class ManageQuestionComponent extends React.Component<ManageQuestionProps, Manag
 
         [].push.apply(response, elements);
 
-        console.log(this.props.questionid, teams)
+        //console.log(this.props.questionid, teams)
 
         return response;
     }
