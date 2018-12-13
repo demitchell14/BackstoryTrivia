@@ -1,7 +1,9 @@
 import * as mongo from "mongodb";
-import {MongoDetails} from "../config"
+import {MongoDetails} from "../../config"
 import {Collection, Cursor, FilterQuery, MongoClient, ObjectID, UpdateQuery} from "mongodb";
-import {GameOptions} from "../trivia/game/Game";
+import {GameOptions} from "../../trivia/game/Game";
+import {FindAndModifyWriteOpResultObject} from "mongodb";
+import {User} from "../../react/src/store/session";
 
 export class Database {
 
@@ -25,13 +27,20 @@ export class Database {
         this._collection = collection;
         return this;
     }
-    public find(query:FilterQuery<UserObject|SessionObject|GameOptions>):Cursor<UserObject|SessionObject|GameOptions> {
+
+    public find(query:FilterQuery<Object>): Cursor<Object>;
+    public find(query:FilterQuery<Object>, update?:UpdateQuery<Object>): Promise<FindAndModifyWriteOpResultObject<Object>>;
+    public find(query:FilterQuery<Object>, update?:UpdateQuery<Object>) {
         this.resetTimeout();
         const col = this.collection;
+        //col.find({email: { $}})
+        if (update) {
+            return col.findOneAndUpdate(query, update);
+        }
         return col.find(query);
     }
 
-    public async update(query:FilterQuery<UserObject|SessionObject|GameOptions>, update:UpdateQuery<UserObject|SessionObject|GameOptions>) {
+    public async update(query:FilterQuery<UserObject|TeamObject|SessionObject|GameOptions>, update:UpdateQuery<UserObject|TeamObject|SessionObject|GameOptions>) {
         this.resetTimeout();
         const col = this.collection;
 
@@ -39,7 +48,7 @@ export class Database {
         return await col.updateOne(query, update)
     }
 
-    public async insert(query:Partial<UserObject|SessionObject>) {
+    public async insert(query:Partial<UserObject|SessionObject|TeamObject>) {
         this.resetTimeout();
         const col = this.collection;
         let base;
@@ -81,6 +90,24 @@ export interface UserObject {
     passwordhash: string;
     lastAuth: string;
     session?:string;
+
+    //V2
+    pin?: string;
+    savedUIDs?:Array<string>;
+}
+
+export interface TeamObject {
+    _id: ObjectID;
+    teamName: string;
+    email: string;
+    hashedPassword: string;
+    hashedPin: string;
+    savedUIDs: Array<string>;
+
+    image?: string;
+    players?: Array<string>;
+
+    //autologin?: boolean;
 }
 
 export interface SessionObject {
