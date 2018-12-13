@@ -16,7 +16,8 @@
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-scripts-ts": "3.1.0",
-    "socket.io-client": "^2.1.1"
+    "socket.io-client": "^2.1.1",
+    "unstated": "^2.1.1"
   },
   "proxy": "http://localhost:8080/",
   "scripts": {
@@ -24,7 +25,7 @@
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
-    "scss": "sass --watch src/scss:src/css",
+    "scss": "sass --watch src:src",
     "analyze": "source-map-explorer build/static/js/main.*"
   },
   "devDependencies": {
