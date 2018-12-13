@@ -120,6 +120,7 @@ export interface GameOptions {
 }
 
 export interface Question {
+    _id: any;
     answer: string;
     choices?: Array<{
         answer:string;
