@@ -79,7 +79,7 @@ export class User {
             body: JSON.stringify(opts)
         });
 
-        if (response.status === 200) {
+        if (response.status < 500) {
             let json = await response.json() as UserResponseProps;
             json._session = json.session;
             delete json.session;
@@ -103,6 +103,29 @@ export class User {
             //this._isAuthorized = bool;
         }
         return this._isAuthorized;
+    }
+    
+    public waitForAuthorization():Promise<this> {
+        const MAX = 4*30; // 30 second timeout
+        let timeout = 0;
+        return new Promise((resolve, reject) => {
+            let waiter = (() => {
+                setTimeout(() => {
+                    if (this._isAuthorized) {
+                        console.log(`Waited ${timeout} iterations.`)
+                        resolve(this);
+                    } else {
+                        if (timeout > MAX) {
+                            reject("Unable to authorize.");
+                        } else {
+                            timeout++;
+                            waiter();
+                        }
+                    }
+                }, 250);
+            });
+            waiter();
+        });
     }
 }
 
