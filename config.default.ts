@@ -13,10 +13,10 @@ export const Encryption = {
 };
 
 export const MongoDetails = {
-    baseurl: "ds029541.mlab.com:29541",
-    username: "trivia",
-    password: "trivia123",
-    db: "sockettrivia",
+    baseurl: process.env.MONGO_URL,
+    username: process.env.MONGO_USER,
+    password: process.env.MONGO_PASS,
+    db: process.env.MONGO_DB,
     maxSavedSessions: 15,
 };
 
