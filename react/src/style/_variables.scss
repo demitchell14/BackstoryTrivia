@@ -3,6 +3,7 @@ $primary:     #6F5998;
 $secondary:   #F6F7EB;
 $sky:         #DFFDFF;
 $dark:        #464655;
+$bs:          #b28564;
 
 //$enable-rounded:            false;
 
@@ -16,7 +17,8 @@ $theme-colors: (
         "info":       $info,
         "warning":    $warning,
         "danger":     $danger,
-        "light":      $light
+        "light":      $light,
+        "bs":         $bs
 );
 
 $box-shadow:            0 .5rem 1rem rgba($black, .3);
