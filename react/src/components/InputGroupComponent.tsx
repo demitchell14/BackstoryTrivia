@@ -65,7 +65,7 @@ class InputGroupComponent extends React.Component<InputProps, InputState> {
         let inputClass = this.state.type === "inline" ? "col" : "col-12";
 
         return (
-            <div className="form-row my-1">
+            <div className={`form-row my-1 ${this.props.className}`}>
                 <div className={labelClass}>
                     {this.state.label}
                 </div>
@@ -95,6 +95,7 @@ interface InputProps {
     type?:string;
     state?:InputState;
     children?:any;
+    className?: string;
 }
 
 interface InputState {
