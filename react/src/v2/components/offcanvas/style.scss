@@ -1,0 +1,27 @@
+@import "../../../style/core";
+
+.offcanvas {
+  position: relative;
+  //overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+  //height: fit-content;
+
+  .offcanvas-sidebar {
+    display: block;
+    position: absolute;
+    padding-left: .5rem;
+    padding-right: .5rem;
+    transition-timing-function: ease-in-out;
+    transition-property: transform;
+    //transition: .4s transform;
+  }
+
+  .offcanvas-body {
+    min-height: 1400px;
+    transition-timing-function: ease-in-out;
+    transition-property: margin-left;
+    overflow-x: hidden;
+    //transition: .4s margin-left;
+  }
+}
