@@ -21,6 +21,14 @@ let activatedUrls = [
     "/api/v1/game/pause",
     "/api/v1/game/resume",
     "/api/v1/game",
+    "/register/team",
+    "/manage/game/save",
+    "/game/authorize",
+    "/game/question/answer",
+    "/game/question",
+    "/game/pause",
+    "/game/resume",
+    "/game",
 ];
 
 let userAuthentation = [
@@ -64,6 +72,7 @@ const middleware = function(opts?:any) {
             let url = req.url;
             url = "/" + url.split("/").filter(a => a.trim().length > 0).join("/")
             //log(u, req.url, req.baseUrl, req.originalUrl);
+
             if (typeof u === "string")
                 return u === url;
             if (u instanceof RegExp) {
@@ -75,6 +84,7 @@ const middleware = function(opts?:any) {
         };
 
 
+        //console.log("Got Here!")
         if (a = activatedUrls.find(func)) {
             let gameToken = req.body.game;
             // -- Get the Game ID from either body.token or headers.game
@@ -86,6 +96,8 @@ const middleware = function(opts?:any) {
             }
 
             let nGame = await loadGame(gameToken);
+
+            //console.log(nGame)
 
             if (nGame instanceof Game)
                 req.trivia.game = nGame;
