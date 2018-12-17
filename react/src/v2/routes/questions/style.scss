@@ -1,0 +1,36 @@
+@import "../../../style/core";
+
+.questions {
+  //height: 100%;
+  //overflow-y: auto;
+  .hamburger-inner {
+    &,
+    &::before,
+    &::after {
+      background-color: #000 !important;
+
+    }
+  }
+
+  .blocker {
+    //margin-bottom: 12rem;
+  }
+  .filter-nav {
+    //margin-top: -12rem;
+    z-index: 100;
+    &.sticky {
+      position: fixed;
+
+      margin-top: 0;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
+
+
+  }
+
+  & > .creator-wrapper {
+
+  }
+}
