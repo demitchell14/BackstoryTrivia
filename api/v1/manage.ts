@@ -18,7 +18,23 @@ const router = express.Router();
 
 router.post("/game/save", async function(req:SaveRequest, res, next) {
 
-    let game = req.trivia.game;
+    let {game, user} = req.trivia;
+
+    if (req.trivia.error) {
+        res.status(req.trivia.statusCode).send(req.trivia.error);
+        return;
+    }
+    if (!user.authorized) {
+        res.sendStatus(403)
+        return;
+    }
+
+    if (game.started) {
+        res.status(400).send("Game is running")
+        return;
+    }
+
+    game.question().pause();
 
     if (req.body instanceof Array) {
         req.body.map(({key, value}) => {
@@ -26,7 +42,11 @@ router.post("/game/save", async function(req:SaveRequest, res, next) {
                 case "name":
                     return game.setName(value);
                 case "token":
-                    return game.setToken(value);
+                    let tmp = _.cloneDeep(game),
+                        ret = tmp.setToken(value);
+
+                    delete req.trivia.games[game.token];
+                    return ret;
                 case "started":
                     return game.setStarted(value)
                 case "questions":
@@ -41,10 +61,15 @@ router.post("/game/save", async function(req:SaveRequest, res, next) {
                 default:
                     game[key] = value;
             }
+            //game.update(true);
         })
+        //req.forceUpdate();
+    } else {
+        res.status(400).send("Malformed data");
+        return;
     }
 
-    req.forceUpdate();
+    //req.forceUpdate();
 
     //log(req.trivia);
     log(game)

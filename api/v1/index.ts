@@ -45,6 +45,10 @@ router.get("/gamelist2", async function(req:MiddlewareReq, res, next) {
 
 router.post("/register/team", async function(req:MiddlewareReq, res, next) {
     const game = req.trivia.game;
+    if (req.trivia.error) {
+        res.status(req.trivia.statusCode).send(req.trivia.error);
+        return;
+    }
 
     let data = _.cloneDeep(req.body) as RegisterTeamOpts;
     delete data.token;

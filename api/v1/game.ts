@@ -105,10 +105,18 @@ router.get("/list", async function(req:MiddlewareReq, res, next) {
 
 router.get("/question", async function(req:MiddlewareReq, res, next) {
     let teamAuth = req.headers.token,
-        game = await loadGame(req.headers.game), ///req.trivia.game,
+        game = req.trivia.game,  //await loadGame(req.headers.game), ///req.trivia.game,
         response = {} as any;
 
-    log(game, teamAuth);
+    if (req.trivia.error) {
+        res.status(req.trivia.statusCode).send(req.trivia.error);
+        return;
+    }
+
+    if (typeof teamAuth !== "string") {
+        res.sendStatus(403);
+        return;
+    }
 
     if (game.hasTeam(teamAuth)) {
         let team = game.getTeam(teamAuth);
@@ -142,6 +150,9 @@ router.get("/question", async function(req:MiddlewareReq, res, next) {
             delete q.answer;
             response.question = q;
         }
+    } else {
+        res.sendStatus(403);
+        return;
     }
 
 
@@ -149,12 +160,19 @@ router.get("/question", async function(req:MiddlewareReq, res, next) {
 });
 
 router.post("/question/answer", async function(req:MiddlewareReq, res, next) {
+
+    if (req.trivia.error) {
+        res.status(req.trivia.statusCode).send(req.trivia.error);
+        return;
+    }
+    let status = 200;
     let sock = SocketHandler();
     let teamAuth = req.headers.token,
         game = req.trivia.game,
         response = {} as any;
 
-    log(sock)
+
+    //log(sock)
     if (game.hasTeam(teamAuth)) {
         const team = game.getTeam(teamAuth);
         let question = game.question().current();
@@ -165,18 +183,24 @@ router.post("/question/answer", async function(req:MiddlewareReq, res, next) {
         try {
             let ans = team.answer(question, choice)
             response.answer = ans;
+            // TODO - status = 201;
         } catch (err) {
-            console.error(err);
+            //res.status(403).send(`${team.name} has already answered this question!`)
+            //return;
+            status = 403;
+            response.error = `${team.name} has already answered this question!`;
+            //console.error(err);
         }
-
-        log(team);
+        //log(team);
+        game.update(true)
         sock.broadcast(`a-${game.token}`, "team answered", {team: team.name, answer: response.answer});
     } else {
+        status = 401;
         response.error = "Invalid team";
     }
 
     response.ok = "ok";
-    res.json(response);
+    res.status(status).json(response);
 })
 
 router.options("/authorize", async function(req:MiddlewareReq, res, next) {

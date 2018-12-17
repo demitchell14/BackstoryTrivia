@@ -21,6 +21,16 @@ let activatedUrls = [
     "/api/v1/game/pause",
     "/api/v1/game/resume",
     "/api/v1/game",
+
+
+    "/register/team",
+    "/manage/game/save",
+    "/game/authorize",
+    "/game/question/answer",
+    "/game/question",
+    "/game/pause",
+    "/game/resume",
+    "/game",
 ];
 
 let userAuthentation = [
@@ -49,6 +59,7 @@ const middleware = function(opts?:any) {
         if (typeof req.trivia === "undefined") {
             // @ts-ignore
             req.trivia = {};
+            req.trivia.statusCode = 200;
         }
         if (typeof req.trivia.socket === "undefined") {
             req.trivia.socket = sock;
@@ -81,7 +92,11 @@ const middleware = function(opts?:any) {
             if (typeof gameToken === "undefined") {
                 gameToken = req.headers.game;
                 if (typeof gameToken === "undefined") {
-                    throw new Error("No game defined");
+                    req.trivia.error = "No game defined";
+                    req.trivia.statusCode = 404;
+                    next();
+                    return;
+                    //throw new Error("No game defined");
                 }
             }
 
@@ -92,6 +107,10 @@ const middleware = function(opts?:any) {
             else {
                 if (typeof nGame !== "undefined")
                     req.trivia.game = new Game(nGame)
+                else {
+                    req.trivia.statusCode = 404;
+                    req.trivia.error = "Game not found";
+                }
             }
 
             info(`${a} requires a game instance.`)
@@ -122,9 +141,11 @@ const middleware = function(opts?:any) {
             //log(current.update(), current.needsUpdate)
             if (current.update()) {
                 //games[current.token] = current;
-                log(current.token, "needs update:", current.needsUpdate)
+                //console.log(current.token, "needs update:", current.needsUpdate)
+                console.log(current);
                 saveGame(current).then(res => {
-                    log(`${current.token} was ${res ? "successfully" : "not successfully"} saved.`);
+                    console.log(res)
+                    console.log(`${current.token} was ${res ? "successfully" : "not successfully"} saved.`);
                 })
             }
         } else
@@ -185,6 +206,7 @@ export const saveGame = async function(game?:Game, _force?:boolean|number) {
     if (saveLimiter[game.token])
         clearInterval(saveLimiter[game.token]);
 
+    //console.log(saveLimiter)
     const fn = async () => {
         const db = new Database();
         await db.openCollection("games");
@@ -196,7 +218,7 @@ export const saveGame = async function(game?:Game, _force?:boolean|number) {
 
     return new Promise((resolve, reject) => {
         if (game) {
-            log(games);
+            console.log(games);
             saveLimiter[game.token] = setTimeout(async () => {
                 let result = await fn();
                 resolve(result);
@@ -264,6 +286,8 @@ export interface MiddlewareReq<G = {}> extends Request {
         games: G;
         socket?: SocketClass;
         user?:Authorization;
+        error?:any;
+        statusCode:number;
     }
     forceUpdate:() => void;
     headers: {
