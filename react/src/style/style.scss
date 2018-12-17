@@ -11,14 +11,18 @@
 @import "../../node_modules/bootstrap/scss/grid";
 @import "../../node_modules/bootstrap/scss/jumbotron";
 @import "../../node_modules/bootstrap/scss/utilities";
+@import "../../node_modules/bootstrap/scss/card";
 @import "../../node_modules/bootstrap/scss/tables";
+@import "../../node_modules/bootstrap/scss/custom-forms";
 @import "../../node_modules/bootstrap/scss/forms";
 @import "../../node_modules/bootstrap/scss/buttons";
 @import "../../node_modules/bootstrap/scss/print";
 @import "../../node_modules/bootstrap/scss/button-group";
 @import "../../node_modules/bootstrap/scss/dropdown";
-//@import "../../node_modules/bootstrap/scss/list-group";
+@import "../../node_modules/bootstrap/scss/list-group";
 @import "../../node_modules/bootstrap/scss/alert";
+@import "../../node_modules/bootstrap/scss/input-group";
+//@import "../../node_modules/bootstrap/scss/modal";
 
 @import "../../node_modules/bootstrap/scss/nav";
 @import "../../node_modules/bootstrap/scss/navbar";
@@ -26,16 +30,24 @@
 @import "_custom";
 
 
-.wrapper {
-  overflow: hidden;
-  height: 100%;
-  height: 100vh;
+$hamburger-layer-color         : #fff;
+@import "./hamburgers/hamburgers";
 
+
+.wrapper {
+  overflow-x: hidden;
+  height: 100%;
+  //height: 100vh;
+
+  main {
+    //height: 100%;
+  }
 }
 
 
 .canvas-body {
   height: 100%;
+  //overflow-y: hidden;
   &:after {
     transition: .3s opacity;
     position:absolute;
@@ -47,7 +59,7 @@
   }
   &.active {
     &:after {
-      height: 100%;
+      //height: 100%;
       width: 100%;
       opacity: .3;
     }
