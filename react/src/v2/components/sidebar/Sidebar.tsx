@@ -5,6 +5,9 @@ import "./style.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Link} from "react-router-dom";
 import {IconLookup} from '@fortawesome/fontawesome-svg-core';
+import {Subscribe} from "unstated";
+import AdminAuthorization from "../../handlers/authorization/AdminAuthorization";
+import {AuthTemplate} from "../../handlers/authorization/Authorization";
 
 class Sidebar extends React.Component<SidebarProps, SidebarState> {
     public state = {
@@ -39,6 +42,40 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
         link:string;
     }>;
 
+    public renderQuickNav() {
+        return (
+            <Subscribe to={[AdminAuthorization]}>
+                {(auth:AuthTemplate) => {
+                    return (
+                        <section className={"sb-nav"}>
+                            <div className={"sb-nav-item"}>
+                                <a href={"#"} onClick={(e) => e.preventDefault()}>
+                                    <FontAwesomeIcon fixedWidth={true}
+                                                     className={"ico"} icon={["fal", "user-circle"]}/>
+                                    <p className={"text"}>My Account</p>
+                                </a>
+                            </div>
+                            {auth.isLoggedIn() ? (
+                                <div className={"sb-nav-item"}>
+                                    <a href={"#"} onClick={(e) => {
+                                        e.preventDefault();
+                                        auth.reset();
+                                    }}>
+                                        <FontAwesomeIcon fixedWidth={true}
+                                                         className={"ico"} icon={["fal", "sign-out"]}/>
+                                        <p className={"text"}>Sign Out</p>
+                                    </a>
+                                </div>
+                            ) : undefined}
+                        </section>
+                    )
+                }}
+            </Subscribe>
+        )
+    }
+
+
+
 
     public render() {
         // @ts-ignore
@@ -52,23 +89,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
                         <p className={"sb-subtitle"}>Join us every Sunday!</p>
                     </Link>
                 </section>
-                <section className={"sb-nav"}>
-                    <div className={"sb-nav-item"}>
-                        <a href={"#"} onClick={(e) => e.preventDefault()}>
-                            <FontAwesomeIcon fixedWidth={true}
-                                             className={"ico"} icon={["fal", "user-circle"]}/>
-                            <p className={"text"}>My Account</p>
-                        </a>
-                    </div>
-
-                    <div className={"sb-nav-item"}>
-                        <a href={"#"} onClick={(e) => e.preventDefault()}>
-                        <FontAwesomeIcon fixedWidth={true}
-                                         className={"ico"} icon={["fal", "sign-out"]}/> 
-                        <p className={"text"}>Sign Out</p>
-                        </a>
-                    </div>
-                </section>
+                {this.renderQuickNav()}
                 <section className={"sb-body"}>
                     <ul className={"list"}>
                         {this.listBody.map((link, k) => (

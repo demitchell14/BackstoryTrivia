@@ -118,7 +118,10 @@
       transition: color,background .25s;
 
       &:hover {
-        background: theme-color(bs);
+        &:active {
+          background: theme-color(bs);
+        }
+        background: theme-color-level(bs, -3);
         color: white;
         .ico {
           animation: bounce-left 0.65s ease-in-out alternate both;
