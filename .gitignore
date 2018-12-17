@@ -9,6 +9,8 @@
 *.iml
 out
 gen
+app.yaml
+config.ts
 
 package-lock.json
 Game/**
