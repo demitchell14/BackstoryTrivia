@@ -25,7 +25,7 @@ class Heading extends React.Component<HeadingProps, HeadingState> {
                     </div>
                 </div>
                 <div className={"heading-body"}>
-                    <h3>A Title</h3>
+                    <h3 className={"mb-0"}>A Title</h3>
                 </div>
                 <div className={"logo"}>
                     <img src={logo} height={75} width={126}/>
