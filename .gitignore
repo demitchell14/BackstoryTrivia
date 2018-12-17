@@ -16,6 +16,8 @@ config.ts
 
 Game/**
 
+trivia/**/*
+
 routes2/**/*
 ejs2/**/*
 dist/**/*
@@ -96,3 +98,4 @@ typings/
 .serverless
 
 key.json.enc
+/trivia/

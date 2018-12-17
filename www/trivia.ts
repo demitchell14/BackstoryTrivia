@@ -264,6 +264,8 @@ export interface MiddlewareReq<G = {}> extends Request {
         games: G;
         socket?: SocketClass;
         user?:Authorization;
+        error?: any;
+        statusCode?: any;
     }
     forceUpdate:() => void;
     headers: {

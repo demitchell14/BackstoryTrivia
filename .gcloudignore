@@ -26,6 +26,8 @@ tsconfig.*
 readme.md
 README.md
 
+*.patch
+
 react/src
 react/test
 react/public
