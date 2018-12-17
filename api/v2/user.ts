@@ -44,10 +44,16 @@ class UserRouting {
         const {email, password, pin, autologin} = body;
         let authkey, _id;
         if (params.authkey) {
-            authkey = await jwt.verify(params.authkey);
-            _id = ObjectID.createFromHexString(authkey._id);
-            console.log(authkey)
+            let proceed = true;
+            authkey = await jwt.verify(params.authkey).catch(err => {
+                console.log(err)
+            });
+            if (authkey) {
+                _id = ObjectID.createFromHexString(authkey._id);
+                //console.log(authkey)
+            }
         }
+
 
         let queryParams = {_id, email} as any;
         if (typeof queryParams._id === "undefined")
@@ -69,7 +75,7 @@ class UserRouting {
             if (count) {
                 const results = await query.next() as UserObject;
 
-                const token = jwt.sign({_id, autologin }, autologin ? "14d" : undefined);
+                const token = jwt.sign({_id, autologin: authkey.autologin }, authkey.autologin ? "14d" : undefined);
                 res.json({token, email: results.email});
                 this.updateUser(req, results);
                 return;
