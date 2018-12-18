@@ -95,6 +95,14 @@ class GameControllerComponent extends React.Component<GameControllerProps, GameC
     public render() {
         // @ts-ignore
         let data = this.props.game.questions[this.props.game.currentQuestionId] || {} as Question;
+        let answer;
+        if (data.choices && data.choices.length > 0) {
+            const tmp = data.choices.find(c => c.correct);
+            if (tmp) answer = tmp.answer;
+        } else {
+            answer = data.answer;
+        }
+
         return (
             <div className={"card"}>
                 <div className={"card-body"}>
@@ -120,7 +128,7 @@ class GameControllerComponent extends React.Component<GameControllerProps, GameC
                                         <h5 className={"alert-heading"}>Current Question</h5>
                                         <p className={"mb-0"}>{data.question ? data.question : "Unknown."}</p>
                                         <hr/>
-                                        <p className={"mb-0"}><b>Correct Answer:</b> {data.choices ? data.choices.length > 0 ? data.choices.find(c => c.correct).answer : data.answer : data.answer}</p>
+                                        <p className={"mb-0"}><b>Correct Answer:</b> {answer}</p>
                                     </div>
                             ) : ""}
                             <div className={"row mt-3"}>

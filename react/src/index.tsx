@@ -7,6 +7,7 @@ import { library} from "@fortawesome/fontawesome-svg-core";
 import {faCaretDown, faCaretUp, faCaretCircleDown, faCaretCircleUp} from "@fortawesome/pro-solid-svg-icons";
 import {faTrashAlt} from "@fortawesome/pro-light-svg-icons";
 
+// @ts-ignore
 library.add(faTrashAlt, faCaretDown, faCaretUp, faCaretCircleDown, faCaretCircleUp);
 
 //import registerServiceWorker from './registerServiceWorker';
