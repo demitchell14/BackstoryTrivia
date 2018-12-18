@@ -30,6 +30,8 @@ react/src
 react/test
 react/public
 
+trivia/**/*
+
 **/*.ts
 **/*.tsx
 
