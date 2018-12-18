@@ -3,12 +3,13 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "commonjs",
-    "allowJs": true,
+    "allowJs": false,
     "sourceMap": true,
+    "declaration": true,
     "outDir": "dist",
     "moduleResolution": "node"
   },
   "include": [
-    "bin", "routes", "app.ts", "config.ts", "www"
+    "bin", "routes", "app.ts", "config.ts", "www", "middleware", "api", "Functions"
   ]
 }

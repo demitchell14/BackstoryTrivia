@@ -18,7 +18,9 @@
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-scripts-ts": "3.1.0",
+    "react-sticky": "^6.0.3",
     "react-swipe-events": "^1.0.3",
+    "react-transition-group": "^2.5.1",
     "socket.io-client": "^2.1.1",
     "unstated": "^2.1.1"
   },
@@ -40,6 +42,8 @@
     "@types/react": "^16.7.3",
     "@types/react-dom": "^16.0.9",
     "@types/react-router-dom": "^4.3.1",
+    "@types/react-sticky": "^6.0.2",
+    "@types/react-transition-group": "^2.0.14",
     "@types/reactstrap": "^6.4.2",
     "@types/socket.io-client": "^1.4.32",
     "http-traffic-simulator": "0.0.8",

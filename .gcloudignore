@@ -33,6 +33,8 @@ react/public
 **/*.ts
 **/*.tsx
 
+*.patch
+
 Functions
 
 

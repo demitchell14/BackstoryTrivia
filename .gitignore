@@ -12,6 +12,8 @@ gen
 app.yaml
 config.ts
 
+*.patch
+
 package-lock.json
 Game/**
 
