@@ -7,12 +7,11 @@ import * as ReactDOM from 'react-dom';
 import { library} from "@fortawesome/fontawesome-svg-core";
 //import {faCaretDown, faCaretUp, faCaretCircleDown, faCaretCircleUp} from "@fortawesome/pro-solid-svg-icons";
 // @ts-ignore
-import {faQuestion, faTools, faGamepad, faChevronLeft, faHome, faSnake, faSignOut, faUserCircle} from "@fortawesome/pro-light-svg-icons";
+import {faCheckCircle, faTimesCircle, faTrashAlt, faQuestion, faFingerprint, faTools, faGamepad, faChevronLeft, faHome, faSnake, faSignOut, faUserCircle} from "@fortawesome/pro-light-svg-icons";
 //import {} from "@fortawesome/pro-regular-svg-icons"
 
-//library.add(faTrashAlt, faCaretDown, faCaretUp, faCaretCircleDown, faCaretCircleUp);
 // @ts-ignore
-library.add(faTools, faQuestion, faSnake, faSignOut, faUserCircle, faGamepad, faHome, faChevronLeft);
+library.add(faCheckCircle, faTimesCircle, faTrashAlt, faFingerprint, faTools, faQuestion, faSnake, faSignOut, faUserCircle, faGamepad, faHome, faChevronLeft);
 
 import Main from "./v2/Main";
 //import HeadingComponent from "./components/HeadingComponent";
