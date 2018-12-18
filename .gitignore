@@ -14,12 +14,8 @@ config.ts
 
 *.patch
 
-app.yaml
-
 package-lock.json
 Game/**
-
-trivia/**/*
 
 routes2/**/*
 ejs2/**/*
@@ -101,4 +97,3 @@ typings/
 .serverless
 
 key.json.enc
-/trivia/

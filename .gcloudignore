@@ -37,6 +37,8 @@ trivia/**/*
 **/*.ts
 **/*.tsx
 
+*.patch
+
 Functions
 
 
