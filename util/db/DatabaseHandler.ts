@@ -1,7 +1,8 @@
 import * as mongo from "mongodb";
 import {MongoDetails} from "../../config"
 import {Collection, Cursor, FilterQuery, MongoClient, ObjectID, UpdateQuery} from "mongodb";
-import {GameOptions} from "../../trivia/game/Game";
+import {GameProps} from "notrivia";
+//import {GameOptions} from "../../trivia/game/Game";
 import {FindAndModifyWriteOpResultObject} from "mongodb";
 import {User} from "../../react/src/store/session";
 
@@ -40,7 +41,7 @@ export class Database {
         return col.find(query);
     }
 
-    public async update(query:FilterQuery<UserObject|TeamObject|SessionObject|GameOptions>, update:UpdateQuery<UserObject|TeamObject|SessionObject|GameOptions>) {
+    public async update(query:FilterQuery<UserObject|TeamObject|SessionObject|GameProps.Game>, update:UpdateQuery<UserObject|TeamObject|SessionObject|GameProps.Game>) {
         this.resetTimeout();
         const col = this.collection;
 

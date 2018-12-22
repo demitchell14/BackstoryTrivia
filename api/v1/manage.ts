@@ -5,8 +5,7 @@ import * as _ from "lodash";
 import * as RandExp from "randexp";
 
 import {getAllGames, MiddlewareReq} from "../../www/trivia";
-import Game from "../../trivia/game/Game";
-import Question from "../../trivia/game/Question";
+import {Game, Question} from "notrivia";
 import {log} from "../../util/logger";
 import {Database} from "../../util/db/DatabaseHandler";
 import {Cursor} from "mongodb";

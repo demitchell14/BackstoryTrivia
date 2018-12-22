@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 import {Request, Response} from "express"
-import Game, {GameOptions} from "../trivia/game/Game";
+import {Game, GameProps} from "notrivia"
 import {Socket} from "socket.io";
 import SocketHandler, {SocketHandler as SocketClass} from "./SocketHandler";
 import * as fs from "fs";
@@ -35,18 +35,6 @@ let userAuthentation = [
     "/api/v1/user/authorize"
 ];
 
-// -------------------------------------------------
-let gameFile = fs.readFileSync("./trivia/json/game123.json", {encoding: "UTF-8"});
-
-const g = JSON.parse(gameFile);
-
-(async () => {
-    const db = new Database();
-    await db.openCollection("games");
-    await db.insert(g)
-
-});
-// --------------------------------------------------
 
 const middleware = function(opts?:any) {
 
@@ -165,7 +153,7 @@ export const getAllGames = async function(forced?:boolean) {
             let gamesData = db.find({}) as Cursor;
             if (await gamesData.count() > 0) {
 
-                await gamesData.forEach((ga: GameOptions) => {
+                await gamesData.forEach((ga: GameProps.Game) => {
                     if (!forced) {
                         games[ga.token] = new Game(ga);
                     }
@@ -253,10 +241,10 @@ export const loadGame = async function(token:string):Promise<Game|undefined> {
         const db = new Database();
         await db.openCollection("games");
 
-        let gameQuery = await db.find({token: token} as GameOptions) as Cursor;
+        let gameQuery = await db.find({token: token} as GameProps.Game) as Cursor;
         //log(token)
         if (await gameQuery.count() > 0) {
-            const data = (await gameQuery.toArray())[0] as GameOptions;
+            const data = (await gameQuery.toArray())[0] as GameProps.Game;
             game = new Game(data);
 
             log(`Loading ${game.token}...`)
