@@ -2,9 +2,7 @@ import * as uuidv1 from "uuid/v1";
 import * as express from "express";
 import * as _ from "lodash";
 import {MiddlewareReq, saveGame} from "../../www/trivia";
-import Team from "../../trivia/game/Team";
-import Player from "../../trivia/game/Player";
-import Game from "../../trivia/game/Game";
+import {Team, Player, Game} from "notrivia";
 
 import GameRoutes from "./game";
 import UserRoutes from "./user";

@@ -62,7 +62,8 @@
     "socket.io": "^2.1.1",
     "typescript": "^3.1.6",
     "uuid": "^3.3.2",
-    "jsonwebtoken": "latest"
+    "jsonwebtoken": "latest",
+    "notrivia": "../trivia"
   },
   "devDependencies": {
     "@babel/core": "^7.1.5",

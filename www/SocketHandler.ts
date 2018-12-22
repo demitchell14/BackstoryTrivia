@@ -2,8 +2,7 @@ import * as SocketIO from "socket.io"
 import * as moment from "moment";
 import {loadGame, saveGame} from "./trivia"
 import {Server} from "http";
-import Game from "../trivia/game/Game";
-import Team from "../trivia/game/Team";
+import {Game, Team} from "notrivia";
 import {log} from "../util/logger";
 
 export class SocketHandler {
