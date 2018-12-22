@@ -7,12 +7,15 @@ import * as ReactDOM from 'react-dom';
 import { library} from "@fortawesome/fontawesome-svg-core";
 //import {faCaretDown, faCaretUp, faCaretCircleDown, faCaretCircleUp} from "@fortawesome/pro-solid-svg-icons";
 // @ts-ignore
-import {faCheckCircle, faTimesCircle, faTrashAlt, faQuestion, faFingerprint, faTools, faGamepad, faChevronLeft, faHome, faSnake, faSignOut, faUserCircle} from "@fortawesome/pro-light-svg-icons";
-//import {} from "@fortawesome/pro-regular-svg-icons"
+import {faCheckCircle, faKeyboard, faEdit, faBallot, faTimes, faSquare, faTimesCircle, faTrashAlt, faQuestion, faFingerprint, faTools, faGamepad, faChevronLeft, faHome, faSnake, faSignOut, faUserCircle} from "@fortawesome/pro-light-svg-icons";
+import {faPlusCircle, faBan, faMinusCircle, faTimesCircle as c2, faUndoAlt} from "@fortawesome/pro-regular-svg-icons";
+
+//import {} from ""
+// @ts-ignore
+library.add(faTimes, faBan, faKeyboard, faEdit, faBallot, faSquare, faCheckCircle, faTimesCircle, c2, faTrashAlt, faUndoAlt, faFingerprint, faTools, faQuestion, faSnake, faSignOut, faUserCircle, faGamepad, faHome, faChevronLeft);
 
 // @ts-ignore
-library.add(faCheckCircle, faTimesCircle, faTrashAlt, faFingerprint, faTools, faQuestion, faSnake, faSignOut, faUserCircle, faGamepad, faHome, faChevronLeft);
-
+library.add(faPlusCircle, faMinusCircle);
 import Main from "./v2/Main";
 //import HeadingComponent from "./components/HeadingComponent";
 //import NavigationComponent from "./components/NavigationComponent";
