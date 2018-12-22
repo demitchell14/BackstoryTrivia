@@ -1,0 +1,24 @@
+.qpt {
+  display: flex;
+  align-items: center;
+  //justify-content: center;
+  .qpt-display {
+    text-align: center;
+    width: 100px;
+    font-size: 2.5em;
+    line-height:1.5;
+    padding: .25rem .5rem;
+    border: none;
+  }
+  .qpt-actions {
+    display: flex;
+    flex-direction: column;
+
+    .qpt-action {
+      font-size: 2em;
+      //border-radius: 25%;
+      //margin: .5rem;
+      //padding: .75rem;
+    }
+  }
+}
