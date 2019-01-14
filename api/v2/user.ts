@@ -7,12 +7,14 @@ import jwt, {AuthorizedRequest} from "../../util/jwt";
 import {Database, UserObject} from "../../util/db/DatabaseHandler";
 import {ObjectID} from "bson";
 import {Cursor} from "mongodb";
+import {Mongoose,Document} from "mongoose";
+import {Moderators} from "../../middleware/models/UserSchema";
 
 const router = express.Router();
 
 class UserRouting {
 
-    updateUser(req: LoginBody, results: UserObject) {
+    updateUser(req: LoginBody, results: UserObject|Moderators) {
         const {db, ip} = req;
         let {_id, savedUIDs} = results;
         if (typeof savedUIDs === "undefined")
@@ -31,28 +33,38 @@ class UserRouting {
         }
     }
 
-    defaultRoute = (req:AuthorizedRequest, res, next) => {
+    defaultRoute = async (req:AuthorizedRequest, res, next) => {
         console.log(req)
         res.json({
             decoded: req.decoded
         })
+        const db = await req.app.get("database") as Mongoose;
+        //console.log();
     };
 
     loginRoute = async (req: LoginBody, res, next) => {
         //let errors = []
         const {db, params, body} = req;
+        const type = "moderator";
         const {email, password, pin, autologin} = body;
         let authkey, _id;
         if (params.authkey) {
             let proceed = true;
             authkey = await jwt.verify(params.authkey).catch(err => {
-                console.log(err)
+                res.status(401).json(err);
+                proceed = false;
             });
             if (authkey) {
                 _id = ObjectID.createFromHexString(authkey._id);
                 //console.log(authkey)
             }
+
+            if (!proceed) {
+                return;
+            }
         }
+
+
 
 
         let queryParams = {_id, email} as any;
@@ -65,52 +77,49 @@ class UserRouting {
             return;
         }
 
+
+         // const db2 = await req.app.get("database") as Mongoose;
+
         await db.openCollection("moderators");
-        const query = db.find(queryParams).limit(1) as Cursor;
-        const count = await query.count();
+        const query = await Moderators.findOne(queryParams);
 
         //console.log(count, query)
         if (authkey) {
-            // console.log(count, query)
-            if (count) {
-                const results = await query.next() as UserObject;
+            const data = query.toJSON() as Moderators;
 
+            if (data) {
+                const {email, name} = data;
                 const token = jwt.sign({_id, autologin: authkey.autologin }, authkey.autologin ? "14d" : undefined);
-                res.json({token, email: results.email});
-                this.updateUser(req, results);
-                return;
-
+                res.json({token, email, name, type});
+                this.updateUser(req, data);
             }
+            return;
         } else {
             if (email) {
                 if (password) {
-                    if (count > 0) {
-                        const results = await query.next() as UserObject;
-                        let {passwordhash, _id} = results;
-                        if (bcrypt.compareSync(password, passwordhash)) {
-                            const token = jwt.sign({_id, autologin}, autologin ? "14d" : undefined);
-                            res.json({token, email});
-                            this.updateUser(req, results);
-                            return;
-                        }
+                    const results = query.toJSON() as Moderators;
+                    let {passwordhash, _id, name} = results;
+                    console.log(passwordhash,)
+                    if (bcrypt.compareSync(password, passwordhash)) {
+                        const token = jwt.sign({_id, autologin}, autologin ? "14d" : undefined);
+                        res.json({token, email, name, type});
+                        this.updateUser(req, results);
+                        return;
                     }
                 } else if (pin) {
-                    if (count > 0) {
-                        const results = await query.next() as UserObject;
-                        let {_id} = results;
-                        if (bcrypt.compareSync(pin, results.pin)) {
-                            const token = jwt.sign({_id, autologin}, autologin ? "14d" : undefined)
-                            res.json({token, email});
-                            this.updateUser(req, results);
-                            return;
-                        }
+                    const results = query.toJSON() as Moderators;
+                    let {_id, name} = results;
+                    if (bcrypt.compareSync(pin, results.pin)) {
+                        const token = jwt.sign({_id, autologin}, autologin ? "14d" : undefined)
+                        res.json({token, email, name, type});
+                        this.updateUser(req, results);
+                        return;
                     }
                 }
             }
         }
         res.sendStatus(500);
     }
-
 
     registerRoute = async (req: RegisterBody, res, next) => {
 
@@ -139,6 +148,7 @@ class UserRouting {
 
         res.sendStatus(500);
     }
+
 }
 
 const routes = new UserRouting();

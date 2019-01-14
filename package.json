@@ -63,7 +63,7 @@
     "typescript": "^3.1.6",
     "uuid": "^3.3.2",
     "jsonwebtoken": "latest",
-    "notrivia": "../trivia"
+    "notrivia": "./notrivia"
   },
   "devDependencies": {
     "@babel/core": "^7.1.5",
@@ -76,13 +76,13 @@
     "@types/express-graphql": "^0.6.2",
     "@types/lodash": "^4.14.118",
     "@types/mongodb": "^3.1.14",
-    "@types/mongoose": "^5.3.4",
+    "@types/mongoose": "^5.3.7",
     "@types/morgan": "^1.7.35",
     "@types/node": "^10.12.5",
     "@types/popper.js": "^1.11.0",
     "@types/uuid": "^3.4.4",
     "babel-loader": "^8.0.4",
-    "mongoose": "^5.3.15"
+    "mongoose": "^5.4.2"
   },
   "engines": {
     "node": ">=10"
