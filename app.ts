@@ -18,11 +18,15 @@ import React from "./www/React";
 // -- End Routes
 import * as compression from "compression";
 
+import {Mongoose} from "./middleware/Mongoose";
+
 /**
  *
  * @type {Express}
  */
 const app = express();
+
+app.set("database", Mongoose());
 
 app.use(logger("dev"));
 app.use(compression());
