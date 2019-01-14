@@ -1,0 +1,16 @@
+.build-stage-subtext {
+  font-weight: 400;
+  font-size: .8em;
+  color: fade_out(black, .4);
+}
+
+.builder-action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  padding: .25rem 1rem;
+
+  .builder-action-button {
+    margin-left: .5rem;
+    margin-right: .5rem;
+  }
+}
