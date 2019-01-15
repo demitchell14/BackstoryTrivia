@@ -11,7 +11,8 @@ import {
     Paper, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {Api} from "../../../containers";
+import {Api, Question} from "../../../containers";
+import {SyntheticEvent} from "react";
 //import {Api} from "../../../containers";
 
 const styles = theme => ({
@@ -61,6 +62,19 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
     public render() {
         const {classes, questions} = this.props;
 
+        const answer = (question:Question) => {
+            if (question.type === "Open Ended") {
+                return question.answer;
+            }
+            if (question.choices) {
+                const correct = question.choices.find(c => c.correct);
+                if (correct) {
+                    return correct.answer;
+                }
+            }
+            return "";
+        }
+
         return (
             <Paper className={classes.questionsContainer} elevation={1}>
                 <List component={"nav"} disablePadding>
@@ -81,14 +95,16 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
 
                                             secondary={(
                                                 <React.Fragment>
-                                                    <Typography className={classes.questionSecondary} component={"span"} color={"textPrimary"}>{question.answer}</Typography>
+                                                    <Typography className={classes.questionSecondary} component={"span"} color={"textPrimary"}>
+                                                        {answer(question)}
+                                                    </Typography>
                                                 </React.Fragment>
                                             )}
                                         />
                                     </ExpansionPanelSummary>
                                     <ExpansionPanelDetails>
                                         <Tooltip title={"View / Edit"}>
-                                            <IconButton color={"primary"}>
+                                            <IconButton color={"primary"} onClick={this.handleAction("view", question)}>
                                                 <FontAwesomeIcon icon={["fal", "eye"]} fixedWidth/>
                                             </IconButton>
                                         </Tooltip>
@@ -123,6 +139,19 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
             </Paper>
         );
     }
+
+    public handleAction = (type:string, obj:Question) => {
+        return (evt:SyntheticEvent) => {
+            if (this.props.onSelected) {
+                switch (type) {
+                    case "view":
+                        this.props.onSelected(evt, obj._id)
+                        break;
+                }
+                //this.props.onSelected(evt, )
+            }
+        }
+    }
 }
 
 interface QuestionListPanelProps {
@@ -131,6 +160,7 @@ interface QuestionListPanelProps {
     questions?: {
         currentQuestions: Api.QuestionListResponse;
     };
+    onSelected?: (evt:SyntheticEvent, target: any) => any;
 }
 
 interface QuestionListPanelState {

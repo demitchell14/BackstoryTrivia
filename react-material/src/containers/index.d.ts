@@ -9,6 +9,10 @@ export namespace Api {
         filters: QuestionFilter[];
         questions: Question[];
     }
+    
+    interface QuestionInsertResponse {
+        questionObj: Question;
+    }
 }
 
 export interface QuestionFilter {
@@ -21,7 +25,7 @@ export interface Question {
     category: string[];
     choices: Array<{
         answer: string;
-        corrent: boolean;
+        correct: boolean;
     }> | null;
     points: number;
     question: string;
