@@ -1,9 +1,13 @@
 import * as React from "react";
 import {
     Divider,
-    ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary,
+    ExpansionPanel,
+    ExpansionPanelDetails,
+    ExpansionPanelSummary,
     Grid,
-    List, ListItem, ListItemText,
+    List,
+    ListItem,
+    ListItemText,
     Typography,
     withStyles
 } from "@material-ui/core";
@@ -17,7 +21,7 @@ const styles = theme => ({
         marginTop: "1rem",
         marginBottom: "1rem",
     }
-})
+});
 
 class Home extends React.Component<MainProps, MainState> {
     public constructor(props) {
@@ -75,14 +79,40 @@ class Home extends React.Component<MainProps, MainState> {
                         </Grid>
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
-                <ExpansionPanel>
+                <ExpansionPanel defaultExpanded>
                     <ExpansionPanelSummary disableRipple={false}>
                         <Typography variant={"h6"}>Create / Manage Lists</Typography>
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
                         <Grid container>
                             <Grid xs={12} item>
-                                <Typography>Another Paragraph</Typography>
+                                <Typography paragraph>Lists are just another way to sort your collection of questions,
+                                    just like categories.
+                                    The primary difference is, however, that lists are supposed to be used directly with
+                                    game building,
+                                    whereas categories are just a way to group your questions while you search through
+                                    them.</Typography>
+                                <Typography paragraph>Another key difference is that lists are stored <b>On Your
+                                    Device</b>, unlike categories
+                                    which are stored along with the question itself inside our databases. In the future,
+                                    you will be able
+                                    export your lists of questions if that is something that you wish.</Typography>
+                                <Typography paragraph>A drawback of lists being stored on device is that you will not be
+                                    able to share them across devices.
+                                    This sucks, but it is a consequence of the that that talking to databases can be
+                                    expensive and
+                                    if I'm being honest, I'm not entirely sure how powerful the current database is so I
+                                    don't want to strain in too bad.
+                                    In the future I may relook at this and add it to our storage, however.</Typography>
+                                <Typography>Every item consists of a few components.</Typography>
+                                <Divider className={classes.verticalMargin} variant={"middle"}/>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography variant={"h6"}>Required Fields:</Typography>
+                                <List>
+                                    <ListItem><ListItemText primary={"List Name"}
+                                                            secondary={"This is something for your reference"}/></ListItem>
+                                </List>
                             </Grid>
                         </Grid>
                     </ExpansionPanelDetails>

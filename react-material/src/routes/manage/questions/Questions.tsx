@@ -1,8 +1,19 @@
 import * as React from "react";
+import {SyntheticEvent} from "react";
 import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     Divider,
-    Grid, IconButton, InputBase,
-    Paper, Tab, Tabs,
+    Grid,
+    IconButton,
+    InputBase,
+    Paper,
+    Tab,
+    Tabs,
     withStyles,
 } from "@material-ui/core";
 import {Menu as MenuIcon} from "@material-ui/icons";
@@ -14,7 +25,6 @@ import {Api, Question} from "../../../containers";
 import QuestionListPanel from "./QuestionListPanel";
 import Builder from "./build/Builder";
 import Home from "./home/Home";
-import {SyntheticEvent} from "react";
 
 const styles = theme => ({
     toolbar: {
@@ -65,6 +75,7 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
                 data: {},
             },
             errors: [],
+            deleteModalActive: false,
         } as QuestionsState
     }
 
@@ -83,16 +94,15 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
                             const {currentQuestions} = question.state;
                             const questions = {
                                 currentQuestions
-                            }
+                            };
                             this.setState({
                                 questions
                             });
-                        }
+                        };
 
                         this.questionSubscription = func;
 
                         question.subscribe(func);
-;
                     })
                 //console.log(user, question);
             }
@@ -139,7 +149,7 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
                     let choices = builder.data.choices;
                     if (choices) {
                         choices = choices.map(c => {
-                            c.correct = false
+                            c.correct = false;
                             return c;
                         });
                         choices[target].correct = true;
@@ -173,11 +183,11 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
                 }
                 return;
             case "reset":
-                delete builder.data
-                this.setState({builder});
+                this.setState({selectedTarget: undefined, deleteModalActive: false, deleteTarget: undefined});
+                // this.setState({builder});
                 return;
         }
-    }
+    };
 
     public render() {
         const {classes} = this.props;
@@ -191,16 +201,34 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
         const tabsProps = [
             {},
             {
-                onChange: this.builderStateChanged,
+                // onChange: this.builderStateChanged,
                 onSubmit: this.props.containers ? this.builderSubmit(this.props.containers.question) : undefined,
                 handleCategories: this.props.containers ? this.handleCategories(this.props.containers.question) : undefined,
                 sendAction: this.choiceAction,
-                data: this.state.builder.data,
+                selectedId: this.state.selectedTarget ? this.state.selectedTarget : undefined
+                // data: this.state.builder.data,
             }
         ];
         
         return (
             <main className={classes.content}>
+
+                <Dialog
+                    open={this.state.deleteModalActive}
+                    onClose={() => this.setState({deleteModalActive: false})}
+                >
+                    <DialogTitle>Are you sure you want to delete this question?</DialogTitle>
+                    <DialogContent>
+                        {this.state.deleteTarget ? this.state.deleteTarget.component : undefined}
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => this.setState({deleteModalActive: false})}>Cancel</Button>
+                        <Button
+                            onClick={this.deleteQuestion(this.state.deleteTarget ? this.state.deleteTarget.target : undefined)}
+                            color={"primary"}>Continue</Button>
+                    </DialogActions>
+                </Dialog>
+
                 <div className={classes.toolbar} />
                 <Grid container spacing={16}>
                     <Grid sm={6} md={8} item>
@@ -217,6 +245,7 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
                             ...tabsProps[this.state.tab]
                         })}
                     </Grid>
+
                     <Grid sm={6} md={4} item>
                         <Paper className={classes.inputRoot} elevation={1}>
                             <IconButton className={classes.iconButton} aria-label="Menu">
@@ -232,8 +261,10 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
                             </IconButton>
                         </Paper>
                         
-                        <QuestionListPanel 
+                        <QuestionListPanel
                             onSelected={this.questionSelected}
+                            onDeleted={this.questionDeleted}
+                            onCloned={this.questionCloned}
                             questions={this.state.questions}
                         />
                     </Grid>
@@ -244,21 +275,61 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
     
     public questionSelected = (evt, target) => {
         if (this.state.errors.length > 0) {
+            console.error(this.state.errors);
             return;
         }
-        if (this.state.questions) {
-            const qs = this.state.questions;
-            if (qs.currentQuestions) {
-                const questions = qs.currentQuestions.questions;
-                const targetQuestion = questions.find(q => q._id === target);
-                let builder = this.state.builder;
-                if (targetQuestion) {
-                    builder.data = Object.assign({}, targetQuestion);
-                }
-                this.setState({builder, tab: 1});
+        this.setState({selectedTarget: target, tab: 1});
+    };
+
+    public questionCloned = (evt, target: string) => {
+        if (this.state.errors.length > 0) {
+            console.error(this.state.errors);
+            return;
+        }
+        this.setState({selectedTarget: `__${target}`, tab: 1});
+    };
+
+    public questionDeleted = (evt, target: string) => {
+        const questionObject = this.state.questions;
+        if (questionObject && questionObject.currentQuestions) {
+            const {questions} = questionObject.currentQuestions;
+            const question = questions.find(q => q._id === target);
+            if (question) {
+                const modal = (
+                    <div>
+                        <DialogContentText>You're about to delete the question,
+                            "<span>{question.question}</span>"</DialogContentText>
+                        <DialogContentText>Deleting questions from your collection is a permanent action and cannot be
+                            undone!</DialogContentText>
+                    </div>
+                );
+                console.log("Trying to delete " + target);
+                this.setState({
+                    deleteTarget: {
+                        component: modal, target
+                    },
+                    deleteModalActive: true
+                });
             }
         }
-    }
+
+    };
+
+    public deleteQuestion = (target?: string) => {
+        return (evt) => {
+            if (target) {
+                if (this.props.containers) {
+                    const {question} = this.props.containers;
+                    if (question) {
+                        question.delete(target)
+                            .then((success) => {
+                                this.setState({deleteModalActive: false})
+                            })
+                    }
+                }
+            }
+        }
+    };
 
     public builderStateChanged = (evt, key, value) => {
         let builder = this.state.builder;
@@ -267,7 +338,7 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
         }
         builder.data[key] = value;
         this.setState({builder});
-    }
+    };
 
     public handleCategories = (container?:QuestionContainer) => {
         if (container) {
@@ -282,23 +353,27 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
             }
         }
         return undefined;
-    }
+    };
 
     public builderSubmit = (container:QuestionContainer) => {
-        if (container && this.state.builder.data) {
-            const {data} = this.state.builder;
-            return (evt:SyntheticEvent) => {
+        if (container) {
+            return (evt: SyntheticEvent, data) => {
                 evt.preventDefault();
                 evt.stopPropagation();
+
                 if (data) {
-                    container.create(data);
+                    if (data._id) {
+                        container.update(data);
+                    } else {
+                        container.create(data);
+                    }
                 }
                 //if (this.props.data)
                     //container.create(this.props.data)
             }
         }
         return undefined;
-    }
+    };
 
     public tabChanged = (evt, value) => {
         this.setState({tab: value});
@@ -325,7 +400,13 @@ interface QuestionsState {
     errors: Array<{
         type: string;
         message: string;
-    }>
+    }>;
+    selectedTarget?: any;
+    deleteTarget?: {
+        target: string;
+        component: any;
+    };
+    deleteModalActive: boolean;
 }
 
 
