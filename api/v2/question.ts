@@ -8,7 +8,8 @@ import {Question} from "notrivia";
 import {Database, QuestionObject} from "../../util/db/DatabaseHandler";
 import {ObjectID} from "bson";
 import {Mongoose} from "mongoose";
-import {Questions as QuestionsDB} from "../../middleware/models/QuestionSchema";
+import {Questions, Questions as QuestionsDB} from "../../middleware/models/QuestionSchema";
+import * as _ from "lodash";
 
 const router = express.Router();
 
@@ -22,13 +23,15 @@ class QuestionRoute implements QuestionRoute{
         const {question, timeLimit, points, answer, choices, type, questionDetails, questionImage, category} = req.body;
         if (question && type && (answer || choices)) {
             const {decoded, db} = req;
+            const _creator = ObjectID.createFromHexString(decoded._id);
             const questionObj = new Question(req.body);
 
 
             let insertable = {
                 question, timeLimit, points, answer, choices, type, questionDetails, questionImage,
-                category: category.split(",").map(c => c.trim().toLowerCase()),
-                _creator: ObjectID.createFromHexString(decoded._id),
+                // @ts-ignore
+                category: category instanceof Array ? category : category.split(",").map(c => c.trim().toLowerCase()),
+                _creator,
             }
 
             await db.openCollection("questions");
@@ -37,6 +40,65 @@ class QuestionRoute implements QuestionRoute{
             return;
         }
         res.status(500).json({error: "Missing important information"})
+    }
+
+    update = async (req:RequestTypes.Update, res) => {
+        const {db, decoded} = req;
+        const _creator = ObjectID.createFromHexString(decoded._id);
+        const _id = req.body._id ? ObjectID.createFromHexString(req.body._id) : undefined;
+        if (_id) {
+            const response = {} as any;
+            const qDoc = await db.openCollection("questions");
+            const cursor = qDoc.find({_id, _creator});
+            const question = await cursor.next() as Questions;
+            if (question) {
+                const filtered = Object.keys(req.body).filter(k => !_.isEqual(req.body[k], question[k]));
+
+                response.filtered = {} as any;
+                filtered.map(f => {
+                    response.filtered[f] = req.body[f];
+                });
+
+
+                delete response.filtered._id;
+                delete response.filtered._creator;
+                if (Object.keys(response.filtered).length > 0) {
+                    console.log(response.filtered);
+                    console.log(question);
+                    const update = await qDoc.update({_id, _creator}, {$set: response.filtered});
+
+                    console.log(update);
+                }
+                //console.log(response.filtered);
+            }
+
+
+
+
+
+            res.json(response);
+        } else {
+            res.status(404).json({error: "No question index sent"});
+        }
+    }
+
+    delete = async (req:RequestTypes.Delete, res) => {
+        const {db, body, decoded} = req;
+        const _creator = ObjectID.createFromHexString(decoded._id);
+        if (body.target) {
+            const _id = ObjectID.createFromHexString(body.target);
+            await db.openCollection("questions");
+            const exists = await db.find({_id, _creator});
+            if (await exists.count() === 1) {
+                const deleted = await db.delete({_id, _creator});
+                res.json(deleted);
+                db.close();
+            } else {
+                res.status(404).json({error: "Question does not exist"});
+            }
+        } else {
+            res.status(404).json({error: "A target is required to delete"});
+        }
     }
 
     list_mongoosetest = async (req:RequestTypes.List, res, next) => {
@@ -74,6 +136,7 @@ class QuestionRoute implements QuestionRoute{
             response.filters.push({filter: "limit", value: requestQuery.limit});
         }
         if (requestQuery.category) {
+
             const a = requestQuery.category;
             query.filter({category: {$in: [a]}})
             response.filters.push({filter: "category", value: requestQuery.category});
@@ -130,6 +193,12 @@ declare namespace RequestTypes {
             category?: string;
         };
     }
+    interface Update extends AuthorizedRequest, Middleware.Mongo {
+        body: Question & {
+            category?: string;
+            _id: string;
+        };
+    }
     interface List extends AuthorizedRequest, Middleware.Mongo {
         query: {
             limit?: number;
@@ -137,12 +206,22 @@ declare namespace RequestTypes {
             full?:any;
         }
     }
+    interface Delete extends AuthorizedRequest, Middleware.Mongo {
+        body: {
+            target: string;
+        }
+    }
 }
 
 const routes = new QuestionRoute();
 
 router.get("/", jwt.authorized, Mongo(), routes.index);
-router.post("/insert", jwt.authorized, Mongo(), routes.add);
+
+router.put("/", jwt.authorized, Mongo(), routes.update);
+router.post("/", jwt.authorized, Mongo(), routes.add);
+router.delete("/", jwt.authorized, Mongo(), routes.delete);
+
+
 router.get("/list", jwt.authorized, Mongo(), routes.list);
 
 export default router;
