@@ -1,15 +1,12 @@
 import * as React from "react";
+import {SyntheticEvent} from "react";
 import * as classNames from "classnames";
 import {Divider, Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText, withStyles,} from "@material-ui/core";
 
-import {
-    ChevronRight as ChevronRightIcon,
-    ChevronLeft as ChevronLeftIcon,
-} from "@material-ui/icons"
+import {ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon,} from "@material-ui/icons"
 
-import {withRouter, RouterProps} from "react-router";
+import {RouterProps, withRouter} from "react-router";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {SyntheticEvent} from "react";
 
 const drawerWidth = 240;
 
@@ -116,7 +113,7 @@ class SideNavigation extends React.Component<SideNavigationProps, SideNavigation
                 <div>
                     <Divider />
                     <List onClick={this.handleAuthorizedRoutes}>
-                        <ListItem value={"/test"} button>
+                        <ListItem value={"/manage/games"} button>
                             <ListItemIcon><FontAwesomeIcon fixedWidth className={classes.menuIcon} icon={["fal", "clipboard-list-check"]} /></ListItemIcon>
                             <ListItemText primary={"Manage Games"} />
                         </ListItem>
@@ -130,7 +127,7 @@ class SideNavigation extends React.Component<SideNavigationProps, SideNavigation
         }
 
         return undefined;
-    }
+    };
 
     private renderAuthorizedRoutes = () => {
         const {classes} = this.props;
@@ -153,7 +150,7 @@ class SideNavigation extends React.Component<SideNavigationProps, SideNavigation
         }
 
         return undefined;
-    }
+    };
 
     private handleStandardRoutes = (evt:SyntheticEvent) => {
         const target = evt.target as HTMLDivElement;
@@ -166,7 +163,7 @@ class SideNavigation extends React.Component<SideNavigationProps, SideNavigation
                 this.props.history.push(href)
             }
         }
-    }
+    };
 
     private handleAuthorizedRoutes = (evt:SyntheticEvent) => {
         const target = evt.target as HTMLDivElement;
@@ -179,7 +176,7 @@ class SideNavigation extends React.Component<SideNavigationProps, SideNavigation
                 this.props.history.push(href)
             }
         }
-    }
+    };
 
     private handleClose = (evt?) => {
         if (this.props.closeMenu) {
@@ -190,7 +187,7 @@ class SideNavigation extends React.Component<SideNavigationProps, SideNavigation
 
 const isMobile = function() {
     return window.innerWidth <= 425;
-}
+};
 
 
 interface SideNavigationProps extends RouterProps{
