@@ -1,4 +1,5 @@
 import * as React from "react";
+import {SyntheticEvent} from "react";
 import {
     Avatar,
     Checkbox,
@@ -7,13 +8,14 @@ import {
     Grid,
     IconButton,
     List,
-    ListItem, ListItemSecondaryAction,
-    TextField, Theme,
+    ListItem,
+    ListItemSecondaryAction,
+    TextField,
+    Theme,
     Tooltip,
     Typography
 } from "@material-ui/core";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {SyntheticEvent} from "react";
 
 class MultipleChoice extends React.Component<MultipleChoiceProps, MultipleChoiceState> {
 
@@ -33,24 +35,24 @@ class MultipleChoice extends React.Component<MultipleChoiceProps, MultipleChoice
 
     chipClicked = (id?:number) => {
         return (evt:SyntheticEvent) => {
-            if (this.props.sendAction && typeof id === "number" && !this.state.active.correct) {
-                this.props.sendAction("correct", id);
+            if (this.props.onChange && typeof id === "number" && !this.state.active.correct) {
+                this.props.onChange("correct", id);
                 return;
             }
             let {active} = this.state;
             active.correct = !active.correct;
             this.setState({active})
         }
-    }
+    };
 
     correctChanged = (id:number) => {
         return (evt:SyntheticEvent) => {
             evt.stopPropagation();
-            if (this.props.sendAction) {
-                this.props.sendAction("correct", id);
+            if (this.props.onChange) {
+                this.props.onChange("correct", id);
             }
         }
-    }
+    };
 
     answerChanged = (id?:number) => {
         //console.log(id);
@@ -60,19 +62,19 @@ class MultipleChoice extends React.Component<MultipleChoiceProps, MultipleChoice
             active.answer = target.value;
             this.setState({active, error: {}});
         }
-    }
+    };
 
     addChoice = (id?:number) => {
         return (evt:SyntheticEvent) => {
             //console.log(this.state);
 
             if (this.state.active.answer === "") {
-                this.setState({error: {answer: "Answer is required"}})
+                this.setState({error: {answer: "Answer is required"}});
                 return;
             }
 
-            if (this.props.sendAction) {
-                this.props.sendAction(typeof id === "number" ? "update" : "add", id, this.state.active);
+            if (this.props.onChange) {
+                this.props.onChange(typeof id === "number" ? "update" : "add", id, this.state.active);
                 this.reset();
             }
 
@@ -83,18 +85,18 @@ class MultipleChoice extends React.Component<MultipleChoiceProps, MultipleChoice
             // }
 
         }
-    }
+    };
 
     removeChoice = (id?:number) => {
         if (id) {
             return (evt: SyntheticEvent) => {
-                if (this.props.sendAction) {
-                    this.props.sendAction("remove", id)
+                if (this.props.onChange) {
+                    this.props.onChange("remove", id);
                 }
             }
         }
         return undefined;
-    }
+    };
 
     changeSelected = (id:number) => {
         return (evt:SyntheticEvent) => {
@@ -102,16 +104,17 @@ class MultipleChoice extends React.Component<MultipleChoiceProps, MultipleChoice
                 this.setState({selected:id, active: Object.assign({}, this.props.choices[id])});
             }
         }
-    }
+    };
 
     reset = (evt?:any) => {
         let active = this.state.active;
         active.answer = "";
         active.correct = false;
         this.setState({active, selected: undefined});
-    }
+    };
 
     public render() {
+        console.log(this.state);
         let {classes, choices} = this.props;
         const {selected, active} = this.state;
         return (
@@ -186,15 +189,13 @@ class MultipleChoice extends React.Component<MultipleChoiceProps, MultipleChoice
 
 interface MultipleChoiceProps {
     state?: MultipleChoiceState;
-    correctChanged?: (evt:SyntheticEvent) => any;
-    addChoice?: (evt:SyntheticEvent) => any;
     choices?: Array<{
         answer: string;
         correct: boolean;
-    }>
+    }>;
+    onChange?: (a, b, c?) => any;
     classes?: any;
     theme?: Theme;
-    sendAction?: (action:string, target?:number, value?: any) => any;
 }
 
 interface MultipleChoiceState {
