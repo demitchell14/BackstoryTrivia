@@ -41,15 +41,23 @@ export class Database {
         return col.find(query);
     }
 
-    public async update(query:FilterQuery<UserObject|TeamObject|SessionObject|GameProps.Game>, update:UpdateQuery<UserObject|TeamObject|SessionObject|GameProps.Game>) {
+    public async update(query:FilterQuery<UserObject|TeamObject|SessionObject|QuestionObject|GameProps.Game>, update:UpdateQuery<UserObject|TeamObject|SessionObject|QuestionObject|GameProps.Game>) {
         this.resetTimeout();
         const col = this.collection;
+
 
 
         return await col.updateOne(query, update)
     }
 
-    public async insert(query:Partial<UserObject|SessionObject|TeamObject>) {
+    public async delete(query) {
+        this.resetTimeout();
+        const col = this.collection;
+
+        return await col.deleteOne(query);
+    }
+
+    public async insert(query:Partial<UserObject|SessionObject|TeamObject|QuestionObject>) {
         this.resetTimeout();
         const col = this.collection;
         let base;
@@ -116,6 +124,23 @@ export interface SessionObject {
     sessionToken:string;
     expiration:number;
     userToken:string;
+}
+
+export interface QuestionObject {
+    _id:ObjectID;
+    _creator:ObjectID;
+    question: string;
+    questionDetails?: string;
+    questionImage?: string;
+    type: string;
+    answer?: string;
+    timeLimit: number;
+    points: number;
+    choices?: Array<{
+        answer: string;
+        correct: boolean;
+    }>;
+    category: string[];
 }
 
 export interface GameParams {
