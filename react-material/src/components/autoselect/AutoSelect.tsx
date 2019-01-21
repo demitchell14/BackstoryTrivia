@@ -1,8 +1,8 @@
 import * as React from 'react';
 import classNames from 'classnames';
 //@ts-ignore
-import Select from 'react-select';
-import { withStyles } from '@material-ui/core/styles';
+import {Async} from 'react-select';
+import {withStyles} from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import NoSsr from '@material-ui/core/NoSsr';
 import TextField from '@material-ui/core/TextField';
@@ -10,7 +10,7 @@ import Paper from '@material-ui/core/Paper';
 import Chip from '@material-ui/core/Chip';
 import MenuItem from '@material-ui/core/MenuItem';
 import CancelIcon from '@material-ui/icons/Cancel';
-import { emphasize } from '@material-ui/core/styles/colorManipulator';
+import {emphasize} from '@material-ui/core/styles/colorManipulator';
 import {Button} from "@material-ui/core";
 
 
@@ -62,7 +62,6 @@ const styles = theme => ({
 });
 
 function NoOptionsMessage(props) {
-    console.log(props)
     return (
         <Typography
             color="textSecondary"
@@ -184,6 +183,27 @@ class AutoSelect extends React.Component<AutoSelectProps, AutoSelectState> {
         });
     };
 
+    componentWillMount(): void {
+        if (this.props.defaultValue) {
+            const obj = [] as any;
+            const def = this.props.defaultValue;
+            const val = def.map(val => {
+                return {
+                    label: val,
+                    value: val
+                }
+            });
+            obj.push(...val);
+            //obj.push(this.props.defaultValue.map((c:string) => ({label: c, value: c})));
+            this.setState({multi: obj});
+        }
+    }
+
+    componentDidUpdate(prevProps: Readonly<AutoSelectProps>, prevState: Readonly<AutoSelectState>, snapshot?: any): void {
+        console.log(this.state);
+        console.log(this.props);
+    }
+
     render() {
         // @ts-ignore
         const { classes, theme } = this.props;
@@ -198,6 +218,7 @@ class AutoSelect extends React.Component<AutoSelectProps, AutoSelectState> {
             }),
         };
 
+        // @ts-ignore
         const selectProps = {
             classes,
             styles: selectStyles,
@@ -214,12 +235,28 @@ class AutoSelect extends React.Component<AutoSelectProps, AutoSelectState> {
             isMulti: true,
             isSearchable: true,
             name: this.props.name || ""
-        }
+        };
+
+        const asyncProps = {
+            cacheOptions: true, isMulti: true, isSearchable: true,
+            defaultOptions: true,
+            name: this.props.name || "",
+            options: this.props.options || [],
+            components, classes, styles: selectStyles,
+            onChange: this.handleChange('multi'),
+            textFieldProps: {
+                label: this.props.label || "Label",
+                InputLabelProps: {
+                    shrink: true,
+                },
+            },
+            loadOptions: this.props.values || undefined
+        };
 
         return (
             <div className={classes.root}>
                 <NoSsr>
-                    <Select {...selectProps} />
+                    <Async {...asyncProps} />
                 </NoSsr>
             </div>
         );
@@ -237,8 +274,10 @@ interface AutoSelectProps {
         label: string;
         value: string;
     }>;
+    values: (value, callback) => any;
     onChange: (name, value) => void;
     name?: string;
+    defaultValue?: string[];
 }
 
 interface AutoSelectState {
