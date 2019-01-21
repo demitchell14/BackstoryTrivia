@@ -34,6 +34,7 @@ export interface Question {
     timeLimit: number;
     type: QuestionType;
     _id: string;
+    _creator: string;
 }
 
 export type QuestionType = "Open Ended"|"Multiple Choice";
