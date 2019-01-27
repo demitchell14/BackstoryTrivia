@@ -4,6 +4,7 @@ import {Api} from "./index";
 //import {AuthTemplate, Bodies, Responses} from "./Authorization";
 
 class UserContainer extends Container<UserState> {
+    public static containerName = "user";
     //public type = "admin";
     public state = {} as UserState;
 
@@ -11,7 +12,7 @@ class UserContainer extends Container<UserState> {
         super();
         this.state = {
             initializing: true
-        }
+        };
         this.checkToken().then(() => this.setState({initializing: false}).catch(() => this.setState({initializing: false})));
     }
 
@@ -24,7 +25,7 @@ class UserContainer extends Container<UserState> {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(data)
-        })
+        });
         const _body = await response.text();
         if (response.status === 200) {
             this.storeData(_body)
@@ -42,7 +43,7 @@ class UserContainer extends Container<UserState> {
     register = async (data) => {
 
         return this;
-    }
+    };
 
     async checkToken() : Promise<string|undefined> {
         const _token = localStorage.getItem("user-token");

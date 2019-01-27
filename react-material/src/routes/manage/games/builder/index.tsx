@@ -18,7 +18,8 @@ import QuestionContainer from "../../../../containers/QuestionContainer";
 import UserContainer from "../../../../containers/UserContainer";
 import withContainer from "../../../../containers/withContainer";
 import {Question} from "../../../../containers";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+
+const FAIcon = React.lazy(() => import("../../../../FontAwesome"));
 
 const styles = theme => ({
     paper: {
@@ -272,7 +273,7 @@ const QuestionSelection = (props) => {
                 />
             </Grid>
             <Grid style={{alignSelf: "center", justifyContent: "center", display: "flex"}} item xs={12} md={2}>
-                <FontAwesomeIcon size={"3x"} icon={["fal", "arrow-from-right"]}/>
+                <FAIcon size={"3x"} icon={["fal", "arrow-from-right"]}/>
             </Grid>
             <Grid item xs={12} md={5}>
                 <QuestionListPanel

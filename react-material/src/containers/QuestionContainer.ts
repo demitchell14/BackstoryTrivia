@@ -2,7 +2,7 @@ import {Container} from "unstated";
 import {Api, Question} from "./index";
 
 class QuestionContainer extends Container<QuestionState> {
-
+    public static containerName = "question";
     public state = {
         categories: [
             {

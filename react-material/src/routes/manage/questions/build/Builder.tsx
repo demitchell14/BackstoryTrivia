@@ -20,11 +20,12 @@ import {
 
 import "../style.css";
 import AutoSelect from "../../../../components/autoselect/AutoSelect";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Question} from "../../../../containers";
 import MultipleChoice from "./MultipleChoice";
 import withContainer from "../../../../containers/withContainer";
 import QuestionContainer from "../../../../containers/QuestionContainer";
+
+const FAIcon = React.lazy(() => import("../../../../FontAwesome"));
 
 const styles = (theme:Theme) => {
     return {
@@ -443,7 +444,7 @@ const QDetails = props => {
                             <CardMedia className={classes.image} image={props.data.questionImage}/>
                         ) : (
                             <div>
-                                <div className={classes.centered}><FontAwesomeIcon size={"3x"} icon={["far", "image"]}/>
+                                <div className={classes.centered}><FAIcon size={"3x"} icon={["far", "image"]}/>
                                 </div>
                                 <Typography>Upload question image (optional)</Typography>
                             </div>

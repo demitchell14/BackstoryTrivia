@@ -1,6 +1,9 @@
 import * as React from "react";
 import {AppBar, Button, IconButton, Menu, MenuItem, Toolbar, Typography, withStyles,} from "@material-ui/core";
-import {AccountCircle, Menu as MenuIcon} from "@material-ui/icons";
+
+import AccountCircle from "@material-ui/icons/AccountCircle"
+import MenuIcon from "@material-ui/icons/Menu"
+
 import classNames from 'classnames';
 import {RouterProps, withRouter} from "react-router";
 import {Link} from "react-router-dom";
@@ -58,28 +61,17 @@ class TopNavigation extends React.Component<TopNavigationProps, TopNavigationSta
         } as TopNavigationState
     }
 
-    private handleAccountMenu = (evt) => {
-        this.setState({menuAnchorEl: evt.currentTarget})
-
-    }
-
-    private closeAccountMenu = (evt) => {
-        this.setState({menuAnchorEl: null})
-    }
-
-
     public handleDrawerOpen = (evt) => {
         //console.log("Open Menu");
         if (this.props.openMenu) {
             this.props.openMenu();
         }
-    }
-
+    };
 
     public render() {
         const {classes, isAuthorized, isMenuOpen} = this.props;
         const { menuAnchorEl } = this.state;
-        const open = Boolean(menuAnchorEl)
+        const open = Boolean(menuAnchorEl);
 
         return (
             <AppBar
@@ -147,6 +139,15 @@ class TopNavigation extends React.Component<TopNavigationProps, TopNavigationSta
             </AppBar>
         );
     }
+
+    private handleAccountMenu = (evt) => {
+        this.setState({menuAnchorEl: evt.currentTarget})
+
+    };
+
+    private closeAccountMenu = (evt) => {
+        this.setState({menuAnchorEl: null})
+    };
     
     private handleLogout = (evt) => {
         if (this.props.logout) {
@@ -157,7 +158,7 @@ class TopNavigation extends React.Component<TopNavigationProps, TopNavigationSta
 
 const isMobile = function() {
     return window.innerWidth <= 425;
-}
+};
 
 interface TopNavigationProps extends RouterProps {
     state?: TopNavigationState;

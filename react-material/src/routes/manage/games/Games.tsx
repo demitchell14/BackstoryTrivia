@@ -2,12 +2,13 @@ import * as React from "react";
 import {BottomNavigation, BottomNavigationAction, Paper, Tab, Tabs, withStyles} from "@material-ui/core";
 import withContainer from "../../../containers/withContainer";
 import UserContainer from "../../../containers/UserContainer";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Home from "./home";
 import Builder from "./builder";
 
 import "./styles.css"
 import {match as MatchProps, RouteProps, RouterProps, withRouter} from "react-router";
+
+const FAIcon = React.lazy(() => import("../../../FontAwesome"));
 // import {CSSTransition, TransitionGroup,} from "react-transition-group";
 
 
@@ -22,7 +23,8 @@ const styles = theme => ({
     content: {
         flexGrow: 1,
         padding: theme.spacing.unit * 3,
-        overflowX: "hidden"
+        overflowX: "hidden",
+        marginBottom: 100
     },
     inputRoot: {
         //margin: "6px 8px 2px",
@@ -49,13 +51,17 @@ const styles = theme => ({
         marginBottom: "1rem"
     },
     bottomNav: {
-        position: "absolute",
+        position: "fixed",
         width: "100%",
         left: 0,
         bottom: 0,
+        zIndex: 1000
     },
     navIcon: {
         fontSize: "1.4em"
+    },
+    scroller: {
+        overflowX: "auto"
     }
 });
 
@@ -96,10 +102,10 @@ class Games extends React.Component<GamesProps, GamesState> {
     public render() {
 
         // [
-        //     {label: "Home", icon: <FontAwesomeIcon className={classes.navIcon} fixedWidth icon={["far", "home"]} />},
-        //     {label: "Games", icon: <FontAwesomeIcon className={classes.navIcon} fixedWidth icon={["fal", "clipboard-list-check"]} />},
-        //     {label: "Builder", icon: <FontAwesomeIcon className={classes.navIcon} fixedWidth icon={["fas", "plus-circle"]} />},
-        //     //{label: "Home", icon: <FontAwesomeIcon className={classes.navIcon} icon={["far", "home"]} />}
+        //     {label: "Home", icon: <FAIcon className={classes.navIcon} fixedWidth icon={["far", "home"]} />},
+        //     {label: "Games", icon: <FAIcon className={classes.navIcon} fixedWidth icon={["fal", "clipboard-list-check"]} />},
+        //     {label: "Builder", icon: <FAIcon className={classes.navIcon} fixedWidth icon={["fas", "plus-circle"]} />},
+        //     //{label: "Home", icon: <FAIcon className={classes.navIcon} icon={["far", "home"]} />}
         // ]
         const {classes, match} = this.props;
 
@@ -112,7 +118,7 @@ class Games extends React.Component<GamesProps, GamesState> {
                     active={target.name}
                     tabs={this.tabs.map(tab => ({
                         label: tab.name,
-                        icon: <FontAwesomeIcon fixedWidth className={classes.navIcon} icon={tab.icon}/>
+                        icon: <FAIcon fixedWidth className={classes.navIcon} icon={tab.icon}/>
                     }))}
                     onChange={this.handleTabChange}
                 />
@@ -149,7 +155,8 @@ const Navigator = props => {
     if (window.innerWidth > 425) {
         return (
             <Paper elevation={1} className={classes.tabOffset}>
-                <Tabs value={active} fullWidth scrollable scrollButtons={"auto"} onChange={onChange}>
+                <Tabs value={active} fullWidth scrollable scrollButtons={"auto"} onChange={onChange}
+                      classes={{scrollable: classes.scroller}}>
                     {tabs ? tabs.map((tab, id) => <Tab key={id} value={tab.label} label={tab.label}
                                                        icon={tab.icon}/>) : undefined}
                 </Tabs>
