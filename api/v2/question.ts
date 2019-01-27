@@ -4,7 +4,7 @@ import {Request} from "express";
 import * as graphqlHTTP from "express-graphql";
 import jwt, {AuthorizedRequest} from "../../util/jwt";
 import {Middleware, Mongo} from "../../middleware/Mongo";
-import {Question} from "notrivia";
+import {Question} from "../../notrivia";
 import {Database, QuestionObject} from "../../util/db/DatabaseHandler";
 import {ObjectID} from "bson";
 import {Mongoose} from "mongoose";

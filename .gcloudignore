@@ -26,13 +26,13 @@ tsconfig.*
 readme.md
 README.md
 
-*.patch
-
 react/src
 react/test
 react/public
 
-trivia/**/*
+react-material/src
+react-material/test
+react-material/public
 
 **/*.ts
 **/*.tsx
