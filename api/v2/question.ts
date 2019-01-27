@@ -30,7 +30,7 @@ class QuestionRoute implements QuestionRoute{
             let insertable = {
                 question, timeLimit, points, answer, choices, type, questionDetails, questionImage,
                 // @ts-ignore
-                category: category instanceof Array ? category : category.split(",").map(c => c.trim().toLowerCase()),
+                category: category instanceof Array ? category : category ? category.split(",").map(c => c.trim().toLowerCase()) : [],
                 _creator,
             }
 
