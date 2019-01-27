@@ -273,7 +273,6 @@ class Builder extends React.Component<BuilderProps, BuilderState> {
     };
 
     public handleMultipleChoice = (action: string, id: number, data?: any) => {
-        console.log(action, id, data);
         const question = this.state.data;
         if (typeof question === "undefined") {
             return;
