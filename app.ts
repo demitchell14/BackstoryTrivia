@@ -31,7 +31,9 @@ app.set("database", Mongoose());
 app.use(logger("dev"));
 app.use(compression());
 if (process.env.NODE_ENV && process.env.NODE_ENV.trim() === "production") {
-    app.use(express.static(path.join(process.cwd(), "./react/build")));
+    if (process.env.PUBLIC_DIR) {
+        app.use(express.static(path.join(process.cwd(), `./${process.env.PUBLIC_DIR}/build`)));
+    }
 }
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
