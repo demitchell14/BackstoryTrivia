@@ -19,9 +19,10 @@ import {
     Typography,
     withStyles
 } from "@material-ui/core";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Api, Question} from "../../../containers";
-import {Menu as MenuIcon} from "@material-ui/icons";
+import MenuIcon from "@material-ui/icons/Menu";
+
+const FAIcon = React.lazy(() => import("../../../FontAwesome"));
 //import {Api} from "../../../containers";
 
 const styles = theme => ({
@@ -185,19 +186,19 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
                                                     <Tooltip title={"View / Edit"}>
                                                         <IconButton color={"primary"}
                                                                     onClick={this.handleAction("view", question)}>
-                                                            <FontAwesomeIcon icon={["fal", "eye"]} fixedWidth/>
+                                                            <FAIcon icon={["fal", "eye"]} fixedWidth/>
                                                         </IconButton>
                                                     </Tooltip>
                                                     <Tooltip title={"Copy As / Clone"}>
                                                         <IconButton color={"primary"}
                                                                     onClick={this.handleAction("clone", question)}>
-                                                            <FontAwesomeIcon icon={["fal", "clone"]} fixedWidth/>
+                                                            <FAIcon icon={["fal", "clone"]} fixedWidth/>
                                                         </IconButton>
                                                     </Tooltip>
                                                     <Tooltip title={<span>Delete Question. <b>Permanent!</b></span>}>
                                                         <IconButton color={"secondary"}
                                                                     onClick={this.handleAction("delete", question)}>
-                                                            <FontAwesomeIcon icon={["fal", "trash"]} fixedWidth/>
+                                                            <FAIcon icon={["fal", "trash"]} fixedWidth/>
                                                         </IconButton>
                                                     </Tooltip>
                                                 </div>
@@ -212,8 +213,8 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
                                                 placement={"left"} color={"primary"}>
                                                 <IconButton color={"default"}
                                                             onClick={this.handleAction(showSelect ? "select" : showUnselect ? "unselect" : "", question)}>
-                                                    <FontAwesomeIcon fixedWidth
-                                                                     icon={["far", showSelect ? "plus" : showUnselect ? "minus" : "check"]}/>
+                                                    <FAIcon fixedWidth
+                                                            icon={["far", showSelect ? "plus" : showUnselect ? "minus" : "check"]}/>
                                                 </IconButton>
                                             </Tooltip>
                                         </ListItemSecondaryAction>
