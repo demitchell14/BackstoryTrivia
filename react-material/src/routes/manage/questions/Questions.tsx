@@ -7,16 +7,12 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
-    Divider,
     Grid,
-    IconButton,
-    InputBase,
     Paper,
     Tab,
     Tabs,
     withStyles,
 } from "@material-ui/core";
-import {Menu as MenuIcon} from "@material-ui/icons";
 import QuestionContainer from "../../../containers/QuestionContainer";
 import UserContainer from "../../../containers/UserContainer";
 import withContainer from "../../../containers/withContainer";
@@ -231,7 +227,7 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
 
                 <div className={classes.toolbar} />
                 <Grid container spacing={16}>
-                    <Grid sm={6} md={8} item>
+                    <Grid sm={6} md={7} item>
                         <Paper elevation={1} className={classes.tabOffset}>
                             <Tabs value={this.state.tab} fullWidth onChange={this.tabChanged} scrollable scrollButtons={"auto"}>
                                 <Tab label={"Home"} />
@@ -246,22 +242,8 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
                         })}
                     </Grid>
 
-                    <Grid sm={6} md={4} item>
-                        <Paper className={classes.inputRoot} elevation={1}>
-                            <IconButton className={classes.iconButton} aria-label="Menu">
-                                <MenuIcon />
-                            </IconButton>
-                            <InputBase className={classes.input} placeholder="Search Question" />
-                            <IconButton className={classes.iconButton} aria-label="Search">
-                                S
-                            </IconButton>
-                            <Divider className={classes.divider} />
-                            <IconButton color="primary" className={classes.iconButton} aria-label="Directions">
-                                D
-                            </IconButton>
-                        </Paper>
-                        
-                        <QuestionListPanel
+                    <Grid sm={6} md={5} item>
+                        <QuestionListPanel showSearch showActions
                             onSelected={this.questionSelected}
                             onDeleted={this.questionDeleted}
                             onCloned={this.questionCloned}
