@@ -1,7 +1,7 @@
 import * as mongo from "mongodb";
 import {MongoDetails} from "../../config"
 import {Collection, Cursor, FilterQuery, MongoClient, ObjectID, UpdateQuery} from "mongodb";
-import {GameProps} from "notrivia";
+import {GameProps} from "../../notrivia";
 //import {GameOptions} from "../../trivia/game/Game";
 import {FindAndModifyWriteOpResultObject} from "mongodb";
 import {User} from "../../react/src/store/session";
