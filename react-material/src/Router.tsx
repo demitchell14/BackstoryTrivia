@@ -51,7 +51,7 @@ class Router extends React.Component<RouterProps, RouterState> {
         return [
             <Route key={"test"} exact={true} path={"/test"} component={isAuthorized ? Test : Redirector} />,
             <Route key={"manage/questions"} exact={true} path={"/manage/questions"} component={isAuthorized ? Questions : Redirector} />,
-            <Route key={"manage/games"} exact={true} path={"/manage/games"}
+            <Route key={"manage/games"} exact={true} path={["/manage/games", "/manage/games/:tab"]}
                    component={isAuthorized ? Games : Redirector}/>,
         ];
     }
