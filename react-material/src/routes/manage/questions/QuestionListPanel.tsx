@@ -15,6 +15,7 @@ import {
     ListItemSecondaryAction,
     ListItemText,
     Paper,
+    TextField,
     Tooltip,
     Typography,
     withStyles
@@ -67,7 +68,11 @@ const styles = theme => ({
     noMargin: {
         margin: 0
     },
-    w100: {width: "100%"}
+    w100: {width: "100%"},
+    dflex: {
+        display: "flex",
+        width: "100%"
+    }
 });
 
 
@@ -104,7 +109,7 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
 
     public render() {
         // console.log("List Rendered");
-        const {classes, questions, title, showSearch, showActions, showSelect, showUnselect, emptyMessage} = this.props;
+        const {classes, questions, title, showSearch, showActions, showSelect, showUnselect, emptyMessage, showDetails} = this.props;
 
         const answer = (question:Question) => {
             if (question.type === "Open Ended") {
@@ -150,14 +155,14 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
                                 </Paper>
                             </ListItem>
                         )}
-                        {questions ? filteredQuestions.length > 0 ? filteredQuestions.map(question => {
+                        {questions ? filteredQuestions.length > 0 ? filteredQuestions.map((question, idx) => {
                             return (
                                 <ListItem key={question._id} button divider disableRipple
                                           className={classes.questionContainer}>
                                     <ExpansionPanel style={{width: "100%"}}>
                                         <ExpansionPanelSummary>
                                             <ListItemAvatar>
-                                                <Avatar/>
+                                                <Avatar>{question.timeLimit || ""}</Avatar>
                                             </ListItemAvatar>
                                             <ListItemText
                                                 primary={(
@@ -181,7 +186,18 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
                                         </ExpansionPanelSummary>
                                         <ExpansionPanelDetails>
 
-                                            {showActions ? (
+                                            {showDetails && (
+                                                <div className={classes.dflex}>
+                                                    <TextField fullWidth
+                                                               defaultValue={question.timeLimit}
+                                                               type={"number"} label={"Time Limit"}/>
+                                                    <TextField fullWidth
+                                                               defaultValue={question.points}
+                                                               type={"number"} label={"Points"}/>
+                                                </div>
+                                            )}
+
+                                            {showActions && (
                                                 <div>
                                                     <Tooltip title={"View / Edit"}>
                                                         <IconButton color={"primary"}
@@ -202,7 +218,7 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
                                                         </IconButton>
                                                     </Tooltip>
                                                 </div>
-                                            ) : ""}
+                                            )}
                                         </ExpansionPanelDetails>
                                     </ExpansionPanel>
 
@@ -285,12 +301,14 @@ interface QuestionListPanelProps {
     showSelect?: boolean;
     showUnselect?: boolean;
     emptyMessage?: string;
+    showDetails?: boolean;
     onSelected?: (evt:SyntheticEvent, target: any) => any;
     onUnselected?: (evt: SyntheticEvent, target: any) => any;
     onDeleted?: (evt: SyntheticEvent, target: any) => any;
     onCloned?: (evt: SyntheticEvent, target: any) => any;
     styles?: React.CSSProperties;
     contentStyles?: React.CSSProperties;
+    maxHeight?: string | number;
 }
 
 interface QuestionListPanelState {

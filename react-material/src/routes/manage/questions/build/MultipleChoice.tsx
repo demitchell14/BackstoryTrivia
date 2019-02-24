@@ -115,7 +115,7 @@ class MultipleChoice extends React.Component<MultipleChoiceProps, MultipleChoice
     };
 
     public render() {
-        console.log(this.state);
+        // console.log(this.state);
         let {classes, choices} = this.props;
         const {selected, active} = this.state;
         return (
@@ -150,9 +150,10 @@ class MultipleChoice extends React.Component<MultipleChoiceProps, MultipleChoice
                             <Chip
                                 style={{marginTop: ".5rem"}}
                                 clickable
-                                avatar={<Avatar>S</Avatar>}
+                                avatar={<Avatar>{active.correct ? <FAIcon icon={["far", "check"]}/> :
+                                    <FAIcon icon={["far", "times"]}/>}</Avatar>}
                                 onClick={this.chipClicked(selected)}
-                                color={"primary"}
+                                color={active.correct ? "primary" : "secondary"}
                                 label={active.correct ? "Choice is correct!" : "Choice is wrong!"}
                             />
                             <Divider style={{margin: ".5rem 0", backgroundColor: "transparent"}}/>
@@ -162,7 +163,7 @@ class MultipleChoice extends React.Component<MultipleChoiceProps, MultipleChoice
                                 error={typeof this.state.error.answer !== "undefined"}
                                 helperText={typeof this.state.error.answer !== "undefined" ? (
                                     this.state.error.answer
-                                ) : (typeof selected === "number" ? `This is answer choice #${(selected+1) || 0}.` : `No question is selected`)}
+                                ) : (typeof selected === "number" ? `This is answer choice #${(selected + 1) || 0}.` : `No Answer is selected`)}
                                 placeholder={"Austin"}
                                 onChange={this.answerChanged(selected)}
                                 label={"Answer Choice"}

@@ -117,32 +117,39 @@ class Builder extends React.Component<BuilderProps, BuilderState> {
 
     public render() {
         // console.log("Builder Rendered");
-        let {classes} = this.props;
+        let {classes, sendAction, containers} = this.props;
         const {stage, data} = this.state;
         const {type} = data;
         let Body;
 
+        const {onChange, handleAutoSelect, choiceChanged, handleMultipleChoice} = this;
 
         switch (stage) {
             case 0:
                 Body = <QType className={classes.questionTypeCls} onChange={this.onChange}/>;
                 break;
             case 1:
-                Body = <QDetails
-                    classes={classes}
-                    onChange={this.onChange}
-                    handleAutoSelect={this.handleAutoSelect}
-                    handleMultipleChoice={this.handleMultipleChoice}
-                    sendAction={this.props.sendAction}
-                    choiceChanged={this.choiceChanged}
-                    container={this.props.containers ? this.props.containers.question : []}
-                    data={data}
-                />;
+                // Body = <QDetails
+                //     classes={classes}
+                //     onChange={this.onChange}
+                //     handleAutoSelect={this.handleAutoSelect}
+                //     handleMultipleChoice={this.handleMultipleChoice}
+                //     sendAction={this.props.sendAction}
+                //     choiceChanged={this.choiceChanged}
+                //     container={this.props.containers ? this.props.containers.question : []}
+                //     data={data}
+                // />;
+                Body = React.createElement(QDetails, {
+                    classes, data, sendAction, handleMultipleChoice,
+                    onChange, handleAutoSelect, choiceChanged,
+                    container: containers ? containers.question : []
+                });
                 break;
             case 2:
                 Body = <QSummary/>;
                 break;
             default:
+                console.log("Defaulted");
                 Body = null;
         }
 
@@ -354,13 +361,12 @@ const QDetails = props => {
     // @ts-ignore
     const {_id, questionImage, answer, questionDetails, type, category, choices, points, question, timeLimit} = props.data || {} as any;
 
-    console.log(category);
+    console.log(props);
 
     return (
-        <Grid container className={classes.buildStep} justify={"flex-start"} spacing={16}>
+        <Grid component={"form"} container className={classes.buildStep} justify={"flex-start"} spacing={16}>
             <Grid xs={12} item>
                 <TextField
-                    variant={"standard"}
                     placeholder={"What is the capitol of Texas?"}
                     fullWidth multiline required
                     rows={2} rowsMax={4} label={"Enter Question"}

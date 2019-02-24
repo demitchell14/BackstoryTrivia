@@ -36,7 +36,7 @@ class Main extends React.Component<MainProps, MainState> {
     render() {
         const {classes, containers} = this.props;
 
-        console.log(containers);
+        //console.log(containers);
         //const {isAuthorized,} = this.state
 
         if (containers) {
