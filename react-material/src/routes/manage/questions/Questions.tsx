@@ -7,7 +7,7 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
-    Grid,
+    Drawer,
     Paper,
     Tab,
     Tabs,
@@ -33,6 +33,7 @@ const styles = theme => ({
     content: {
         flexGrow: 1,
         padding: theme.spacing.unit * 3,
+        marginRight: 400
     },
     inputRoot: {
         //margin: "6px 8px 2px",
@@ -42,7 +43,15 @@ const styles = theme => ({
         alignItems: 'center',
         width: "auto",
     },
-
+    drawerPaper: {
+        width: 400,
+        right: 0,
+        left: "unset"
+    },
+    questionsDrawer: {
+        width: 400,
+        flexShrink: 0
+    },
     input: {
         marginLeft: 8,
         flex: 1,
@@ -63,6 +72,10 @@ const styles = theme => ({
 
 class Questions extends React.Component<QuestionsProps, QuestionsState> {
     private questionSubscription:any;
+    public tabs = [
+        Home,
+        Builder
+    ];
     public constructor(props) {
         super(props);
         this.state = {
@@ -188,11 +201,6 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
     public render() {
         const {classes} = this.props;
 
-        const tabs = [
-            Home,
-            Builder
-        ];
-
 
         const tabsProps = [
             {},
@@ -226,31 +234,32 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
                 </Dialog>
 
                 <div className={classes.toolbar} />
-                <Grid container spacing={16}>
-                    <Grid sm={6} md={7} item>
-                        <Paper elevation={1} className={classes.tabOffset}>
-                            <Tabs value={this.state.tab} fullWidth onChange={this.tabChanged} scrollable scrollButtons={"auto"}>
-                                <Tab label={"Home"} />
-                                <Tab label={"Create Question"} />
-                                <Tab label={"Create Lists"} disabled />
-                                <Tab label={"Settings"} disabled />
-                            </Tabs>
-                        </Paper>
 
-                        {React.createElement(tabs[this.state.tab], {
-                            ...tabsProps[this.state.tab]
-                        })}
-                    </Grid>
+                <Paper elevation={1} className={classes.tabOffset}>
+                    <Tabs value={this.state.tab} fullWidth onChange={this.tabChanged}>
+                        <Tab label={"Home"}/>
+                        <Tab label={"Create Question"}/>
+                        <Tab label={"Create Lists"} disabled/>
+                    </Tabs>
+                </Paper>
 
-                    <Grid sm={6} md={5} item>
-                        <QuestionListPanel showSearch showActions
-                            onSelected={this.questionSelected}
-                            onDeleted={this.questionDeleted}
-                            onCloned={this.questionCloned}
-                            questions={this.state.questions}
-                        />
-                    </Grid>
-                </Grid>
+                {React.createElement(this.tabs[this.state.tab], {
+                    ...tabsProps[this.state.tab]
+                })}
+
+                <Drawer variant={"permanent"}
+                        className={classes.questionsDrawer}
+                        classes={{
+                            paper: classes.drawerPaper
+                        }}
+                >
+                    <QuestionListPanel showSearch showActions contentStyles={{maxHeight: "100%"}}
+                                       onSelected={this.questionSelected}
+                                       onDeleted={this.questionDeleted}
+                                       onCloned={this.questionCloned}
+                                       questions={this.state.questions}
+                    />
+                </Drawer>
             </main>
         );
     }

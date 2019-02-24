@@ -113,14 +113,14 @@ class Games extends React.Component<GamesProps, GamesState> {
         return (
             <main className={classes.content}>
                 <div className={classes.toolbar}/>
-                <Navigator
-                    classes={classes}
-                    active={target.name}
-                    tabs={this.tabs.map(tab => ({
+                <Navigator style={{marginBottom: 0}}
+                           classes={classes}
+                           active={target.name}
+                           tabs={this.tabs.map(tab => ({
                         label: tab.name,
                         icon: <FAIcon fixedWidth className={classes.navIcon} icon={tab.icon}/>
                     }))}
-                    onChange={this.handleTabChange}
+                           onChange={this.handleTabChange}
                 />
                 <div style={{width: "100%", position: "relative"}}>
                     {target && React.createElement(target.component, {
@@ -151,12 +151,12 @@ class Games extends React.Component<GamesProps, GamesState> {
 }
 
 const Navigator = props => {
-    const {classes, tabs, active, onChange} = props;
+    const {classes, tabs, active, onChange, style} = props;
     if (window.innerWidth > 425) {
         return (
             <Paper elevation={1} className={classes.tabOffset}>
-                <Tabs value={active} fullWidth scrollable scrollButtons={"auto"} onChange={onChange}
-                      classes={{scrollable: classes.scroller}}>
+                <Tabs value={active} fullWidth onChange={onChange}
+                      classes={{scrollable: classes.scroller}} style={style}>
                     {tabs ? tabs.map((tab, id) => <Tab key={id} value={tab.label} label={tab.label}
                                                        icon={tab.icon}/>) : undefined}
                 </Tabs>

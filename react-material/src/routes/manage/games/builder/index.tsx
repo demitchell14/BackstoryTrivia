@@ -34,6 +34,14 @@ const styles = theme => ({
 
     fieldCls: {
         marginBottom: theme.spacing.unit,
+    },
+    collectionDivider: {
+        justifyContent: "center",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        textAlign: "center",
+        padding: ".5rem"
     }
 });
 
@@ -103,6 +111,8 @@ class Builder extends React.Component<BuilderProps, BuilderState> {
     }
 
     public sendGame = (evt: SyntheticEvent) => {
+
+        console.log(this.state.forms);
         console.log("Saving Game Here!")
     };
 
@@ -140,6 +150,7 @@ class Builder extends React.Component<BuilderProps, BuilderState> {
             case 1:
 
                 return <QuestionSelection
+                    classes={classes}
                     select={this.addQuestion}
                     unselect={this.removeQuestion}
                     selectedQuestions={forms.questions}
@@ -204,7 +215,7 @@ const BasicInfo = (props) => {
     const form = props.form as IBasicForm;
 
     return (
-        <Grid container spacing={spacing}>
+        <Grid component={"form"} container spacing={spacing}>
             <Grid item md={8} xs={12}>
                 <TextField
                     fullWidth
@@ -259,21 +270,23 @@ const BasicInfo = (props) => {
 
 const QuestionSelection = (props) => {
     // const questions = props.questions as Question[];
-    const {selectedQuestions, questions} = props;
+    const {selectedQuestions, questions, classes} = props;
     return (
         <Grid container>
             <Grid item xs={12} md={5}>
                 <QuestionListPanel
                     contentStyles={{maxHeight: 400}}
                     questions={selectedQuestions}
-                    showUnselect
+                    showUnselect showDetails
                     onUnselected={props.unselect}
                     title={"Selected Questions"}
                     emptyMessage={"Select questions from the menu on the right and they will be added here!"}
                 />
             </Grid>
-            <Grid style={{alignSelf: "center", justifyContent: "center", display: "flex"}} item xs={12} md={2}>
-                <FAIcon size={"3x"} icon={["fal", "arrow-from-right"]}/>
+            <Grid className={classes.collectionDivider} item xs={12} md={2}>
+                <FAIcon size={"3x"} icon={["far", "exchange"]}/>
+                <Typography variant={"subtitle1"}>Choose questions from the right to add to your trivia
+                    game!</Typography>
             </Grid>
             <Grid item xs={12} md={5}>
                 <QuestionListPanel
