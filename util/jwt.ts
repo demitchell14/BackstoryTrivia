@@ -20,8 +20,8 @@ const authorizedAccessOnly = (req:AuthorizedRequest, res:Response, next) => {
                 });
             } else {
                 if (decoded._id) {
-                    const {_id, autologin} = decoded;
-                    res.setHeader("authorization", "bearer " + sign({_id, autologin: autologin ? autologin : false}, decoded.autologin ? "14d" : "1m"));
+                    //const {_id, autologin} = decoded;
+                    //res.setHeader("authorization", "bearer " + sign({_id, autologin: autologin ? autologin : false}, decoded.autologin ? "14d" : "1m"));
                 }
                 req.decoded = decoded;
                 next();
@@ -57,11 +57,13 @@ const verify = (token:string) => {
 
 export interface AuthorizedRequest extends Request {
     decoded?: AuthorizedToken;
+    body: any;
 }
 export interface AuthorizedToken {
     iat: number;
     expires: number;
     _id: string;
+    type: string;
     autologin?: boolean;
 }
 

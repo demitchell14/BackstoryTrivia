@@ -2,7 +2,7 @@ import * as mongoose from "mongoose";
 import {Model} from "mongoose";
 import {ObjectID} from "bson";
 
-const QuestionScema = new mongoose.Schema({
+const QuestionSchema = new mongoose.Schema({
    question: {
        type: String,
        required: true,
@@ -44,7 +44,7 @@ const QuestionScema = new mongoose.Schema({
     }
 });
 
-export const Questions = mongoose.model('questions', QuestionScema, "questions") // as Model<Questions>;
+export const Questions = mongoose.model('questions', QuestionSchema, "questions") // as Model<Questions>;
 // export const Moderators = mongoose.model('moderators', QuestionScema, "moderators")// as Model<Moderators>;
 
 export interface Questions {
