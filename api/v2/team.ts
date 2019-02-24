@@ -54,7 +54,7 @@ class TeamRouting {
             });
 
             if (complete.insertedCount > 0) {
-                const token = jwt.sign({ _id: complete.insertedId }, autologin ? "14d" : undefined);
+                const token = jwt.sign({ _id: complete.insertedId, type: "team", }, autologin ? "14d" : undefined);
                 res.json({token, email});
                 return;
             }
@@ -94,7 +94,7 @@ class TeamRouting {
             if (count) {
                 const results = await query.next() as TeamObject;
 
-                const token = jwt.sign({_id, autologin: typeof authkey.autologin === "boolean" ? authkey.autologin : authkey }, autologin ? "14d" : undefined);
+                const token = jwt.sign({_id, type: "team", autologin: typeof authkey.autologin === "boolean" ? authkey.autologin : authkey }, autologin ? "14d" : undefined);
                 res.json({token, email: results.email});
                 this.updateUser(req, results);
                 return;
@@ -108,7 +108,7 @@ class TeamRouting {
 
                         let {hashedPassword, _id} = results;
                         if (bcrypt.compareSync(password, hashedPassword)) {
-                            const token = jwt.sign({_id, autologin}, autologin ? "14d" : undefined);
+                            const token = jwt.sign({_id, type: "team", autologin}, autologin ? "14d" : undefined);
                             res.json({token, email});
                             this.updateUser(req, results);
                             return;
@@ -119,7 +119,7 @@ class TeamRouting {
                         const results = await query.next() as TeamObject;
                         let {_id} = results;
                         if (bcrypt.compareSync(pin, results.hashedPin)) {
-                            const token = jwt.sign({_id, autologin}, autologin ? "14d" : undefined)
+                            const token = jwt.sign({_id, type: "team", autologin}, autologin ? "14d" : undefined)
                             res.json({token, email});
                             this.updateUser(req, results);
                             return;

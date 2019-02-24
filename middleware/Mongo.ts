@@ -17,5 +17,6 @@ export function Mongo() : RequestHandler {
 export declare namespace Middleware {
     interface Mongo extends Request {
         db: Database;
+        body: any;
     }
 }

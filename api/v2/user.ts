@@ -35,9 +35,8 @@ class UserRouting {
 
     defaultRoute = async (req:AuthorizedRequest, res, next) => {
         console.log(req)
-        res.json({
-            decoded: req.decoded
-        })
+
+        res.send ({decoded: req.decoded})
         const db = await req.app.get("database") as Mongoose;
         //console.log();
     };
@@ -89,7 +88,7 @@ class UserRouting {
 
             if (data) {
                 const {email, name} = data;
-                const token = jwt.sign({_id, autologin: authkey.autologin }, authkey.autologin ? "14d" : undefined);
+                const token = jwt.sign({_id, type: "moderator", autologin: authkey.autologin }, authkey.autologin ? "14d" : undefined);
                 res.json({token, email, name, type});
                 this.updateUser(req, data);
             }
@@ -101,7 +100,7 @@ class UserRouting {
                     let {passwordhash, _id, name} = results;
                     console.log(passwordhash,)
                     if (bcrypt.compareSync(password, passwordhash)) {
-                        const token = jwt.sign({_id, autologin}, autologin ? "14d" : undefined);
+                        const token = jwt.sign({_id, type: "moderator", autologin}, autologin ? "14d" : undefined);
                         res.json({token, email, name, type});
                         this.updateUser(req, results);
                         return;
@@ -110,7 +109,7 @@ class UserRouting {
                     const results = query.toJSON() as Moderators;
                     let {_id, name} = results;
                     if (bcrypt.compareSync(pin, results.pin)) {
-                        const token = jwt.sign({_id, autologin}, autologin ? "14d" : undefined)
+                        const token = jwt.sign({_id, type: "moderator", autologin}, autologin ? "14d" : undefined)
                         res.json({token, email, name, type});
                         this.updateUser(req, results);
                         return;
@@ -140,7 +139,7 @@ class UserRouting {
             });
 
             if (complete.insertedCount > 0) {
-                const token = jwt.sign({ _id: complete.insertedId }, autologin ? "14d" : undefined);
+                const token = jwt.sign({ _id: complete.insertedId, type: "moderator", }, autologin ? "14d" : undefined);
                 res.json({token, email});
                 return;
             }
