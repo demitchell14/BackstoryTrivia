@@ -39,9 +39,49 @@ export class PlayerContainer extends Container<any>{
                 Object.keys(json).map(k => this[k] = json[k]);
                 return success;
             }
-            return true;
+            return false;
         } else {
             return false;
+        }
+    }
+    
+    sendLogin = async (formdata: LoginFormData) => {
+        if (formdata.pin === "")
+            delete formdata.pin;
+        if (formdata.password === "")
+            delete formdata.password;
+
+        if (formdata.autologin === "on")
+            formdata.autologin = true;
+        if (formdata.autologin === "off")
+            formdata.autologin = false;
+
+        const response = await fetch("/api/v2/team/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(formdata)
+        });
+
+        const json = await response.json() as LoginResponse;
+
+        console.log(json);
+        if (response.status === 200) {
+            if (json.token && json.email) {
+                if (this.storage) {
+                    this.storage.setToken(json.token);
+                    this.storage.setEmail(json.email);
+
+                    return true;
+                } else {
+                    return ["Storage Container is undefined"];
+                }
+            } else {
+                return ["Response Error occurred"];
+            }
+        } else {
+            return json.error;
         }
     }
 
@@ -79,6 +119,27 @@ export class PlayerContainer extends Container<any>{
             this.storage = storage;
         }
     }
+
+    reset = () => {
+        if (this.storage) {
+            this.storage.clearEmail();
+            this.storage.clearPin();
+            this.storage.clearToken();
+        }
+    }
+}
+
+export interface LoginFormData {
+    email: string;
+    password?: string;
+    pin?: string;
+    autologin: string|boolean;
+}
+
+export interface LoginResponse {
+    token?: string;
+    email?: string;
+    error?: string[];
 }
 
 export interface RegisterFormData {
@@ -87,6 +148,7 @@ export interface RegisterFormData {
     passwordConfirm: string;
     teamName: string;
 }
+
 export interface RegisterResponse {
     token?: string;
     email?: string;
