@@ -18,12 +18,18 @@ html, body {
   overflow-y: auto;
   margin-bottom: 4rem;
 }
+.bg-main {
+  background-color: theme-color-level(primary, -6);
+}
 .bg-splash {
   //background: #272727;
   background-color: theme-color(primary);
 }
 .bg-register {
   background-color: theme-color-level(primary, 6);
+}
+.bg-login {
+  background-color: theme-color-level(primary, 4);
 }
 .head-pad {
   margin-top: 4rem;
