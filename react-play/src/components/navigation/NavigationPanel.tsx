@@ -1,33 +1,54 @@
+import {SyntheticEvent} from "react";
 import * as React from "react";
 //import {} from "react"
 import "./navigation.css"
+import FAIcon from "../../FontAwesome";
 import {findChild} from "../index";
 
-export function NavigationPanel(props:NavigationPanelProps) {
-    let classes = ["navigation-panel"];
+export class NavigationPanel extends React.Component<NavigationPanelProps, NavigationPanelState> {
+    static componentName = "NavigationPanel";
+    constructor(props:NavigationPanelProps) {
+        super(props);
+        let classes = ["navigation-panel"];
 
-    const title = findChild(props.children, "NavigationTitle") as any;
-    const items = findChild(props.children, "NavigationItems") as any;
+        if (!props.visible) classes = [];
 
-    if (!props.visible) classes = [];
+        if (props.expanded) {
+            classes.push("expanded");
+        }
 
-    if (props.expanded) {
-        classes.push("expanded");
+        this.state = {
+            classes,
+            expanded: props.expanded || false,
+        }
     }
 
-    // const title = React.cloneElement(rawTitle, {
-    //     className: props.expanded && "expanded"
-    // });
+    toggleExpanded = (evt:SyntheticEvent) => {
+        this.setState({expanded: !this.state.expanded})
+    }
 
-    return (
-        <div className={classes.join(" ")}>
-            {!props.locked && props.visible && (<div className={"controller"}>&times;</div>)}
-            {props.visible && title}
-            {props.visible && props.expanded && items}
-        </div>
-    )
+    render = () => {
+        const {classes, expanded} = this.state;
+        const {props} = this;
+
+        const title = findChild(props.children, "NavigationTitle") as any;
+        const items = findChild(props.children, "NavigationItems") as any;
+
+
+        return (
+            <div className={classes.join(" ")} draggable>
+                {!props.locked && props.visible && (<div onClick={this.toggleExpanded} className={"controller"}><FAIcon icon={["fal", "bars"]} /></div>)}
+                {props.visible && title}
+                {props.visible && expanded && items}
+            </div>
+        )
+    }
 }
-NavigationPanel.componentName = "NavigationPanel";
+
+export interface NavigationPanelState {
+    classes: string[];
+    expanded: boolean;
+}
 
 export interface NavigationPanelProps {
     children: React.ReactNode|React.ReactNodeArray;

@@ -1,10 +1,11 @@
 import * as React from "react";
 import {Route, Switch, withRouter, RouteProps, RouterProps as IRouterProps} from "react-router";
+import {Link} from "react-router-dom";
 import {Container, NavigationItem, NavigationItems, NavigationPanel, NavigationTitle} from "./components";
 
 import {StorageContainer, withContainer} from "./containers";
 import {PlayerContainer} from "./containers/player/Container";
-import {Home, Register} from "./routes";
+import {Home, Register, Login} from "./routes";
 
 
 class Router extends React.Component<RouterProps, RouterState> {
@@ -38,6 +39,9 @@ class Router extends React.Component<RouterProps, RouterState> {
             case "/register":
                 bg = "bg-register";
                 break;
+            case "/login":
+                bg = "bg-login";
+                break;
         }
         this.setState({backgroundClass: bg});
     }
@@ -53,8 +57,10 @@ class Router extends React.Component<RouterProps, RouterState> {
                 direction={"column"}
                 className={"bg-core " + backgroundClass}
             >
-                <NavigationPanel visible locked>
-                    <NavigationTitle>Backstory Trivia</NavigationTitle>
+                <NavigationPanel visible>
+                    <NavigationTitle component={Link} className={"h2 text-dark text-decoration-none"} componentProps={{
+                        to: "/"
+                    }}>Backstory Trivia</NavigationTitle>
                     {/*<NavigationSubtitle>Another String Possible?</NavigationSubtitle>*/}
                     <NavigationItems>
                         <NavigationItem />
@@ -67,6 +73,7 @@ class Router extends React.Component<RouterProps, RouterState> {
                 <Switch>
                     <Route path={"/"} exact={true} component={withContainer(Home, StorageContainer, PlayerContainer)} />
                     <Route path={"/register"} exact={true} component={withContainer(Register, StorageContainer, PlayerContainer)} />
+                    <Route path={"/login"} exact={true} component={withContainer(Login, StorageContainer, PlayerContainer)} />
                 </Switch>
             </Container>
         );

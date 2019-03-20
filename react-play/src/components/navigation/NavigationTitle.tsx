@@ -6,7 +6,8 @@ export function NavigationTitle(props:NavigationTitleProps) {
         classes.push(props.className)
     }
     return React.createElement(props.component||"h2", {
-        className: classes.join(" ")
+        className: classes.join(" "),
+        ...props.componentProps
     }, props.children)
 }
 NavigationTitle.componentName = "NavigationTitle";
