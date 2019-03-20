@@ -1,0 +1,21 @@
+
+$primary: color-level("teal", -5);
+
+$theme-colors: ();
+$theme-colors: map-merge(
+  (
+          "primary":    $primary,
+          "secondary":  $secondary,
+          "success":    $success,
+          "info":       $info,
+          "warning":    $warning,
+          "danger":     $danger,
+          "light":      $light,
+          "dark":       $dark
+  ), $theme-colors
+);
+
+$link-color:                              theme-color("primary");
+$link-decoration:                         none;
+$link-hover-color:                        darken($link-color, 15%);
+$link-hover-decoration:                   underline;

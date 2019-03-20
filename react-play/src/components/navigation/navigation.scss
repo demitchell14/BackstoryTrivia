@@ -1,0 +1,66 @@
+@import "../../style/core";
+
+.navigation-panel {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 30px);
+  //width: 100%;
+  min-height: 50px;
+
+  background-color: theme-color-level(primary, 2);
+  color: theme-color-level(primary, 11);
+
+  box-shadow: 0 2px 2px 1px theme-color-level(primary, 4);
+
+  border-bottom-right-radius: .5rem;
+  border-bottom-left-radius: .5rem;
+  //padding-bottom: .5rem;
+  margin-bottom: 2rem;
+  z-index: 1000;
+
+  &.expanded {
+    .navigation-title {
+      top: 0;
+    }
+    .controller {
+      top: 0;
+    }
+  }
+
+  .navigation-title {
+    top: .3rem;
+    width: 100%;
+    padding: 0 1.5rem;
+    position: absolute;
+    transition: top .2s;
+  }
+
+  .nav-items {
+    margin: 40px 4px 4px;
+    list-style: none;
+    padding:0;
+
+    border-left: 1px solid theme-color-level(primary, 2);
+    border-right: 1px solid theme-color-level(primary, 2);
+    .nav-item {
+      padding: 0 .5rem;
+      background-color: theme-color-level(primary, -6);
+      border-bottom: 1px solid theme-color-level(primary, 2);
+
+    }
+  }
+
+  .controller {
+    width: 2rem;
+    height: 2rem;
+    text-align: center;
+    cursor: pointer;
+    top: .3rem;
+    position: absolute;
+    font-size: 1.5em;
+    right: 1rem;
+    transition: top .2s;
+    z-index: 1001;
+  }
+}
