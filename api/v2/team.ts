@@ -1,6 +1,6 @@
 import * as express from "express";
 import * as _ from "lodash";
-import {Request} from "express";
+import {Request, Response} from "express";
 import * as bcrypt from "bcrypt";
 import {Middleware, Mongo} from "../../middleware/Mongo";
 import {Encryption} from "../../config";
@@ -32,14 +32,47 @@ class TeamRouting {
         }
     }
 
-    index =(req:AuthorizedRequest, res, next) => {
-        res.json({decoded: req.decoded});
+    index =(req:IndexRequest, res, next) => {
+
+        const token = jwt.sign(req.decoded, req.decoded.autologin ? "14d" : undefined);
+
+        if (req.query.q) {
+            console.log("Get user information");
+        }
+        res.json({
+            success: true,
+            token
+        });
     }
 
-    register = async (req: RegisterBody, res, next) => {
+    register = async (req: RegisterBody, res:Response, next) => {
         const db = req.db;
-        const {email, teamName, password, pin, players, image, autologin} = req.body;
+        const {email, teamName, password, passwordConfirm, pin, players, image, autologin} = req.body;
+        const error = [];
+
+        if (password !== passwordConfirm) {
+            error.push("Please confirm your passwords.");
+        }
+
+        if (password.length < 8) {
+            error.push("Please make sure your password is at least 8 characters long.");
+        }
+
+        if (typeof teamName === "undefined" || teamName.length === 0) {
+            error.push("Please create a team name.");
+        }
+
+        if (error.length > 0) {
+            res.status(400).json({error});
+            return;
+        }
+
+        console.log(req.body)
+
+
         delete req.body.autologin;
+        delete req.body.passwordConfirm;
+
         await db.openCollection("teams");
         let exists = db.find({ $or: [ { email }, { teamName }] }) as Cursor;
         const count = await exists.count();
@@ -50,7 +83,7 @@ class TeamRouting {
             const complete = await db.insert({
                 email, teamName, image, players,
                 hashedPassword: bcrypt.hashSync(password, Encryption.saltRounts),
-                hashedPin: bcrypt.hashSync(pin, Encryption.saltRounts)
+                hashedPin: pin ? bcrypt.hashSync(pin, Encryption.saltRounts) : undefined
             });
 
             if (complete.insertedCount > 0) {
@@ -60,7 +93,7 @@ class TeamRouting {
             }
         }
 
-        res.sendStatus(500);
+        res.status(400).json({error: ["Email or Team Name is currently in use."]});
     }
 
     login = async (req: LoginBody, res, next) => {
@@ -88,7 +121,6 @@ class TeamRouting {
         const query = db.find(queryParams).limit(1) as Cursor;
         const count = await query.count();
 
-
         if (authkey) {
             // console.log(count, query)
             if (count) {
@@ -112,6 +144,9 @@ class TeamRouting {
                             res.json({token, email});
                             this.updateUser(req, results);
                             return;
+                        } else {
+                            res.status(401).json({error: ["You entered an invalid email or password"]});
+                            return;
                         }
                     }
                 } else if (pin) {
@@ -123,12 +158,16 @@ class TeamRouting {
                             res.json({token, email});
                             this.updateUser(req, results);
                             return;
+                        } else {
+                            res.status(401).json({error: ["You entered an invalid pin."]});
+                            return;
                         }
                     }
                 }
             }
         }
-        res.sendStatus(500);
+
+        res.status(401).json({error: ["You entered an invalid email or password"]});
 
     }
 
@@ -181,6 +220,12 @@ class TeamRouting {
     }
 }
 
+interface IndexRequest extends AuthorizedRequest, Middleware.Mongo {
+    query: {
+        q: string;
+    }
+}
+
 interface RemoveBody extends Middleware.Mongo, AuthorizedRequest {
     body: {
         target?: string;
@@ -209,7 +254,8 @@ interface LoginBody extends Middleware.Mongo {
 interface RegisterBody extends Middleware.Mongo {
     body: TeamObject & {
         password: string;
-        pin: string;
+        passwordConfirm: string;
+        pin?: string;
         autologin?: boolean;
     }
 }
