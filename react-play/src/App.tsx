@@ -12,6 +12,12 @@ class App extends React.Component<any, any> {
         }
     }
 
+    componentDidMount(): void {
+        import("./FontAwesome")
+            .then(fa => fa.init())
+            .then(() => this.forceUpdate());
+    }
+
     public render() {
         const {storageContainer} = this.state;
         return (
