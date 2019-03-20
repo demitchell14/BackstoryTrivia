@@ -30,11 +30,6 @@ app.set("database", Mongoose());
 
 app.use(logger("dev"));
 app.use(compression());
-if (process.env.NODE_ENV && process.env.NODE_ENV.trim() === "production") {
-    if (process.env.PUBLIC_DIR) {
-        app.use(express.static(path.join(process.cwd(), `./${process.env.PUBLIC_DIR}/build`)));
-    }
-}
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -47,6 +42,16 @@ if (process.env.NODE_ENV && process.env.NODE_ENV.trim() === "production") {
 }
 app.use('/api/v1', Middleware(), ApiV1);
 app.use('/api/v2', ApiV2);
+
+
+if (process.env.NODE_ENV && process.env.NODE_ENV.trim() === "production") {
+    if (process.env.PUBLIC_DIR) {
+        app.use(express.static(path.join(process.cwd(), `./${process.env.PUBLIC_DIR}/build`)));
+    }
+    if (process.env.PLAY_DIR) {
+        app.use(express.static(path.join(process.cwd(), `./${process.env.PLAY_DIR}/build`)));
+    }
+}
 
 
 export function SocketInit(server:Server) {
