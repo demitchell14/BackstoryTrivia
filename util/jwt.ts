@@ -5,7 +5,6 @@ import {JWT_SECRET} from "../config";
 
 const authorizedAccessOnly = (req:AuthorizedRequest, res:Response, next) => {
     let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
-
     if (typeof token === "string") {
         if (token.startsWith('Bearer ')) {
             // Remove Bearer from string
@@ -36,6 +35,11 @@ const authorizedAccessOnly = (req:AuthorizedRequest, res:Response, next) => {
 };
 
 const sign = (data:any, expires?:any) => {
+    if (data.exp)
+        delete data.exp;
+    if (data.iat)
+        delete data.iat;
+
     return jwt.sign(data,
         JWT_SECRET,
         { expiresIn: expires || '1m' // expires in 24 hours
