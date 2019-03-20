@@ -1,13 +1,13 @@
 import * as React from "react";
 import {RouterProps} from "react-router";
 import {Link} from "react-router-dom";
-import {Container, Button, SplashOption} from "../../components";
+import {Container, SplashOption} from "../../components";
 import {PlayerContainer, StorageContainer} from "../../containers";
 
 export class Home extends React.Component<HomeProps, HomeState> {
     public constructor(props:any) {
         super(props);
-        this.state = {} as HomeState
+        this.state = {show: false} as HomeState
 
         props.containers.player.attachStorage(props.containers.storage);
     }
@@ -18,8 +18,11 @@ export class Home extends React.Component<HomeProps, HomeState> {
         const player = this.props.containers.player;
         const check = player.check()
         check.then(res => {
+            console.log(res)
             if (res) {
                 this.props.history.push("/play");
+            } else {
+                this.setState({show: true});
             }
         })
     }
@@ -37,17 +40,17 @@ export class Home extends React.Component<HomeProps, HomeState> {
                 justifyContent={"around"}
                 flex={{grow:1}}>
 
-
-
-                <SplashOption reverse
-                    title={<h4 key={"h4"}>Are you new?</h4>}
-                    button={<Link key={"button"} to={"/register"} className={"btn btn-block btn-primary"}>Register to Play</Link>}
-                />
-
-                <SplashOption
+                {this.state.show && [
+                    <SplashOption key={"new"} reverse
+                                  title={<h4 key={"h4"}>Are you new?</h4>}
+                                  button={<Link key={"button"} to={"/register"} className={"btn btn-block btn-primary"}>Register to Play</Link>}
+                    />,
+                    <SplashOption key={"return"}
                     title={<h4 key={"h4"}>Returning player?</h4>}
-                    button={<Button block variant={"primary"} key={"button"} title={"Login"} />}
-                />
+                    button={<Link key={"button"} to={"/login"} className={"btn btn-block btn-primary"}>Login</Link>}
+                    />
+                ]}
+
             </Container>
         );
     }
@@ -62,5 +65,5 @@ interface HomeProps extends RouterProps{
 }
 
 interface HomeState {
-
+    show: boolean;
 }
