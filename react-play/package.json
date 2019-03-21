@@ -16,13 +16,14 @@
     "normalize.css": "^8.0.1",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
+    "react-ga": "^2.5.7",
     "react-router-dom": "^4.3.1",
     "react-scripts-ts": "3.1.0",
     "react-snap": "^1.23.0",
     "react-spring": "^8.0.15",
-    "sass-loader": "^7.1.0",
-    "unstated": "^2.1.1",
-    "socket.io": "^2.1.1"
+    "socket.io": "^2.1.1",
+    "universal-analytics": "^0.4.20",
+    "unstated": "^2.1.1"
   },
   "scripts": {
     "start": "react-scripts-ts start",
@@ -42,6 +43,9 @@
     "@types/react-dom": "^16.8.2",
     "@types/react-router-dom": "^4.3.1",
     "@types/socket.io-client": "^1.4.32",
+    "@types/universal-analytics": "^0.4.2",
+    "@types/react-ga": "^2.3.0",
+    "sass-loader": "^7.1.0",
     "typescript": "^3.3.3333",
     "webpack-bundle-analyzer": "^3.0.3"
   }
