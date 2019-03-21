@@ -44,6 +44,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/debug": "0.0.31",
+    "@types/socket.io": "^2.1.2",
     "@types/webpack": "^4.4.24",
     "axios": "^0.18.0",
     "bcrypt": "^3.0.2",
@@ -59,12 +60,12 @@
     "lodash": "^4.17.11",
     "moment": "^2.22.2",
     "mongodb": "^3.1.9",
+    "mongoose": "^5.4.2",
     "morgan": "^1.9.1",
     "randexp": "^0.5.3",
     "socket.io": "^2.1.1",
     "typescript": "^3.1.6",
-    "uuid": "^3.3.2",
-    "mongoose": "^5.4.2"
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.1.5",
