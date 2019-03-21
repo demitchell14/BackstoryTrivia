@@ -3,6 +3,7 @@ import {Subscribe} from "unstated";
 
 export * from "./storage/Container"
 export * from "./player/Container";
+export * from "./socket/Container";
 
 
 export function withContainer(element:any, ...containers:any[]):any {
