@@ -15,6 +15,8 @@ export * from "./button/Button"
 
 export * from "./splash/SplashOption";
 
+export * from "./loading/Loading";
+
 
 export function findChild(root:any, search:any): React.ReactNode {
     if (root instanceof Array) {

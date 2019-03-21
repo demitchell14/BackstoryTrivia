@@ -1,0 +1,27 @@
+@import "../../style/core";
+
+.loading {
+  position: absolute;
+  display: flex;
+  width: 200px;
+  min-height: 100px;
+  align-items: center;
+  opacity: 0;
+  transition: .15s ease all;
+  &.visible {
+    display: flex;
+    opacity: .85;
+  }
+  &.dark {
+    background: theme-color-level(primary, 6);
+    color: theme-color-level(primary,-8);
+    border-radius: 1rem;
+    box-shadow: 1px 1px 2px 1px theme-color-level(primary, 8);
+  }
+
+  .text {
+    font-size: 1.4em;
+    flex-grow: 1;
+    text-align:center;
+  }
+}
