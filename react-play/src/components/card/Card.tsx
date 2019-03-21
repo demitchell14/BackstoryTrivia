@@ -78,6 +78,12 @@ export class Card extends React.Component<CardProps, CardState> {
         classes.push(assignVariant(props));
         classes.push(assignTheme(props));
 
+        if (props.className) {
+            const nCls = props.className.split(" ");
+            //console.log();
+            [].push.call(classes, nCls.filter(c => classes.find(a => a === c) === undefined));
+        }
+
         this.state = {
             classes, style
         }
@@ -243,6 +249,7 @@ export interface CardProps {
     display?: string;
     onMouseEnter?: (evt:any) => void;
     onMouseLeave?: (evt:any) => void;
+    className?: string;
 }
 
 interface ApplyBorderRadius {
