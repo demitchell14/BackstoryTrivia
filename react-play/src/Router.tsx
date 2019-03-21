@@ -3,9 +3,8 @@ import {Route, Switch, withRouter, RouteProps, RouterProps as IRouterProps} from
 import {Link} from "react-router-dom";
 import {Container, NavigationItem, NavigationItems, NavigationPanel, NavigationTitle} from "./components";
 
-import {StorageContainer, withContainer} from "./containers";
-import {PlayerContainer} from "./containers/player/Container";
-import {Home, Register, Login} from "./routes";
+import {SocketContainer, StorageContainer, PlayerContainer, withContainer} from "./containers";
+import {Home, Register, Login, Play} from "./routes";
 
 
 class Router extends React.Component<RouterProps, RouterState> {
@@ -74,6 +73,7 @@ class Router extends React.Component<RouterProps, RouterState> {
                     <Route path={"/"} exact={true} component={withContainer(Home, StorageContainer, PlayerContainer)} />
                     <Route path={"/register"} exact={true} component={withContainer(Register, StorageContainer, PlayerContainer)} />
                     <Route path={"/login"} exact={true} component={withContainer(Login, StorageContainer, PlayerContainer)} />
+                    <Route path={"/play"} exact={true} component={withContainer(Play, StorageContainer, PlayerContainer, SocketContainer)} />
                 </Switch>
             </Container>
         );
