@@ -17,7 +17,7 @@ export class StorageContainer extends Container<any>{
     
     hasToken = () => localStorage.getItem(`${VER}-token`) !== null
     
-    getToken = () => localStorage.getItem(`${VER}-token`);
+    getToken = () => localStorage.getItem(`${VER}-token`) || "";
 
     clearToken = () => localStorage.removeItem(`${VER}-token`);
 
@@ -41,7 +41,7 @@ export class StorageContainer extends Container<any>{
 
     hasPin = () => localStorage.getItem(`${VER}-pin`) !== null
 
-    getPin = () => localStorage.getItem(`${VER}-pin`);
+    getPin = () => localStorage.getItem(`${VER}-pin`) || "";
 
     clearPin = () => localStorage.removeItem(`${VER}-pin`);
     
