@@ -1,5 +1,6 @@
 import {Container} from "unstated";
 import {StorageContainer} from "..";
+import * as ReactGA from "react-ga";
 
 export class PlayerContainer extends Container<any>{
     static containerName:string = "player";
@@ -72,6 +73,16 @@ export class PlayerContainer extends Container<any>{
                 if (this.storage) {
                     this.storage.setToken(json.token);
                     this.storage.setEmail(json.email);
+                    
+                    let label = formdata.pin ? "With Pin" : "With Password";
+                    
+                    label += ", " + (formdata.autologin ? "Extended Login Timer" : "Standard Login Timer");
+                    
+                    ReactGA.event({
+                        category: "Team",
+                        action: "Logged in",
+                        label
+                    })
 
                     return true;
                 } else {
@@ -101,6 +112,11 @@ export class PlayerContainer extends Container<any>{
                 if (this.storage) {
                     this.storage.setToken(json.token);
                     this.storage.setEmail(json.email);
+
+                    ReactGA.event({
+                        category: "Team",
+                        action: "Registered"
+                    })
 
                     return true;
                 } else {

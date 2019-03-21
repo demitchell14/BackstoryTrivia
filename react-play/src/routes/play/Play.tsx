@@ -1,5 +1,6 @@
 import {RefObject, SyntheticEvent} from "react";
 import * as React from "react";
+import {RouterProps} from "react-router";
 import {Card, CardBody, Container, Loading} from "../../components";
 import {PlayerContainer, SocketContainer, StorageContainer} from "../../containers";
 import {BrowserQRCodeReader} from "@zxing/library";
@@ -21,6 +22,15 @@ export class Play extends React.Component<PlayProps, PlayState> {
     }
 
     componentDidMount(): void {
+        const {player} = this.props.containers;
+
+        const check = player.check();
+        check.then(res => {
+            if (typeof res === "boolean" && !res) {
+                this.props.history.replace("/");
+            }
+        });
+
         this.sendViewSettings();
     }
 
@@ -34,6 +44,8 @@ export class Play extends React.Component<PlayProps, PlayState> {
                         if (this.cameraRef.current) {
                             this.qr.decodeFromInputVideoDevice(targetController.deviceId, this.cameraRef.current)
                                 .then(res => {
+                                    this.setState({game: res.getText()});
+                                    this.onJoin();
                                     this.sendViewSettings();
                                 })
                                 .catch(err => {
@@ -144,8 +156,9 @@ export class Play extends React.Component<PlayProps, PlayState> {
         this.setState({game: target.value});
     }
 
-    onJoin = (evt:SyntheticEvent) => {
-        evt.preventDefault();
+    onJoin = (evt?:SyntheticEvent) => {
+        if (evt)
+            evt.preventDefault();
         if (this.state.game) {
             if (this.state.view === "find") {
                 // Send game off and get response
@@ -167,7 +180,7 @@ export class Play extends React.Component<PlayProps, PlayState> {
     }
 }
 
-interface PlayProps {
+interface PlayProps extends RouterProps {
     state?: PlayState;
     containers: {
         storage: StorageContainer;

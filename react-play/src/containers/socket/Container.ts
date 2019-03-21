@@ -1,5 +1,6 @@
 import {Container} from "unstated";
 import * as io from "socket.io-client";
+import * as ReactGA from "react-ga";
 import Timeout = NodeJS.Timeout;
 
 
@@ -30,6 +31,12 @@ export class SocketContainer extends Container<SocketProps> {
             socket.on("connect", () => {
                 this.socket = socket;
                 this.socket.emit("authenticate", token, game);
+
+                ReactGA.event({
+                    category: "Socket",
+                    action: "Connected"
+                });
+
                 resolve(this.socket);
             })
         })

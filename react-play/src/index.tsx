@@ -1,5 +1,7 @@
 import * as React from 'react';
 import * as  ReactDOM from 'react-dom';
+import * as ReactGA from "react-ga";
+
 import App from './App';
 
 import "normalize.css";
@@ -7,6 +9,11 @@ import "./style/style.css";
 // import * as serviceWorker from './serviceWorker';
 
 const root = document.getElementById("root");
+
+ReactGA.initialize('UA-39450602-7', {
+    debug: true, //testMode: true,
+    
+});
 
 if (root) {
     if (root.hasChildNodes()) {

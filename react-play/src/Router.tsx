@@ -1,7 +1,10 @@
+import {Location} from "history";
 import * as React from "react";
 import {Route, Switch, withRouter, RouteProps, RouterProps as IRouterProps} from "react-router";
 import {Link} from "react-router-dom";
 import {Container, NavigationItem, NavigationItems, NavigationPanel, NavigationTitle} from "./components";
+
+import * as ReactGA from "react-ga";
 
 import {SocketContainer, StorageContainer, PlayerContainer, withContainer} from "./containers";
 import {Home, Register, Login, Play} from "./routes";
@@ -14,9 +17,16 @@ class Router extends React.Component<RouterProps, RouterState> {
             backgroundClass: "bg-core"
         } as RouterState;
     }
+    
+    sendActivity = (location:Location) => {
+        ReactGA.pageview(location.pathname);
+    }
+    
 
     componentWillMount(): void {
         if (this.props.location) {
+            this.sendActivity(this.props.location)
+            
             this.applyBackground(this.props.location.pathname);
         }
     }
@@ -24,6 +34,7 @@ class Router extends React.Component<RouterProps, RouterState> {
     componentWillReceiveProps(nextProps: Readonly<RouterProps>, nextContext: any): void {
         
         if (nextProps.location) {
+            this.sendActivity(nextProps.location)
             this.applyBackground(nextProps.location.pathname);
         }
     }
