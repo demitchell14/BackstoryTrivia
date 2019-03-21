@@ -20,7 +20,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
         check.then(res => {
             console.log(res)
             if (res) {
-                this.props.history.push("/play");
+                this.props.history.replace("/play");
             } else {
                 this.setState({show: true});
             }
