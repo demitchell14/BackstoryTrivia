@@ -1,7 +1,7 @@
 import * as mongo from "mongodb";
 import {MongoDetails} from "../../config"
 import {Collection, Cursor, FilterQuery, MongoClient, ObjectID, UpdateQuery} from "mongodb";
-import {GameProps} from "../../notrivia";
+import {Answer, GameProps} from "../../notrivia";
 //import {GameOptions} from "../../trivia/game/Game";
 import {FindAndModifyWriteOpResultObject} from "mongodb";
 import {User} from "../../react/src/store/session";
@@ -20,6 +20,7 @@ export class Database {
         this.timeout = 5 * 1000; // 60 seconds
         this.resetTimeout();
     }
+
     public async openCollection(collection:string) {
         this.resetTimeout();
         const client = await this.client;
@@ -112,11 +113,43 @@ export interface TeamObject {
     hashedPassword: string;
     hashedPin: string;
     savedUIDs: Array<string>;
+    activeKey?: string;
 
     image?: string;
     players?: Array<string>;
 
     //autologin?: boolean;
+}
+
+export interface GameObject {
+    _id?: any;
+    name?: string;
+    token: string;
+
+    started?: boolean;
+    paused?: boolean;
+    startTime?: string;
+
+    description?: string;
+    image?: string;
+
+    currentQuestionId?: number;
+
+    teams?: Array<{
+        name: string;
+        members?: Array<{
+            id: string;
+            name: string;
+        }>;
+        answers?: Array<{
+            type?: string;
+            correct?: boolean|string;
+            question?: string;
+            answer?: string
+        }>;
+        key?:string;
+    }>;
+    questions?: Partial<QuestionObject>[];
 }
 
 export interface SessionObject {

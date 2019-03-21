@@ -7,7 +7,6 @@ import * as cookieParser from "cookie-parser";
 
 import {Middleware} from "./www/trivia";
 import {Server} from "http";
-import SocketHandler from "./www/SocketHandler";
 
 import {log} from "./util/logger";
 
@@ -19,6 +18,8 @@ import React from "./www/React";
 import * as compression from "compression";
 
 import {Mongoose} from "./middleware/Mongoose";
+import SocketHandler from "./util/SocketHandler.new";
+import GameInstanceManager from "./util/GameInstanceManager";
 
 /**
  *
@@ -54,11 +55,13 @@ if (process.env.NODE_ENV && process.env.NODE_ENV.trim() === "production") {
 }
 
 
-export function SocketInit(server:Server) {
-    let x = SocketHandler(server);
+// export function SocketInit(server:Server) {
+//     let x = SocketHandler(server);
+//
+//     //console.log(x);
+//
+// }
 
-    //console.log(x);
-
-}
-//module.exports = app;
+GameInstanceManager.init();
+SocketHandler.init();
 export default app;
