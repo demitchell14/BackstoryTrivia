@@ -30,6 +30,15 @@ react/src
 react/test
 react/public
 
+react-play-2
+
+react-play/.idea
+react-play/.sass-cache
+react-play/node_modules
+react-play/scripts
+react-play/public
+react-play/src
+
 react-material/src
 react-material/test
 react-material/public

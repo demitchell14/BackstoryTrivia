@@ -1,6 +1,6 @@
 {
   "name": "react-play",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "private": true,
   "proxy": "http://localhost:8080/",
   "dependencies": {
