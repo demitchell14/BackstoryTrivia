@@ -1,9 +1,11 @@
 import {RefObject, SyntheticEvent} from "react";
 import * as React from "react";
 import {RouterProps} from "react-router";
-import {Card, CardBody, Container, Loading} from "../../components";
+import {Card, CardBody, Container, Loading, Snackbar} from "../../components";
 import {PlayerContainer, SocketContainer, StorageContainer} from "../../containers";
 import {BrowserQRCodeReader} from "@zxing/library";
+import FAIcon from "../../FontAwesome";
+import Timeout = NodeJS.Timeout;
 
 export class Play extends React.Component<PlayProps, PlayState> {
     qr:BrowserQRCodeReader;
@@ -13,12 +15,14 @@ export class Play extends React.Component<PlayProps, PlayState> {
         this.state = {
             view: "find",
             game: "",
-            loading: false,
+            loading: false, 
+            showError: false
         } as PlayState
         props.containers.player.attachStorage(props.containers.storage);
 
         this.qr = new BrowserQRCodeReader();
         this.cameraRef = React.createRef();
+
     }
 
     componentDidMount(): void {
@@ -31,7 +35,28 @@ export class Play extends React.Component<PlayProps, PlayState> {
             }
         });
 
+        this.checkStorage()
+
         this.sendViewSettings();
+    }
+
+    checkStorage = async () => {
+        const {storage, socket} = this.props.containers;
+        if (storage.hasGameID() && storage.hasTeamKey() && storage.hasToken()) {
+            this.setState({loading: true});
+            await socket.connect();
+            const request = await socket.requestGame(storage.getGameID()) as any;
+            if (request.success) {
+                // await socket.authenticate(storage.getToken(), storage.getGameID(), storage.getTeamKey())
+                this.setState({
+                    loading: false, gameData: request.game, game: request.game.token,
+                    view: "join", proceed: setTimeout(this.onJoin, 5000),
+                });
+                if (socket.state.status === "authenticated") {
+                    console.log(this.state)
+                }
+            }
+        }
     }
 
     sendViewSettings = () => {
@@ -91,6 +116,7 @@ export class Play extends React.Component<PlayProps, PlayState> {
             <CardBody>
                 <h4>Joining Game...</h4>
                 <p>Trying to join `{props.response.name || "Unknown Name"}`</p>
+                <button onClick={this.reset} className={"close btn btn-secondary-outline-primary"}><FAIcon icon={["far", "times"]} /></button>
                 <div>
                     <p>If this is the game you are trying to join, Simply wait 5 seconds or click the button below.</p>
                     <button type={"button"} className={"btn btn-block btn-primary"} onClick={props.onJoin}>Proceed</button>
@@ -100,10 +126,9 @@ export class Play extends React.Component<PlayProps, PlayState> {
     )
 
     componentWillUnmount(): void {
-        console.log("Unmounting");
         const {socket} = this.props.containers;
-        if (socket.connected()) {
-            console.log("Disconnecting");
+        if (socket.connected() && this.state.proceed !== true) {
+            console.debug("Socket Disconnecting");
             socket.disconnect();
         }
     }
@@ -115,7 +140,7 @@ export class Play extends React.Component<PlayProps, PlayState> {
             case "find":
                 content = this.findView({
                     withCamera: typeof this.state.camera !== "undefined",
-                    game: this.state.game,
+                    game: this.state.game || (this.state.gameData && this.state.gameData.token) ,
                     onChange: this.onGameChange,
                     onJoin: this.onJoin,
                 });
@@ -145,10 +170,51 @@ export class Play extends React.Component<PlayProps, PlayState> {
                 flex={{grow:1}}>
 
                 {content}
+
                 <Loading dark visible={this.state.loading} />
+
+                {this.state.error && this.state.showError && (
+                    <Snackbar variant={"danger"} position={"bottom"} onClose={this.handleSnackbar}>
+                        <p>{this.state.error}</p>
+                    </Snackbar>
+                )}
 
             </Container>
         );
+    }
+
+    reset = (evt:SyntheticEvent) => {
+        const {socket, storage} = this.props.containers;
+        if (typeof this.state.proceed === "object")
+            clearTimeout(this.state.proceed);
+        if (typeof this.state.showError === "object")
+            clearTimeout(this.state.showError);
+        this.setState({
+            view: "find",
+            game: "",
+            loading: false,
+            showError: false,
+            gameData: undefined,
+            connected: undefined,
+            error: undefined,
+        })
+        if (socket.connected()) {
+            socket.disconnect();
+            socket.setState({
+                status: "", activeKey: undefined, room: undefined
+            })
+            socket.connect();
+        }
+        if (storage.hasTeamKey())
+            storage.clearTeamKey();
+        if (storage.hasGameID())
+            storage.clearGameID();
+    }
+
+    handleSnackbar = (evt?:SyntheticEvent):any => {
+        if (this.state.showError)
+            clearTimeout(this.state.showError);
+        this.setState({showError: false, error: undefined});
     }
 
     onGameChange = (evt:SyntheticEvent) => {
@@ -156,25 +222,67 @@ export class Play extends React.Component<PlayProps, PlayState> {
         this.setState({game: target.value});
     }
 
-    onJoin = (evt?:SyntheticEvent) => {
+    onJoin = async (evt?:SyntheticEvent) => {
         if (evt)
             evt.preventDefault();
+        if (this.state.proceed && typeof this.state.proceed !== "boolean") {
+            clearTimeout(this.state.proceed);
+            this.setState({proceed: false});
+        }
+
+
+        const {storage, socket} = this.props.containers;
+
+        await socket.connect()
+            .catch((err) => this.setState({error: err}));
+
         if (this.state.game) {
             if (this.state.view === "find") {
                 // Send game off and get response
                 this.setState({loading: true});
-                const {socket, storage} = this.props.containers;
+
                 if (storage.hasToken()) {
-                    const promise = socket.connect(storage.getToken(), this.state.game);
-                    promise.then(() => {
-                        socket.startPolling();
-                    })
+                    const response = await socket.requestGame(this.state.game) as any;
+                    //console.log(response)
+                    if (response.success) {
+                        this.setState({
+                            gameData: response.game,
+                            view: "join",
+                            loading: false,
+                            proceed: setTimeout(this.onJoin, 5000),
+                        });
+                    } else {
+                        this.setState({
+                            loading: false, 
+                            showError: setTimeout(this.handleSnackbar, 5000),
+                            error: response.message,
+                        })
+                    }
+                    // socket.subscribe(this.handleSocket)
                 }
 
-            }
+            } else
             if (this.state.view === "join") {
                 // Send to game instance
-                console.log("Send to Game Instance");
+                
+                socket.authenticate(storage.getToken(), this.state.game)
+                    .then((success:boolean) => {
+                        if (success) {
+                            storage.setGameID(socket.state.room || "");
+                            storage.setTeamKey(socket.state.activeKey || "");
+                            this.setState({proceed: true});
+                            this.props.history.replace("/" + socket.state.room);
+                        }
+                    });
+            }
+        }
+    }
+
+    handleSocket = () => {
+        const {socket} = this.props.containers;
+        if (socket.state.status === "authenticated") {
+            if (socket.state.room && socket.state.activeKey) {
+
             }
         }
     }
@@ -195,6 +303,10 @@ interface PlayState {
     view: string;
     game: string;
     gameData?: any;
+    error?: any
+    showError: Timeout|false;
+    proceed?: Timeout|boolean;
+    connected?: boolean;
 }
 
 export default Play

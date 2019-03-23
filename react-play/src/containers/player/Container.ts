@@ -46,6 +46,16 @@ export class PlayerContainer extends Container<any>{
         }
     }
     
+    hasSession = async () => {
+        const storage = this.storage;
+        if (storage) {
+            return storage.hasGameID() && storage.hasTeamKey();
+        } else {
+            throw "Storage not connected."
+            // return false;
+        }
+    }
+    
     sendLogin = async (formdata: LoginFormData) => {
         if (formdata.pin === "")
             delete formdata.pin;

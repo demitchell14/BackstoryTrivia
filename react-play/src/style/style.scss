@@ -20,7 +20,7 @@
 @import "../../node_modules/bootstrap/scss/alert";
 //@import "../../node_modules/bootstrap/scss/list-group";
 //@import "../../node_modules/bootstrap/scss/badge";
-//@import "../../node_modules/bootstrap/scss/close";
+// @import "../../node_modules/bootstrap/scss/close";
 //
 //
 //@import "../../node_modules/bootstrap/scss/navbar";
@@ -43,4 +43,6 @@
 */
 
 @import "./basic";
+@import "./buttons";
+
 // @import "./form";

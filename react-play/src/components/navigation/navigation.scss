@@ -4,8 +4,8 @@
   position: absolute;
   display: flex;
   flex-direction: column;
-  width: calc(100% - 30px);
-  //width: 100%;
+  //width: calc(100% - 30px);
+  width: 100%;
   min-height: 50px;
 
   background-color: theme-color-level(primary, 2);

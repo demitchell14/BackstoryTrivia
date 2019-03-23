@@ -4,14 +4,19 @@ import * as ReactGA from "react-ga";
 import Timeout = NodeJS.Timeout;
 
 
-export class SocketContainer extends Container<SocketProps> {
+export class SocketContainer extends Container<SocketState> {
     static containerName:string = "socket";
 
-    socket:SocketIOClient.Socket;
-    poller:Timeout;
+    socket: SocketIOClient.Socket;
+    poller: Timeout;
+
+    connecting:boolean;
     
     constructor() {
         super();
+        this.state = {
+            status: "",
+        }
         
     }
 
@@ -25,22 +30,93 @@ export class SocketContainer extends Container<SocketProps> {
         }
     }
     
-    connect = (token:string, game:string) => {
-        const socket = io.connect();
+    connect = () => {
         return new Promise((resolve, reject) => {
+            if (this.socket && this.socket.connected) {
+                console.debug("Socket Already connected");
+                resolve();
+                return;
+            }
+            console.debug("Socket Connected");
+
+            const socket = io.connect();
             socket.on("connect", () => {
                 this.socket = socket;
-                this.socket.emit("authenticate", token, game);
+                this.socket.on("error", this.handleError);
 
                 ReactGA.event({
                     category: "Socket",
                     action: "Connected"
                 });
-
-                resolve(this.socket);
+                resolve();
+                // resolve(this.socket);
             })
         })
     }
+
+    requestGame = (game:string):Promise<SocketResponses.GameRequest> => {
+        return new Promise((resolve, reject) => {
+            if (this.socket) {
+                console.debug("Requested Game");
+                this.socket.emit("request game", game, (data:any) => {
+                    resolve(data)
+                });
+
+                this.socket.on("room joined", this.roomJoined);
+
+            } else {
+                reject("no socket");
+            }
+        })
+    }
+
+    authenticate = (token:string, gameToken:string, teamKey?: string) => {
+        if (this.socket) {
+            this.setState({status: "authenticating"});
+            this.socket.emit("authenticate", token, gameToken, teamKey);
+
+            return new Promise((resolve) => {
+
+                const timeout = setTimeout(() => {
+                    this.socket.removeEventListener("authenticated")
+                    resolve(false);
+                }, 5000);
+
+                const fn = (props:SocketResponses.Authenticated) => {
+                    clearTimeout(timeout);
+                    this.authenticated(props);
+
+                    this.socket.once("room joined", (room:any) => {
+                        this.roomJoined(room);
+                        resolve(props.success)
+                    })
+                };
+
+                this.socket.once("authenticated", fn);
+            })
+        }
+        return new Promise((resolve) => resolve(false));
+    }
+
+    authenticated = (props:SocketResponses.Authenticated) => {
+        if (props.success) {
+            this.setState({
+                status: "authenticated",
+                activeKey: props.key ? props.key : undefined
+            });
+        } else {
+            this.setState({
+                status: "unauthenticated",
+                activeKey: props.message ? props.message : undefined
+            });
+        }
+    }
+
+    handleError = (...props:any[]) => {
+        console.error(props);
+    }
+
+    roomJoined = (room:any) => this.setState({room});
 
     startPolling = () => {
         console.log("Polling");
@@ -57,6 +133,37 @@ export class SocketContainer extends Container<SocketProps> {
 
 }
 
-export interface SocketProps {
-    
+export declare namespace SocketResponses {
+    interface Authenticated {
+        success:boolean;
+        key?: string;
+        message?: string;
+    }
+    interface GameRequest {
+        success: boolean;
+        game: {
+            name: string;
+            token: string;
+
+            started: boolean;
+            paused?: boolean;
+
+            teams: number;
+            questions: number;
+
+            currentQuestion?: number;
+
+            startTime: string;
+
+            description?: string;
+            image?: string;
+
+        }
+    }
+}
+
+export interface SocketState {
+    status:     string;
+    activeKey?: string;
+    room?:      string;
 }
