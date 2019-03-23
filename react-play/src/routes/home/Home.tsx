@@ -25,6 +25,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
                 this.setState({show: true});
             }
         })
+        console.log(this)
     }
 
     public render() {

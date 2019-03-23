@@ -9,11 +9,16 @@ export function Loading(props:LoadingProps) {
     else
         classes.push("light");
     
+    if (props.full)
+        classes.push("full")
+    
     if (props.visible)
         classes.push("visible");
     return (
-        <div className={classes.join(" ")}>
-            <div className={"text"}>Loading...</div>
+        <div className={`overlay ${props.visible ? "active" : ""}`}>
+            <div className={classes.join(" ")}>
+                <div className={"text"}>Loading...</div>
+            </div>
         </div>
     )
 }
@@ -21,4 +26,5 @@ export function Loading(props:LoadingProps) {
 export interface LoadingProps {
     visible?: boolean;
     dark?:boolean;
+    full?: boolean;
 }

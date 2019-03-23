@@ -45,6 +45,30 @@ export class StorageContainer extends Container<any>{
 
     clearPin = () => localStorage.removeItem(`${VER}-pin`);
     
+    setTeamKey = (key:string) => {
+        sessionStorage.setItem(`${VER}-teamkey`, key);
+        return sessionStorage.getItem(`${VER}-teamkey`);
+    } 
+    
+    getTeamKey = () => sessionStorage.getItem(`${VER}-teamkey`) || "";
+    
+    hasTeamKey = () => sessionStorage.getItem(`${VER}-teamkey`) !== null;
+    
+    clearTeamKey = () => sessionStorage.removeItem(`${VER}-teamkey`);
+
+
+    setGameID = (key:string) => {
+        sessionStorage.setItem(`${VER}-gametoken`, key);
+        return sessionStorage.getItem(`${VER}-gametoken`);
+    }
+
+    getGameID = () => sessionStorage.getItem(`${VER}-gametoken`) || "";
+
+    hasGameID = () => sessionStorage.getItem(`${VER}-gametoken`) !== null;
+
+    clearGameID = () => sessionStorage.removeItem(`${VER}-gametoken`);
+
+    
     test = async () => {
         console.log("Hello From Storage Container");
     }

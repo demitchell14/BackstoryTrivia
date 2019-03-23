@@ -1,10 +1,12 @@
 @import "../../style/core";
 
 .card {
+  position: relative;
   background-color: gray("100");
   padding: .375rem .5rem;
   // border: 1px solid;
   box-shadow: 2px 2px 1px 2px theme-color-level(primary, 6);
+  // box-shadow: 0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(0,0,0,0.14), 0px 1px 18px 0px rgba(0,0,0,0.12);
   transition: .25s ease border-radius;
   &.card-dark {
     background: theme-color-level(primary, 5);
@@ -12,7 +14,8 @@
   }
 
   &.card-outlined {
-    box-shadow: 0px 0px 1rem 0.25rem theme-color-level(primary, 5);
+    box-shadow: 0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(0,0,0,0.14), 0px 1px 18px 0px rgba(0,0,0,0.12);
+    //box-shadow: 0px 0px 1rem 0.25rem theme-color-level(primary, 5);
     border-radius: 1.5rem;
   }
 
@@ -29,5 +32,11 @@
 
   .card-body {
 
+  }
+
+  .close {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
   }
 }

@@ -1,28 +1,28 @@
 import * as React from 'react';
 import {BrowserRouter} from "react-router-dom";
 import {Provider} from "unstated";
-import {StorageContainer} from "./containers";
+import {PlayerContainer, SocketContainer, StorageContainer} from "./containers";
 import Router from "./Router";
 
 class App extends React.Component<any, any> {
     public constructor(props:any) {
         super(props);
         this.state = {
-            storageContainer: new StorageContainer()
+            storageContainer: new StorageContainer(),
+            playerContainer: new PlayerContainer(),
+            socketContainer: new SocketContainer(),
         }
     }
 
     componentDidMount(): void {
-        import("./FontAwesome")
-            .then(fa => fa.init())
-            .then(() => this.forceUpdate());
+        
     }
 
     public render() {
-        const {storageContainer} = this.state;
+        const {storageContainer, playerContainer, socketContainer} = this.state;
         return (
             <BrowserRouter>
-                <Provider inject={[storageContainer]}>
+                <Provider inject={[storageContainer, playerContainer, socketContainer]}>
                     <React.Suspense fallback={""} >
                         <Router />
                     </React.Suspense>

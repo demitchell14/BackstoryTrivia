@@ -11,7 +11,7 @@ import "./style/style.css";
 const root = document.getElementById("root");
 
 ReactGA.initialize('UA-39450602-7', {
-    debug: true, //testMode: true,
+    debug: false, //testMode: true,
     
 });
 

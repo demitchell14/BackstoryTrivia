@@ -243,9 +243,9 @@ export interface CardProps {
     noBorder?: boolean;
     bloated?: boolean|number;
     style?: React.CSSProperties;
-    variant?: string;
+    variant?: "outlined"|"regular"|string;
     color?: string;
-    theme?: string;
+    theme?: "dark"|string;
     display?: string;
     onMouseEnter?: (evt:any) => void;
     onMouseLeave?: (evt:any) => void;
