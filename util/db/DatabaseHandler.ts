@@ -15,9 +15,11 @@ export class Database {
     private timeout:number;
     public constructor(opts?:any) {
         this.client = mongo.MongoClient.connect(url(), {
-            useNewUrlParser: true
+            useNewUrlParser: true, poolSize: 5
         });
-        this.timeout = 5 * 1000; // 60 seconds
+        if (opts && opts.timeout !== false) {
+            this.timeout = 5 * 1000; // 60 seconds
+        }
         this.resetTimeout();
     }
 
@@ -83,10 +85,12 @@ export class Database {
     }
 
     private resetTimeout() {
-        clearTimeout(this.autoTimeout);
-        this.autoTimeout = setTimeout(() => {
-            this.close();
-        }, this.timeout)
+        if (typeof this.timeout === "number") {
+            clearTimeout(this.autoTimeout);
+            this.autoTimeout = setTimeout(() => {
+                this.close();
+            }, this.timeout)
+        }
     }
 }
 

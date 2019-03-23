@@ -3,7 +3,7 @@ import jwt, {AuthorizedToken} from "./jwt";
 import {Database, TeamObject} from "./db/DatabaseHandler";
 import {ObjectID} from "bson";
 import {EventEmitter} from "events";
-import {getGame, getUser} from "../api/v2";
+import {getUser} from "../api/v2";
 import {Game, Team} from "../notrivia";
 import GameInstanceManager from "./GameInstanceManager";
 
@@ -12,13 +12,19 @@ class SocketHandler {
     constructor(server:SocketIO.Server) {
         this.server = server;
 
-        this.server.on("connection", this.connection);
+        this.server.on("connect", this.connection);
+    }
+
+    connect = (socket:SocketIO.Socket) => {
+
     }
 
     connection = (socket:SocketIO.Socket) => {
         console.log("Connected");
 
         const connection = new Connection(socket);
+
+        socket.on("request game", connection.requestGame);
 
         socket.on("authenticate", connection.authenticate);
 
@@ -44,21 +50,23 @@ class SocketHandler {
 }
 
 class Connection extends EventEmitter {
+    socket:SocketIO.Socket;
 
     constructor(socket:SocketIO.Socket) {
         super();
-
+        this.socket = socket;
     }
 
-    authenticate = async (token:string, gameToken:string) => {
+    authenticate = async (token:string, gameToken:string, teamKey?: string) => {
         const decoded = await jwt.verify(token)
             .catch(err => this.handleError(err)) as AuthorizedToken;
         // console.log(decoded);
-        const db = new Database();
+        const db = new Database({timeout: false});
 
         const team = await getUser(db, decoded) as TeamObject;
         // console.log(team);
 
+        let success = false;
         if (team) {
             const instanceManager = GameInstanceManager.getInstance(gameToken)
 
@@ -67,7 +75,16 @@ class Connection extends EventEmitter {
 
             // Team Exists, now find the game that is being searched for
             const game = await instanceManager.instance() as Game;
+            const token = game._id.toHexString();
             if (game) {
+                if (teamKey) {
+                    success = game.hasTeam(teamKey)
+                    // if (game.hasTeam(teamKey)) {
+                    //     success = true;
+                    // } else {
+                    //     success = false;
+                    // }
+                }
 
                 if (team.activeKey) {
                     // TODO Handle ActiveKey
@@ -87,22 +104,67 @@ class Connection extends EventEmitter {
                         game.removeTeam(team.teamName);
                     }
                     game.addTeam(new Team({name: team.teamName}));
+                    success = true;
                 }
-                this.emit("authenticated");
+                this.socket.join(token, (err) => {
+                    if (err) {
+                        this.socket.emit("error", err);
+                        return;
+                    }
+                    this.socket.emit("room joined", token);
+                });
+                this.socket.emit("authenticated", {
+                    success: success,
+                    key: team.activeKey && success ? team.activeKey : game.getTeam(team.teamName).key,
+                    message: success ? undefined : "Please register your team first."
+                });
+            } else {
+                this.socket.emit("authenticated", {
+                    success: success,
+                    message: "Game not found"
+                })
             }
+        } else {
+            this.socket.emit("authenticated", {
+                success: success,
+                message: "Team not found"
+            })
         }
-        // await db.openCollection(decoded.type + "s");
-        // let cursor = await db.find({_id: ObjectID.createFromHexString(decoded._id)})
-        //
-        // if (await cursor.count() === 1) {
-        //     // User exists, now find the game that is being searched for.
-        //     const team = await cursor.next() as TeamObject;
-        //     await db.openCollection("games");
-        //
-        // }
     };
 
+
+    requestGame = async (gameToken:string, callback:Function) => {
+        const instanceManager = await GameInstanceManager.getInstance(gameToken);
+        const game = await instanceManager.instance() as Game;
+        console.log(game);
+        if (game) {
+            console.log("Success");
+            const response = {
+                success: true,
+                game: {
+                    token: game.token,
+                    name: game.getName(),
+                    teams: game.teams.length,
+                    questions: game.questions.length,
+                    description: game.description,
+                    image: game.image,
+                    startTime: game.startTime,
+                    started: game.started
+                },
+            };
+
+            callback(response);
+        } else {
+            console.log("Fail");
+            callback({
+                success: false,
+                message: "Could not find game"
+            })
+        }
+    }
+
     handleError = (err:any) => {
+        this.socket.emit("error", err);
         console.error("Socket Connection Error:", err);
     }
 

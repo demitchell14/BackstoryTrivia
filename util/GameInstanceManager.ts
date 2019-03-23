@@ -16,7 +16,7 @@ class GameInstance {
     instance(raw?:boolean) {
         if (manager)
             return manager.findGame(this.game, raw);
-        return undefined;
+        return new Promise((resolve) => resolve());
     }
 
     save() {
@@ -36,7 +36,7 @@ class InstanceManager {
     // raw:GameObject[];
     constructor(props?) {
         this.games = [];
-        this.db = new Database();
+        this.db = new Database({timeout: false});
     }
 
     async findGame(search:ObjectID|string|any, raw?:boolean) {
@@ -59,9 +59,11 @@ class InstanceManager {
                 return raw ? cached.raw : cached.game;
             }
         }
-
+        console.log((await this.db.client).isConnected())
         // If we get here, game is not cached, so we need to look it up in the database to add to cache
-        const game = await getGame(this.db, typeof search === "string" ? search : search.toHexString());
+        const game = await getGame(this.db, typeof search === "string" ? search : search.toHexString())
+            .catch(err => console.error(err));
+        // this.db.close();
         if (game) {
             const idx = this.games.push({
                 game: new Game(game),
