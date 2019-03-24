@@ -53,12 +53,27 @@ export class SocketContainer extends Container<SocketState> {
             })
         })
     }
+    
+    receiveState = (state:any) => {
+        this.setState({gameStatus: state});
+    }
+
+    requestState = (game:string) => {
+        if (this.socket) {
+            this.socket.emit("request game state", game);
+        }
+    }
 
     requestGame = (game:string):Promise<SocketResponses.GameRequest> => {
         return new Promise((resolve, reject) => {
             if (this.socket) {
                 console.debug("Requested Game");
                 this.socket.emit("request game", game, (data:any) => {
+                    if (data.success) {
+                        this.setState({
+                            game: data.game
+                        })
+                    }
                     resolve(data)
                 });
 
@@ -78,7 +93,8 @@ export class SocketContainer extends Container<SocketState> {
             return new Promise((resolve) => {
 
                 const timeout = setTimeout(() => {
-                    this.socket.removeEventListener("authenticated")
+                    this.socket.removeEventListener("authenticated");
+                    this.socket.removeEventListener("game state");
                     resolve(false);
                 }, 5000);
 
@@ -87,8 +103,10 @@ export class SocketContainer extends Container<SocketState> {
                     this.authenticated(props);
 
                     this.socket.once("room joined", (room:any) => {
-                        this.roomJoined(room);
-                        resolve(props.success)
+                        this.roomJoined(room)
+                            .then(() => {
+                                resolve(props.success);
+                            })
                     })
                 };
 
@@ -100,6 +118,9 @@ export class SocketContainer extends Container<SocketState> {
 
     authenticated = (props:SocketResponses.Authenticated) => {
         if (props.success) {
+            console.debug("Socket Authenticated")
+            this.socket.on("game state", this.receiveState);
+
             this.setState({
                 status: "authenticated",
                 activeKey: props.key ? props.key : undefined
@@ -141,29 +162,40 @@ export declare namespace SocketResponses {
     }
     interface GameRequest {
         success: boolean;
-        game: {
-            name: string;
-            token: string;
-
-            started: boolean;
-            paused?: boolean;
-
-            teams: number;
-            questions: number;
-
-            currentQuestion?: number;
-
-            startTime: string;
-
-            description?: string;
-            image?: string;
-
-        }
+        game: GameObject;
     }
+}
+
+export interface GameObject {
+    name: string;
+    token: string;
+
+    started: boolean;
+    paused?: boolean;
+
+    teams: number;
+    questions: number;
+
+    currentQuestion?: number;
+
+    startTime: string;
+
+    description?: string;
+    image?: string;
+
+}
+
+export interface GameStatus {
+    name: string;
+    paused: boolean;
+    started: boolean;
+    teams: Array<{name: string}>;
 }
 
 export interface SocketState {
     status:     string;
     activeKey?: string;
     room?:      string;
+    game?: GameObject;
+    gameStatus?: GameStatus;
 }
