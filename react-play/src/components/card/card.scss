@@ -8,9 +8,13 @@
   box-shadow: 2px 2px 1px 2px theme-color-level(primary, 6);
   // box-shadow: 0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(0,0,0,0.14), 0px 1px 18px 0px rgba(0,0,0,0.12);
   transition: .25s ease border-radius;
-  &.card-dark {
-    background: theme-color-level(primary, 5);
-    color: theme-color-level(primary, -9);
+
+  @each $color, $value in $theme-colors {
+    &.card-color-#{$color} {
+      background: theme-color-level($color, 5);
+      color: theme-color-level($color, -9);
+      // @include button-secondary-outline-variant($value);
+    }
   }
 
   &.card-outlined {
