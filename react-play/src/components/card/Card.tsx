@@ -76,12 +76,11 @@ export class Card extends React.Component<CardProps, CardState> {
 
         //Object.assign(style, assignVariant(props));
         classes.push(assignVariant(props));
-        classes.push(assignTheme(props));
+        classes.push(assignColor(props));
 
         if (props.className) {
             const nCls = props.className.split(" ");
-            //console.log();
-            [].push.call(classes, nCls.filter(c => classes.find(a => a === c) === undefined));
+            classes.push.apply(classes, nCls.filter(c => classes.find(a => a === c) === undefined));
         }
 
         this.state = {
@@ -217,8 +216,9 @@ function assignVariant(props:CardProps):string { //React.CSSProperties {
     }
 }
 
-function assignTheme(props:CardProps):string {
-    return props.theme && props.theme === "dark" ? "card-dark" : "";
+function assignColor(props:CardProps):string {
+    return props.color ? `card-color-${props.color}` : "";
+    return props.color && props.color === "dark" ? "card-dark" : "";
 }
 
 
