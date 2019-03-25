@@ -9,8 +9,7 @@ import {Container, NavigationItem, NavigationItems, NavigationPanel, NavigationT
 import * as ReactGA from "react-ga";
 
 import {SocketContainer, StorageContainer, PlayerContainer, withContainer} from "./containers";
-import {Home, Register, Login, Play} from "./routes";
-import Live from "./routes/live/Live";
+import {Home, Register, Login, Play, Live} from "./routes";
 
 
 class Router extends React.Component<RouterProps, RouterState> {
@@ -43,7 +42,7 @@ class Router extends React.Component<RouterProps, RouterState> {
     componentWillReceiveProps(nextProps: Readonly<RouterProps>, nextContext: any): void {
         
         if (nextProps.location) {
-            console.log(nextProps);
+            // console.log(nextProps);
             this.sendActivity(nextProps.location);
             this.applyBackground(nextProps.location.pathname);
             // const str = nextProps.location.pathname;
