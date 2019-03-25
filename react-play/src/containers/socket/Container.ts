@@ -1,7 +1,10 @@
 import {Container} from "unstated";
 import * as io from "socket.io-client";
 import * as ReactGA from "react-ga";
+import {generateColor} from "../../util";
 import Timeout = NodeJS.Timeout;
+// @ts-ignore
+import Color = require("color");
 
 
 export class SocketContainer extends Container<SocketState> {
@@ -54,8 +57,37 @@ export class SocketContainer extends Container<SocketState> {
         })
     }
     
-    receiveState = (state:any) => {
-        this.setState({gameStatus: state});
+    receiveState = (state:GameStatus) => {
+        console.log("State Received");
+        // state.teams = state.teams.map(team => ({
+        //     name: team.name,
+        //     color: generateColor(team.name.toUpperCase().charAt(0))
+        // }))
+        if (this.state.gameStatus && this.state.game) {
+            const status = this.state.gameStatus;
+            const game = this.state.game;
+            let newTeams = state.teams.filter(team => status.teams.find(t => t.name === team.name) === null);
+            newTeams = newTeams.map(team => ({
+                ...team,
+                color: generateColor()
+            }));
+            delete state.teams;
+            Object.assign(status, state);
+            status.teams.push.apply(status.teams, newTeams);
+
+            game.paused = state.paused;
+            game.started = state.started;
+            game.name = state.name;
+
+
+            this.setState({gameStatus: status, game });
+        } else {
+            state.teams = state.teams.map(team => ({
+                ...team,
+                color: generateColor()
+            }))
+            this.setState({gameStatus: state});
+        }
     }
 
     requestState = (game:string) => {
@@ -189,7 +221,12 @@ export interface GameStatus {
     name: string;
     paused: boolean;
     started: boolean;
-    teams: Array<{name: string}>;
+    teams: Array<TeamObject>;
+}
+
+export interface TeamObject {
+    name: string;
+    color:Color;
 }
 
 export interface SocketState {
