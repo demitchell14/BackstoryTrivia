@@ -10,9 +10,16 @@
   transition: .25s ease border-radius;
 
   @each $color, $value in $theme-colors {
-    &.card-color-#{$color} {
+    &.card-color-#{$color}-dark {
       background: theme-color-level($color, 5);
       color: theme-color-level($color, -9);
+      // @include button-secondary-outline-variant($value);
+    }
+    &.card-color-#{$color} {
+      $col: theme-color-level($color);
+      background: $col;
+      color: color-yiq($col);
+      // color: theme-color-level($color, -9);
       // @include button-secondary-outline-variant($value);
     }
   }
