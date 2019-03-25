@@ -30,6 +30,16 @@ export class SocketContainer extends Container<SocketState> {
             if (this.poller)
                 clearInterval(this.poller);
             this.socket.disconnect();
+            this.setState({
+                status: "",
+                showNotification: undefined,
+                notification: undefined,
+                activeKey: undefined,
+                room: undefined,
+                game: undefined,
+                gameStatus: undefined,
+                question: undefined,
+            })
         }
     }
     
@@ -49,44 +59,76 @@ export class SocketContainer extends Container<SocketState> {
 
                 ReactGA.event({
                     category: "Socket",
-                    action: "Connected"
+                    action: "Connected",
+                    nonInteraction: true
                 });
                 resolve();
                 // resolve(this.socket);
             })
         })
     }
+
+    receiveQuestion = (data:QuestionDetails) => {
+        const {gameStatus, game} = this.state;
+        if (gameStatus && game) {
+            if (game.started && !game.paused) {
+                this.setState({question: data});
+            } else {
+                this.setState({question: undefined});
+            }
+        } else {
+            this.setState({question: undefined});
+        }
+        console.log(data);
+    }
     
-    receiveState = (state:GameStatus) => {
+    receiveState = (state?:GameStatus) => {
         console.log("State Received");
         // state.teams = state.teams.map(team => ({
         //     name: team.name,
         //     color: generateColor(team.name.toUpperCase().charAt(0))
         // }))
-        if (this.state.gameStatus && this.state.game) {
+        if (this.state.gameStatus && this.state.game && state) {
+            let notification;
+            if (!this.state.game.started && state.started) {
+                notification = "Game was just started! Standby";
+            }
+
+
             const status = this.state.gameStatus;
             const game = this.state.game;
-            let newTeams = state.teams.filter(team => status.teams.find(t => t.name === team.name) === null);
-            newTeams = newTeams.map(team => ({
-                ...team,
-                color: generateColor()
-            }));
-            delete state.teams;
+            if (state.teams) {
+                let newTeams = state.teams.filter(team => status.teams.find(t => t.name === team.name) === null);
+                newTeams = newTeams.map(team => ({
+                    ...team,
+                    color: generateColor()
+                }));
+                delete state.teams;
+                status.teams.push.apply(status.teams, newTeams);
+            }
             Object.assign(status, state);
-            status.teams.push.apply(status.teams, newTeams);
 
             game.paused = state.paused;
             game.started = state.started;
             game.name = state.name;
 
 
-            this.setState({gameStatus: status, game });
+            this.setState({
+                gameStatus: status, game,
+                notification,
+                showNotification: notification ?
+                    // true
+                    setTimeout(() => this.setState({notification: undefined, showNotification: false}), 4000)
+                    : false
+            });
         } else {
-            state.teams = state.teams.map(team => ({
-                ...team,
-                color: generateColor()
-            }))
-            this.setState({gameStatus: state});
+            if (state) {
+                state.teams = state.teams.map(team => ({
+                    ...team,
+                    color: generateColor()
+                }))
+                this.setState({gameStatus: state});
+            }
         }
     }
 
@@ -127,6 +169,7 @@ export class SocketContainer extends Container<SocketState> {
                 const timeout = setTimeout(() => {
                     this.socket.removeEventListener("authenticated");
                     this.socket.removeEventListener("game state");
+                    this.socket.removeEventListener("question state");
                     resolve(false);
                 }, 5000);
 
@@ -152,6 +195,7 @@ export class SocketContainer extends Container<SocketState> {
         if (props.success) {
             console.debug("Socket Authenticated")
             this.socket.on("game state", this.receiveState);
+            this.socket.on("question state", this.receiveQuestion);
 
             this.setState({
                 status: "authenticated",
@@ -198,6 +242,18 @@ export declare namespace SocketResponses {
     }
 }
 
+export interface QuestionDetails {
+    question: string;
+    type: string;
+    started: boolean;
+    timeLeft: number;
+    timeLimit: number;
+    image?: string;
+    details?: string;
+    choices?: string[];
+    points: number;
+}
+
 export interface GameObject {
     name: string;
     token: string;
@@ -235,4 +291,7 @@ export interface SocketState {
     room?:      string;
     game?: GameObject;
     gameStatus?: GameStatus;
+    question?: QuestionDetails;
+    notification?: string;
+    showNotification?: Timeout|boolean;
 }

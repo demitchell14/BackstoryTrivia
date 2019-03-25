@@ -9,7 +9,11 @@ import {Container, NavigationItem, NavigationItems, NavigationPanel, NavigationT
 import * as ReactGA from "react-ga";
 
 import {SocketContainer, StorageContainer, PlayerContainer, withContainer} from "./containers";
-import {Home, Register, Login, Play, Live} from "./routes";
+import {Register, Login} from "./routes";
+
+const Home = React.lazy(() => import("./routes/home/Home"));
+const Play = React.lazy(() => import("./routes/play/Play"));
+const Live = React.lazy(() => import("./routes/live/Live"));
 
 
 class Router extends React.Component<RouterProps, RouterState> {
@@ -103,7 +107,7 @@ class Router extends React.Component<RouterProps, RouterState> {
                 </Subscribe>
                 {ready && (
                     <Switch>
-                        <Route path={"/"} exact={true} component={withContainer(Home, StorageContainer, PlayerContainer)} />
+                        <Route path={"/"} exact={true} component={withContainer(Home, StorageContainer, PlayerContainer, SocketContainer)} />
                         <Route path={"/register"} exact={true} component={withContainer(Register, StorageContainer, PlayerContainer)} />
                         <Route path={"/login"} exact={true} component={withContainer(Login, StorageContainer, PlayerContainer)} />
                         <Route path={"/play"} exact={true} component={withContainer(Play, StorageContainer, PlayerContainer, SocketContainer)} />

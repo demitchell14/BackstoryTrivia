@@ -1,8 +1,10 @@
+import {SyntheticEvent} from "react";
 import * as React from "react";
+import * as ReactGA from "react-ga";
 import {RouteProps, RouterProps} from "react-router";
-import {Container, Loading} from "../../components";
+import {Container, Loading, Snackbar} from "../../components";
 import {PlayerContainer, SocketContainer, StorageContainer} from "../../containers";
-import {ActivityStream, GameNav, TeamView, WaitView} from "..";
+import {ActivityStream, GameNav, TeamView, WaitView} from "./";
 import FAIcon from "../../FontAwesome";
 
 import "./live.css";
@@ -59,6 +61,7 @@ export class Live extends React.Component<LiveProps, LiveState> {
     }
 
     initiate = async () => {
+        console.log("Initiated")
         const {socket, player, storage} = this.props.containers;
         if (socket.state.status !== "authenticated") {
             // TODO Check to see if we already have stored values and cross check
@@ -94,6 +97,7 @@ export class Live extends React.Component<LiveProps, LiveState> {
                     loading: false, view: "waiting"
                 })
             }
+            // socket.subscribe(this.handleGameState);
             socket.requestState(storage.getGameID());
         } else {
             throw false
@@ -101,18 +105,72 @@ export class Live extends React.Component<LiveProps, LiveState> {
     }
 
     handleGameState = () => {
-        // const {socket} = this.props.containers;
-        //
-        // console.log(socket.state);
+        const {socket} = this.props.containers;
+        // const {} = this.state
+        console.log(socket.state);
     }
 
     componentWillReceiveProps(nextProps: Readonly<LiveProps>, nextContext: any): void {
         if (nextProps.location) {
             if (nextProps.location.hash && nextProps.location.hash !== this.state.tab) {
                 // if (this.tabs[nextProps.location.hash])
-                    this.setState({tab: nextProps.location.hash});
+                ReactGA.event({
+                    category: "Game Session",
+                    action: "View Tab",
+                    label: nextProps.location.hash
+                });
+                this.setState({tab: nextProps.location.hash});
             }
         }
+    }
+
+    handleNotification = (evt?:SyntheticEvent) => {
+        if (evt)
+            evt.preventDefault()
+        const {socket} = this.props.containers;
+        if (typeof socket.state.showNotification !== "undefined") {
+            if (typeof socket.state.showNotification === "number")
+                clearTimeout(socket.state.showNotification);
+            if (typeof socket.state.showNotification === "number"
+                || typeof socket.state.showNotification === "boolean")
+                socket.setState({showNotification: false, notification: undefined});
+        }
+    }
+
+    generateStatus = () => {
+        const {socket} = this.props.containers;
+        if (socket.state.game) {
+            if (socket.state.game.started) {
+                if (socket.state.game.paused) {
+                    return {
+                        status: "Waiting for question...",
+                        icon: <FAIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>
+                    };
+                } else {
+                    // TODO handle active question Activity Streamer
+                    if (socket.state.question) {
+                        return {
+                            status: "Active Question!",
+                            timer: {
+                                limit: socket.state.question.timeLimit,
+                                timeLeft: socket.state.question.timeLeft,
+                                showNumber: true
+                            },
+                            // icon: <FAIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>
+                        };
+                    } else {
+                        return {
+                            status: "Loading question...!",
+                            icon: <FAIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>
+                        };
+                    }
+                }
+            }
+        }
+        return {
+            status: "Waiting for game...",
+            icon: <FAIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>
+        };
     }
 
     public render() {
@@ -126,6 +184,7 @@ export class Live extends React.Component<LiveProps, LiveState> {
             default:
                 content = <WaitView data={socket.state.game} />;
         }
+
         if (this.state.tab !== "#") {
             const {socket} = this.props.containers;
             switch (this.state.tab) {
@@ -144,6 +203,7 @@ export class Live extends React.Component<LiveProps, LiveState> {
                     break;
             }
         }
+
         return (
             <Container className={"head-pad px-0 no-overflow-y"}
                 fullWidth
@@ -158,12 +218,22 @@ export class Live extends React.Component<LiveProps, LiveState> {
 
                 <Loading visible={loading} full />
 
+                {/*<ActivityStream*/}
+                {/*    icon={<FAIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>}*/}
+                {/*    status={"Waiting for game..."} minimized={false}*/}
+                {/*/>*/}
+
                 <ActivityStream
-                    icon={<FAIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>}
-                    status={"Waiting for game..."} minimized={false}
+                    {...this.generateStatus()}  minimized={false}
                 />
 
                 {loading ? (<div/>) : content}
+
+                {socket.state.notification && socket.state.showNotification && (
+                    <Snackbar variant={"info"} position={"bottom"} onClose={this.handleNotification}>
+                        <p>{socket.state.notification}</p>
+                    </Snackbar>
+                )}
 
                 <GameNav
                     active={tab} tabs={[

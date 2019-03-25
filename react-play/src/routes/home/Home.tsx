@@ -2,7 +2,7 @@ import * as React from "react";
 import {RouterProps} from "react-router";
 import {Link} from "react-router-dom";
 import {Container, SplashOption} from "../../components";
-import {PlayerContainer, StorageContainer} from "../../containers";
+import {PlayerContainer, SocketContainer, StorageContainer} from "../../containers";
 
 export class Home extends React.Component<HomeProps, HomeState> {
     public constructor(props:any) {
@@ -15,7 +15,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
 
     componentWillMount(): void {
 
-        const player = this.props.containers.player;
+        const {player, socket} = this.props.containers;
         const check = player.check()
         check.then(res => {
             console.log(res)
@@ -24,7 +24,10 @@ export class Home extends React.Component<HomeProps, HomeState> {
             } else {
                 this.setState({show: true});
             }
-        })
+        });
+        if (socket.connected()) {
+            socket.disconnect();
+        }
         console.log(this)
     }
 
@@ -61,6 +64,7 @@ interface HomeProps extends RouterProps{
     containers: {
         storage: StorageContainer;
         player: PlayerContainer;
+        socket: SocketContainer;
     }
     state?: HomeState;
 }
@@ -68,3 +72,5 @@ interface HomeProps extends RouterProps{
 interface HomeState {
     show: boolean;
 }
+
+export default Home;
