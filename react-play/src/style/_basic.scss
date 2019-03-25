@@ -5,6 +5,8 @@ html, body {
   width: 100%;
   padding: 0;
   margin: 0;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  // font-family: Roboto;
 }
 
 #root {
@@ -32,10 +34,16 @@ html, body {
   background-color: theme-color-level(primary, 4);
 }
 .head-pad {
-  margin-top: 4rem;
+  margin-top: 3.5rem;
 }
 
 hr.primary {
   width: 100%;
   border-top: 1px solid theme-color-level(primary, 0);
+}
+.no-overflow-y {
+  overflow-y: hidden;
+}
+.no-overflow-x {
+  overflow-x: hidden;
 }
