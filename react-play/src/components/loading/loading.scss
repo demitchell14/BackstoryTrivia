@@ -11,6 +11,10 @@
   z-index: 2000;
   margin: 0 auto;
   color: transparent;
+
+  left: calc(50% - 100px);
+  top: calc(50% - 100px);
+
   &.visible {
     color: theme-color(dark);
     display: flex;
