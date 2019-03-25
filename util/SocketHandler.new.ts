@@ -17,8 +17,37 @@ class SocketHandler {
 
     actions = {
         start: (game:Game) => {
-            game.setStarted(true);
-            return true;
+            if (!game.started) {
+                game.question().reset();
+                game.question().pause();
+                game.setStarted(true);
+                return true;
+            }
+        },
+        stop: (game:Game) => {
+            if (game.started) {
+                game.question().pause();
+                game.setStarted(false);
+                return true;
+            }
+            return false;
+        },
+        pause: (game:Game) => {
+            if (game.started) {
+                game.paused = true;
+                game.question().pause();
+                return true;
+            }
+            return false;
+        },
+        "start question": (game:Game) => {
+            if (game.started) {
+                const question = game.question().current();
+                const ret = question.start();
+                game.paused = false;
+                return ret;
+            }
+            return false;
         }
     }
 
@@ -40,12 +69,87 @@ class SocketHandler {
         return false
     }
 
+    broadcastQuestion = async (game:Game, loop?:Generator) => {
+        const room = this.server.in(game._id);
+        if (loop) {
+            let interval = 1000;
+            // let timeout;
+            //
+            // const fn = () => {
+            //     const question = game.question().current();
+            //     interval = (question.timeLeft * 1000) / 2;
+            //     if (interval < 500)
+            //         interval = 500;
+            //     const val = loop.next();
+            //     if (val.value === 50) {
+            //         console.log(game);
+            //     }
+            //     if (val.done && timeout) {
+            //         console.log(game);
+            //         clearInterval(timeout);
+            //         this.handleAction(game, "pause");
+            //     }
+            //     // console.log("Value: ", val.value, question);
+            //     room.emit("question state", {
+            //         question: question.question,
+            //         details: question.questionDetails,
+            //         image: question.questionImage,
+            //         timeLeft: question.timeLeft,
+            //         timeLimit: question.timeLimit,
+            //         points: question.points,
+            //         type: question.type,
+            //         choices: question.type === "Multiple Choice" ? question.choices.map(choice => choice.answer) : undefined,
+            //         started: question.started
+            //     });
+            //
+            //     if (!val.done)
+            //         timeout = setTimeout(fn, interval);
+            // };
+            //
+            // timeout = setTimeout(fn, interval)
+
+            const idx = setInterval(() => {
+                const question = game.question().current();
+                if (interval < 500)
+                    interval = 500;
+                const val = loop.next();
+                if (val.value === 50) {
+                    console.log(game);
+                }
+                if (val.done) {
+                    console.log(game);
+                    clearInterval(idx);
+                    this.handleAction(game, "pause");
+                }
+
+                room.emit("question state", {
+                    question: question.question,
+                    details: question.questionDetails,
+                    image: question.questionImage,
+                    timeLeft: question.timeLeft,
+                    timeLimit: question.timeLimit,
+                    points: question.points,
+                    type: question.type,
+                    choices: question.type === "Multiple Choice" ? question.choices.map(choice => choice.answer) : undefined,
+                    started: question.started
+                });
+            }, interval);
+        }
+
+    }
+
     handleAction = async (game:Game, action:string, additional?: any) => {
         if (this.actions[action]) {
             const success = this.actions[action](game, additional);
 
             if (success) {
                 this.broadcastState(game._id);
+                if (typeof success === "object") {
+                    if (typeof success.next !== "undefined") {
+                        return await this.broadcastQuestion(game, success);
+                    } else
+                        throw "Not set up!"
+                }
             }
         }
     }
@@ -208,9 +312,9 @@ class Connection extends EventEmitter {
             const room = this.socket.server.in(typeof game._id === "string" ? game._id : game._id.toHexString());
 
 
-            this.socket.emit("noop");
+            this.socket.emit("game state", state);
             // room.emit("game state", state);
-            room.emit("game state", state);
+            // room.emit("game state", state);
 
 
             // console.log(state);
@@ -233,7 +337,8 @@ class Connection extends EventEmitter {
                     description: game.description,
                     image: game.image,
                     startTime: game.startTime,
-                    started: game.started
+                    started: game.started,
+                    paused: game.paused,
                 },
             };
 

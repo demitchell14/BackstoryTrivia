@@ -44,7 +44,9 @@ class PlayRouting {
                 const socket = SocketHandler.handler();
 
                 if (socket) {
-                    await socket.handleAction(game, action);
+                    const handled = await socket.handleAction(game, action);
+                    // if (handled)
+                    //     console.log("Handled: ", handled);
                     // const res = await socket.broadcastState(gameId);
                     // socket.server.in(gameId).emit("game state")
                 }

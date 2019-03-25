@@ -23,12 +23,27 @@ export class WaitView extends React.Component<WaitViewProps, WaitViewState> {
                     </Card>
 
                     <Card fullWidth display={"flex"} className={"p-3"} variant={"outlined"} color={"primary"}>
-                        <p className={"lead mb-0"}>This game hasn't started just yet.</p>
+                        {data.started && data.paused ? (
+                            <div>
+                                <p className={"lead mb-0"}>This game has started!</p>
+                                <p className={"lead mb-0"}>We are currently waiting on a question to start..</p>
+                            </div>
+                        ) : (!data.started && (
+                            <p className={"lead mb-0"}>This game hasn't started just yet.</p>
+                        ))}
                         <hr/>
-                        <p>While we wait, have a look through the game menu at the bottom of your screen, and
-                        see just how this actually works! The activity bar at the top of your screen will indicate
-                        whether or not the game is running and needs your input. All you need to do is simply click
-                        on it and it will bring you back to the game!</p>
+                        {data.started && data.paused ? (
+                            <div>
+                                <p>This game is about to begin! Hang tight on this page until a question appears on screen!</p>
+                                <p className={"text-muted"}>Please note that this is currently in the testing phases and may not work 100%.
+                                That being said, be sure to have your answers on paper as well</p>
+                            </div>
+                        ) : (!data.started && (
+                            <p>While we wait, have a look through the game menu at the bottom of your screen, and
+                                see just how this actually works! The activity bar at the top of your screen will indicate
+                                whether or not the game is running and needs your input. All you need to do is simply click
+                                on it and it will bring you back to the game!</p>
+                        ))}
                     </Card>
                 </div>
             );
