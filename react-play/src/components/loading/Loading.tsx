@@ -1,26 +1,34 @@
 import * as React from "react";
 
 import "./loading.css";
-export function Loading(props:LoadingProps) {
-    const classes = ["loading"];
-    
-    if (props.dark)
-        classes.push("dark")
-    else
-        classes.push("light");
-    
-    if (props.full)
-        classes.push("full")
-    
-    if (props.visible)
-        classes.push("visible");
-    return (
-        <div className={`overlay ${props.visible ? "active" : ""}`}>
-            <div className={classes.join(" ")}>
-                <div className={"text"}>Loading...</div>
+export class Loading extends React.PureComponent<LoadingProps> {
+    constructor(props:LoadingProps) {
+        super(props);
+    }
+
+    render(): React.ReactElement<any, string | React.JSXElementConstructor<any>> | string | number | {} | React.ReactNodeArray | React.ReactPortal | boolean | null | undefined {
+
+        const props = this.props;
+        const classes = ["loading"];
+
+        if (props.dark)
+            classes.push("dark")
+        else
+            classes.push("light");
+
+        if (props.full)
+            classes.push("full")
+
+        if (props.visible)
+            classes.push("visible");
+        return (
+            <div className={`overlay ${props.visible ? "active" : ""}`}>
+                <div className={classes.join(" ")}>
+                    <div className={"text"}>Loading...</div>
+                </div>
             </div>
-        </div>
-    )
+        )
+    }
 }
 
 export interface LoadingProps {
