@@ -217,8 +217,10 @@ function assignVariant(props:CardProps):string { //React.CSSProperties {
 }
 
 function assignColor(props:CardProps):string {
+    if (props.dark)
+        return props.color ? `card-color-${props.color}-dark` : "";
     return props.color ? `card-color-${props.color}` : "";
-    return props.color && props.color === "dark" ? "card-dark" : "";
+    // return props.color && props.color === "dark" ? "card-dark" : "";
 }
 
 
@@ -250,6 +252,7 @@ export interface CardProps {
     onMouseEnter?: (evt:any) => void;
     onMouseLeave?: (evt:any) => void;
     className?: string;
+    dark?: boolean;
 }
 
 interface ApplyBorderRadius {
