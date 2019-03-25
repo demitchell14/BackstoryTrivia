@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import './live.css';
-import {SvgClock} from "./SvgClock";
+import {SvgClock} from "..";
 
 export function ActivityStream(props:ActivityStreamProps) {
     return (
@@ -22,5 +22,6 @@ export interface ActivityStreamProps {
     timer?: {
         limit: number;
         current?: number;
-    }
+    };
+    minimized?: boolean;
 }
