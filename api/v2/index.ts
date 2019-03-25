@@ -7,10 +7,12 @@ import user from "./user";
 import team from "./team";
 import question from "./question";
 import games from "./games";
+import play from "./play";
 import {Database, GameObject, TeamObject, UserObject} from "../../util/db/DatabaseHandler";
 import {AuthorizedToken} from "../../util/jwt";
 import {ObjectID} from "bson";
 import {Cursor} from "mongodb";
+import {Game} from "../../notrivia";
 //import {A} from "./UserSchema.mongoose";
 const router = express.Router();
 
@@ -18,6 +20,7 @@ router.use('/user', user);
 router.use('/team', team);
 router.use('/question', question);
 router.use('/games', games);
+router.use('/play', play);
 
 export default router;
 
@@ -51,4 +54,44 @@ export async function getGame(db:Database, token:string) {
         return game;
     }
     return undefined;
+}
+
+export function generateGameState(game:Game) {
+    const state = {} as any;
+    state.name = game.name;
+    state.started = game.started;
+    state.paused = game.paused;
+
+    state.teams = game.teams.map(team => ({
+        name: team.name,
+        answered: game.started ? team.answers.length : undefined, // lists all answered questions
+        // correct: team.answers.filter(ans => ans.correct === true) // lists correct answers
+    }));
+
+    if (game.started) {
+
+        const current = game.question().current();
+        state.questionId = current._id;
+
+        if (game.paused === false) {
+            // game is running
+            state.question = {
+                started: current.started,
+                question: current.question,
+                image: current.questionImage || "",
+                description: current.questionDetails || "",
+                type: current.type,
+                choices: current.type === "Multiple Choice" ?
+                    current.choices.map(choice => choice.answer)
+                    : undefined,
+                points: current.points,
+                time: {
+                    limit: current.timeLimit,
+                    left: current.timeLeft,
+                },
+            }
+        }
+    }
+
+    return state;
 }

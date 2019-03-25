@@ -3,7 +3,7 @@ import jwt, {AuthorizedToken} from "./jwt";
 import {Database, TeamObject} from "./db/DatabaseHandler";
 import {ObjectID} from "bson";
 import {EventEmitter} from "events";
-import {getUser} from "../api/v2";
+import {getUser, generateGameState} from "../api/v2";
 import {Game, Team} from "../notrivia";
 import GameInstanceManager from "./GameInstanceManager";
 
@@ -15,9 +15,41 @@ class SocketHandler {
         this.server.on("connect", this.connection);
     }
 
+    actions = {
+        start: (game:Game) => {
+            game.setStarted(true);
+            return true;
+        }
+    }
+
     connect = (socket:SocketIO.Socket) => {
 
     }
+
+    broadcastState = async (token:string) => {
+        const room = this.server.in(token);
+        const mgr = GameInstanceManager.getInstance(token);
+        const game = await mgr.instance() as Game;
+
+        if (game) {
+            const state = generateGameState(game);
+
+            room.emit("game state", state);
+            return state;
+        }
+        return false
+    }
+
+    handleAction = async (game:Game, action:string, additional?: any) => {
+        if (this.actions[action]) {
+            const success = this.actions[action](game, additional);
+
+            if (success) {
+                this.broadcastState(game._id);
+            }
+        }
+    }
+
 
     connection = (socket:SocketIO.Socket) => {
         console.log("Connected");
@@ -31,16 +63,9 @@ class SocketHandler {
         connection.on("authenticated", () => {
             console.debug("Authentication Successful ??? ");
             // Attach additional listeners / emitters for game handling
+            socket.on("request game state", connection.requestState);
         })
 
-        // this.sendPoller(socket);
-    }
-
-    sendPoller = (socket:SocketIO.Socket) => {
-        socket.on("poller", () => console.log(`Polled ${socket.id}`))
-        setInterval(() => {
-
-        }, 2500);
     }
 
     handleError = (err:any) => {
@@ -67,6 +92,7 @@ class Connection extends EventEmitter {
         // console.log(team);
 
         let success = false;
+
         if (team) {
             const instanceManager = GameInstanceManager.getInstance(gameToken)
 
@@ -79,12 +105,8 @@ class Connection extends EventEmitter {
             if (game) {
                 if (teamKey) {
                     success = game.hasTeam(teamKey)
-                    // if (game.hasTeam(teamKey)) {
-                    //     success = true;
-                    // } else {
-                    //     success = false;
-                    // }
                 }
+
 
                 if (team.activeKey) {
                     // TODO Handle ActiveKey
@@ -113,11 +135,14 @@ class Connection extends EventEmitter {
                     }
                     this.socket.emit("room joined", token);
                 });
+                this.emit("authenticated");
                 this.socket.emit("authenticated", {
                     success: success,
                     key: team.activeKey && success ? team.activeKey : game.getTeam(team.teamName).key,
                     message: success ? undefined : "Please register your team first."
                 });
+
+                // this.requestState(gameToken);
             } else {
                 this.socket.emit("authenticated", {
                     success: success,
@@ -132,11 +157,70 @@ class Connection extends EventEmitter {
         }
     };
 
+    requestState = async (token:string) => {
+        if (this.socket) {
+            const instanceManager = GameInstanceManager.getInstance(token)
+
+            const state = {} as any;
+
+            // Team Exists, now find the game that is being searched for
+            const game = await instanceManager.instance() as Game;
+
+            state.name = game.name;
+            state.started = game.started;
+            state.paused = game.paused;
+
+            state.teams = game.teams.map(team => ({
+                name: team.name,
+                answered: game.started ? team.answers.length : undefined, // lists all answered questions
+                // correct: team.answers.filter(ans => ans.correct === true) // lists correct answers
+            }));
+            if (game.started) {
+
+                const current = game.question().current();
+                state.questionId = current._id;
+
+                if (game.paused === false) {
+                    // game is running
+                    state.question = {
+                        started: current.started,
+                        question: current.question,
+                        image: current.questionImage || "",
+                        description: current.questionDetails || "",
+                        type: current.type,
+                        choices: current.type === "Multiple Choice" ?
+                            current.choices.map(choice => choice.answer)
+                            : undefined,
+                        points: current.points,
+                        time: {
+                            limit: current.timeLimit,
+                            left: current.timeLeft,
+                        },
+                    }
+                }
+            }
+
+            console.log("Socket State Requested: ", {
+                room: typeof game._id === "string" ? game._id : game._id.toHexString(),
+                token,
+                socket: this.socket
+            });
+            const room = this.socket.server.in(typeof game._id === "string" ? game._id : game._id.toHexString());
+
+
+            this.socket.emit("noop");
+            // room.emit("game state", state);
+            room.emit("game state", state);
+
+
+            // console.log(state);
+        }
+    }
+
 
     requestGame = async (gameToken:string, callback:Function) => {
         const instanceManager = await GameInstanceManager.getInstance(gameToken);
         const game = await instanceManager.instance() as Game;
-        console.log(game);
         if (game) {
             console.log("Success");
             const response = {
@@ -180,6 +264,8 @@ export default {
                 handler = new SocketHandler(io);
             })
         }
-    }
-
+    },
+    handler() {
+        return handler;
+    },
 }
