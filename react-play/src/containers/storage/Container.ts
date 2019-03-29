@@ -1,4 +1,5 @@
 import {Container} from "unstated";
+import logger from "../../util/logger";
 
 const VER = "v2";
 export class StorageContainer extends Container<any>{
@@ -70,6 +71,6 @@ export class StorageContainer extends Container<any>{
 
     
     test = async () => {
-        console.log("Hello From Storage Container");
+        logger.log("Hello From Storage Container");
     }
 }

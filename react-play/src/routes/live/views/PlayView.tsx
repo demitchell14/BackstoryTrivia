@@ -3,6 +3,7 @@ import {Transition} from "react-spring/renderprops-universal";
 import {MultipleChoice} from "../";
 import {Card} from "../../../components";
 import {GameObject, QuestionDetails, SocketContainer, SocketState} from "../../../containers";
+import logger from "../../../util/logger";
 
 export class PlayView extends React.Component<PlayViewProps, PlayViewState> {
     type = {
@@ -35,7 +36,7 @@ export class PlayView extends React.Component<PlayViewProps, PlayViewState> {
     }
 
     componentDidMount(): void {
-        console.log(this);
+        logger.log(this);
     }
 
     simplify = (state: SocketState): SimplifiedSocketState => {
@@ -89,10 +90,10 @@ export class PlayView extends React.Component<PlayViewProps, PlayViewState> {
                             leave={{opacity: 0}}
                         >
                             {(Show: MultipleChoice | any) => Show && (props => <Show style={props}
-                                                                                     onSubmit={(ans: any) => console.log(`Answer: '${ans}'`)} {...question} />)}
+                                                                                     onSubmit={(ans: any) => logger.log(`Answer: '${ans}'`)} {...question} />)}
                         </Transition>
 
-                        {/*{typeof Obj === "function" && (<Obj onSubmit={(ans:any) => console.log(`Answer: '${ans}'`)} {...question}  />)}*/}
+                        {/*{typeof Obj === "function" && (<Obj onSubmit={(ans:any) => logger.log(`Answer: '${ans}'`)} {...question}  />)}*/}
 
                     </div>
                 );

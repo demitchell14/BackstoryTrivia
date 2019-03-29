@@ -56,7 +56,7 @@ class Router extends React.Component<RouterProps, RouterState> {
     componentWillReceiveProps(nextProps: Readonly<RouterProps>, nextContext: any): void {
         
         if (nextProps.location) {
-            // console.log(nextProps);
+            // logger.log(nextProps);
             this.sendActivity(nextProps.location);
             this.applyBackground(nextProps.location.pathname);
             // const str = nextProps.location.pathname;

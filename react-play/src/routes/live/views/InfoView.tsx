@@ -2,18 +2,19 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import * as React from "react";
 import {SplashOption} from "../../../components";
 import {GameObject} from "../../../containers";
+import logger from "../../../util/logger";
 
 const formatDate = (str: string) => {
     // const date = new Date(str);
-    // console.log(Date.parse(str));
-    // console.log(date);
+    // logger.log(Date.parse(str));
+    // logger.log(date);
 
     // if (date.)
     return str;
 };
 
 export function InfoView(props: InfoPropsView) {
-    console.log(props);
+    logger.log(props);
 
     return (
         <div style={props.style} className={"info-view"}>

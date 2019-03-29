@@ -1,7 +1,8 @@
 import * as React from 'react';
 import * as  ReactDOM from 'react-dom';
 import * as ReactGA from "react-ga";
-
+// import * as process from "process";
+// process.env.mode = "development";
 import App from './App';
 
 import "normalize.css";

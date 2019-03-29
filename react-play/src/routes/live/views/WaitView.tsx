@@ -12,7 +12,7 @@ export class WaitView extends React.Component<WaitViewProps, WaitViewState> {
 
     public render() {
 
-        // console.log(this.props);
+        // logger.log(this.props);
         const {data} = this.props;
         if (data) {
             return (

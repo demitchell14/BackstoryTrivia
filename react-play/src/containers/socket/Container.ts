@@ -2,6 +2,7 @@ import {Container} from "unstated";
 import * as io from "socket.io-client";
 import * as ReactGA from "react-ga";
 import {generateColor} from "../../util";
+import logger from "../../util/logger";
 import Timeout = NodeJS.Timeout;
 // @ts-ignore
 import Color = require("color");
@@ -46,11 +47,11 @@ export class SocketContainer extends Container<SocketState> {
     connect = () => {
         return new Promise((resolve, reject) => {
             if (this.socket && this.socket.connected) {
-                console.debug("Socket Already connected");
+                logger.debug("Socket Already connected");
                 resolve();
                 return;
             }
-            console.debug("Socket Connected");
+            logger.debug("Socket Connected");
 
             const socket = io.connect();
             socket.on("connect", () => {
@@ -69,7 +70,7 @@ export class SocketContainer extends Container<SocketState> {
     }
 
     receiveCountdown = (data:number) => {
-        console.log(data);
+        logger.log(data);
     }
 
     receiveQuestion = (data:QuestionDetails) => {
@@ -83,11 +84,11 @@ export class SocketContainer extends Container<SocketState> {
         } else {
             this.setState({question: undefined});
         }
-        // console.log(data);
+        // logger.log(data);
     }
     
     receiveState = (state?:GameStatus) => {
-        // console.log("State Received");
+        // logger.log("State Received");
         // state.teams = state.teams.map(team => ({
         //     name: team.name,
         //     color: generateColor(team.name.toUpperCase().charAt(0))
@@ -145,7 +146,7 @@ export class SocketContainer extends Container<SocketState> {
     requestGame = (game:string):Promise<SocketResponses.GameRequest> => {
         return new Promise((resolve, reject) => {
             if (this.socket) {
-                console.debug("Requested Game");
+                logger.debug("Requested Game");
                 this.socket.emit("request game", game, (data:any) => {
                     if (data.success) {
                         this.setState({
@@ -198,7 +199,7 @@ export class SocketContainer extends Container<SocketState> {
 
     authenticated = (props:SocketResponses.Authenticated) => {
         if (props.success) {
-            console.debug("Socket Authenticated")
+            logger.debug("Socket Authenticated")
             this.socket.on("game state", this.receiveState);
             this.socket.on("question state", this.receiveQuestion);
             this.socket.on("question countdown", this.receiveCountdown);
@@ -216,15 +217,15 @@ export class SocketContainer extends Container<SocketState> {
     }
 
     handleError = (...props:any[]) => {
-        console.error(props);
+        logger.error(props);
     }
 
     roomJoined = (room:any) => this.setState({room});
 
     startPolling = () => {
-        console.log("Polling");
+        logger.log("Polling");
         if (this.connected()) {
-            console.log("Starting Poller");
+            logger.log("Starting Poller");
             const id =  setInterval(() => {
                 this.socket.emit("poller");
             }, 2500);

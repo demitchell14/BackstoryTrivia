@@ -1,6 +1,7 @@
 import * as React from "react"
 import "./container.css";
 import {animated} from 'react-spring/renderprops';
+import logger from "../../util/logger";
 // import {} from "react-spring";
 
 export function Container(props:ContainerProps) {
@@ -55,7 +56,7 @@ export function Container(props:ContainerProps) {
     }
     if (props.style) {
         if (props.style.position && typeof props.style.position.getValue === "function") {
-            console.log(props.style);
+            logger.log(props.style);
             // @ts-ignore
             const component = animated(props.component||"div");
             return React.createElement(component, {...myProps, style: props.style}, props.children)

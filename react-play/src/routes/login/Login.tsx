@@ -112,7 +112,7 @@ export class Login extends React.Component<LoginProps, LoginState> {
     onChange = (evt:SyntheticEvent) => {
         const target = evt.currentTarget as HTMLInputElement;
         const {form} = this.state;
-        // console.log(target);
+        // logger.log(target);
         if (target.name === "autologin")
             form[target.name] = target.checked ? "on" : "off";
         else

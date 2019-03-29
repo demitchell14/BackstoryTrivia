@@ -4,6 +4,7 @@ import {Link} from "react-router-dom";
 import {animated} from 'react-spring/renderprops';
 import {Container, SplashOption} from "../../components";
 import {PlayerContainer, SocketContainer, StorageContainer} from "../../containers";
+import logger from "../../util/logger";
 
 export class Home extends React.Component<HomeProps, HomeState> {
     public constructor(props:any) {
@@ -19,7 +20,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
         const {player, socket} = this.props.containers;
         const check = player.check()
         check.then(res => {
-            console.log(res)
+            logger.log(res)
             if (res) {
                 this.props.history.replace("/play");
             } else {
@@ -29,13 +30,13 @@ export class Home extends React.Component<HomeProps, HomeState> {
         if (socket.connected()) {
             socket.disconnect();
         }
-        console.log(this)
+        logger.log(this)
     }
 
     public render() {
         // @ts-ignore
         const AnimatedContainer = animated(Container) as any;
-        //console.log(this.props.style);
+        //logger.log(this.props.style);
         return (
             <Container
                 fullWidth

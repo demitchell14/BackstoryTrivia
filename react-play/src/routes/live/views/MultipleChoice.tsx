@@ -1,6 +1,7 @@
 import * as React from "react";
 import {RefObject, SyntheticEvent} from "react";
 import {QuestionDetails} from "../../../containers";
+import logger from "../../../util/logger";
 
 export class MultipleChoice extends React.Component<MultipleChoiceProps, MultipleChoiceState> {
 
@@ -23,7 +24,7 @@ export class MultipleChoice extends React.Component<MultipleChoiceProps, Multipl
             isConfirming: false,
             isSubmitted: false,
         } as MultipleChoiceState;
-        console.log(props);
+        logger.log(props);
     }
 
 
@@ -51,7 +52,7 @@ export class MultipleChoice extends React.Component<MultipleChoiceProps, Multipl
                 return;
             }
             // const question = evt.currentTarget as HTMLDivElement;
-            // console.log(evt.currentTarget);
+            // logger.log(evt.currentTarget);
             this.setState({selected: index});
             const confirmClick = (evt: Event) => {
                 let target = evt.target as HTMLDivElement;
@@ -70,7 +71,7 @@ export class MultipleChoice extends React.Component<MultipleChoiceProps, Multipl
                     this.setState({selected: undefined})
                 }
 
-                console.log({
+                logger.log({
                     isConfirmed, targetID,
                     isConfirming: this.state.isConfirming,
                     selected: this.state.selected,
@@ -82,12 +83,12 @@ export class MultipleChoice extends React.Component<MultipleChoiceProps, Multipl
                 // } else {
                 //     this.setState({ isConfirming: false, selected: undefined})
                 // }
-                // console.log(this.state);
+                // logger.log(this.state);
 
                 document.removeEventListener("click", confirmClick);
                 if (this.state.isSubmitted) {
                     // TODO
-                    console.log(this);
+                    logger.log(this);
                     return;
                 }
                 this.setState({isConfirming: false});
@@ -103,7 +104,7 @@ export class MultipleChoice extends React.Component<MultipleChoiceProps, Multipl
         // const {selected, style} = this.state;
         // this.props.
 
-        // console.log({selected, style})
+        // logger.log({selected, style})
 
         return (
             <div className={"answers row"} style={this.props.style}>
