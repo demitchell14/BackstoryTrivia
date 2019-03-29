@@ -48,6 +48,58 @@ class SocketHandler {
                 return ret;
             }
             return false;
+        },
+
+        "start question countdown": (game:Game, props?:{timer?:string|number}) => {
+            if (props && typeof props.timer !== "undefined" ){
+                let timer:number;
+                const countdown = function*(start:number) {
+                    let date = new Date();
+                    let limit:number, end:number;
+
+                    if (start > 1000) limit = start;
+                    else limit = start * 1000;
+
+                    end = date.getTime() + limit;
+                    if (end > date.getTime()) {
+                        yield end;
+                        // console.log(end, date.getTime());
+                        while (end > date.getTime()) {
+                            yield end - date.getTime()
+                            date = new Date();
+                        }
+                        yield true
+                    }
+                }
+
+                if (typeof props.timer === "string") {
+                    timer = Number.parseInt(props.timer);
+                    if (!Number.isInteger(timer)) {
+                        return false;
+                    }
+                } else timer= props.timer;
+
+                const generator = countdown(timer);
+
+                let timeout = setInterval(() => {
+                    let val = generator.next();
+                    if (val.done) {
+                        clearInterval(timeout);
+                        return;
+                    }
+                    if (val.value === true) {
+                        // start next question
+                        console.log("Countdown Done\nStarting Question")
+                        this.handleAction(game, "start question");
+                    } else {
+                        console.log("Countdown: ", val.value)
+                        this.broadcast(game._id).emit("question countdown", Math.ceil(val.value/1000))
+                        // this.broadcast(game._id).emit("")
+                    }
+                }, 800);
+                return true;
+            }
+            return false;
         }
     }
 
@@ -55,8 +107,17 @@ class SocketHandler {
 
     }
 
-    broadcastState = async (token:string) => {
-        const room = this.server.in(token);
+    broadcast = (token:string|ObjectID) => {
+        let room;
+        if (typeof token === "string")
+            room = this.server.in(token);
+        else
+            room = this.server.in(token.toHexString())
+        return room;
+    }
+
+    broadcastState = async (token:string|ObjectID) => {
+        const room = this.server.in(typeof token === "string" ? token : token.toHexString());
         const mgr = GameInstanceManager.getInstance(token);
         const game = await mgr.instance() as Game;
 
@@ -70,7 +131,7 @@ class SocketHandler {
     }
 
     broadcastQuestion = async (game:Game, loop?:Generator) => {
-        const room = this.server.in(game._id);
+        const room = this.server.in(typeof game._id === "string" ? game._id : game._id.toHexString());
         if (loop) {
             let interval = 1000;
             // let timeout;
@@ -140,10 +201,11 @@ class SocketHandler {
 
     handleAction = async (game:Game, action:string, additional?: any) => {
         if (this.actions[action]) {
-            const success = this.actions[action](game, additional);
+            console.log(additional);
+            const success = this.actions[action](game, {...additional});
 
             if (success) {
-                this.broadcastState(game._id);
+                this.broadcastState(typeof game._id === "string" ? game._id : game._id.toHexString());
                 if (typeof success === "object") {
                     if (typeof success.next !== "undefined") {
                         return await this.broadcastQuestion(game, success);
