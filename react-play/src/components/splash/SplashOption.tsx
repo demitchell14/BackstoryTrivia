@@ -41,10 +41,13 @@ export function SplashOption(props:SplashOptionProps) {
         bloated: true,
         display: "flex",
         theme: "dark",
+        className: props.className,
         rounded, onMouseLeave, onMouseEnter,
         children: React.createElement("div", {}, [
             typeof props.title === "string" ?
                 React.createElement("h5", {key: "h5"}, props.title) : props.title,
+            typeof props.children === "string" ?
+                React.createElement("div", {key: "body"}, props.children) : props.children,
             typeof props.button === "string" ?
                 React.createElement("button", {key:"button"}, props.button) : props.button
         ])
@@ -65,5 +68,7 @@ export interface SplashOptionProps {
     children?:any;
     title?: string|React.ReactNode;
     button?:string|React.ReactNode;
+    body?:string|React.ReactNode;
     reverse?: boolean;
+    className?: string;
 }
