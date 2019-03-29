@@ -5,7 +5,7 @@ import {GameObject} from "../../../containers";
 export class WaitView extends React.Component<WaitViewProps, WaitViewState> {
     public constructor(props:WaitViewProps) {
         super(props);
-        this.state = {} as WaitViewState
+        this.state = {} as WaitViewState;
 
         console.log(props);
     }
@@ -14,7 +14,7 @@ export class WaitView extends React.Component<WaitViewProps, WaitViewState> {
         const {data} = this.props;
         if (data) {
             return (
-                <div className={"wait-view"}>
+                <div style={this.props.style} className={"wait-view"}>
                     <Card fullWidth display={"flex"} className={"p-3 mb-3"} variant={"outlined"} color={"secondary"}>
                         {data.name.length < 20 ?
                             (<h4 className={"mb-0"}>{data.name}</h4>)
@@ -44,6 +44,13 @@ export class WaitView extends React.Component<WaitViewProps, WaitViewState> {
                                 whether or not the game is running and needs your input. All you need to do is simply click
                                 on it and it will bring you back to the game!</p>
                         ))}
+
+                        {data.started && !data.paused && (
+                            <div>
+                                <p>Loading Question...</p>
+                                <p>This should only take a few moments.</p>
+                            </div>
+                        )}
                     </Card>
                 </div>
             );
@@ -56,6 +63,7 @@ export class WaitView extends React.Component<WaitViewProps, WaitViewState> {
 interface WaitViewProps {
     state?: WaitViewState;
     data?: GameObject;
+    style?: React.CSSProperties;
 }
 
 interface WaitViewState {
