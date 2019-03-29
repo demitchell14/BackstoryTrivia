@@ -1,11 +1,10 @@
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import * as React from "react";
 import {SyntheticEvent} from "react";
-import * as ReactGA from "react-ga";
 import {RouteProps,RouterProps} from "react-router";
 import {animated, Transition} from 'react-spring/renderprops';
 import {Container, Loading, Snackbar} from "../../components";
 import {PlayerContainer, SocketContainer, StorageContainer} from "../../containers";
-import FAIcon from "../../FontAwesome";
 import {ActivityStream, GameNav, InfoView, PlayView, TeamView, WaitView} from "./";
 
 import "./live.css";
@@ -118,11 +117,6 @@ export class Live extends React.Component<LiveProps, LiveState> {
         if (nextProps.location) {
             if (nextProps.location.hash !== this.state.tab) {
                 // if (this.tabs[nextProps.location.hash])
-                ReactGA.event({
-                    category: "Game Session",
-                    action: "View Tab",
-                    label: nextProps.location.hash
-                });
                 this.setState({tab: nextProps.location.hash || "#"});
                 console.log(this.state)
             }
@@ -167,7 +161,7 @@ export class Live extends React.Component<LiveProps, LiveState> {
                 if (socket.state.game.paused) {
                     return {
                         status: "Waiting for question...",
-                        icon: <FAIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>
+                        icon: <FontAwesomeIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>
                     };
                 } else {
                     // TODO handle active question Activity Streamer
@@ -179,12 +173,12 @@ export class Live extends React.Component<LiveProps, LiveState> {
                                 timeLeft: socket.state.question.timeLeft,
                                 showNumber: true
                             },
-                            // icon: <FAIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>
+                            // icon: <FontAwesomeIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>
                         };
                     } else {
                         return {
                             status: "Loading question...!",
-                            icon: <FAIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>
+                            icon: <FontAwesomeIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>
                         };
                     }
                 }
@@ -192,7 +186,7 @@ export class Live extends React.Component<LiveProps, LiveState> {
         }
         return {
             status: "Waiting for game...",
-            icon: <FAIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>
+            icon: <FontAwesomeIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>
         };
     };
 
@@ -241,7 +235,7 @@ export class Live extends React.Component<LiveProps, LiveState> {
 
         const views = this.views(socket);
 
-        console.log(views, tab,);
+        // console.log(views, tab,);
 
         return (
             <Container className={"head-pad px-0 no-overflow-x"}
@@ -260,7 +254,7 @@ export class Live extends React.Component<LiveProps, LiveState> {
                 <Loading visible={loading} full />
 
                 {/*<ActivityStream*/}
-                {/*    icon={<FAIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>}*/}
+                {/*    icon={<FontAwesomeIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>}*/}
                 {/*    status={"Waiting for game..."} minimized={false}*/}
                 {/*/>*/}
 

@@ -22,7 +22,7 @@ class Router extends React.Component<RouterProps, RouterState> {
         super(props);
         this.state = {
             backgroundClass: "bg-core",
-            ready: false,
+            // ready: false,
             navLink: (props:RouterProps, socket:SocketContainer) => {
                 if (props.location && props.location.pathname) {
                     const str = props.location.pathname;
@@ -37,6 +37,11 @@ class Router extends React.Component<RouterProps, RouterState> {
     }
     
     sendActivity = (location:Location) => {
+        const str = location.pathname;
+        const matches = str.match(/^\/(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
+        if (matches)
+            return;
+
         ReactGA.pageview(location.pathname);
     }
     
@@ -47,10 +52,6 @@ class Router extends React.Component<RouterProps, RouterState> {
             
             this.applyBackground(this.props.location.pathname);
         }
-
-        import("./FontAwesome")
-            .then(fa => fa.init())
-            .then(() => this.setState({ready:true}));
     }
 
     componentWillReceiveProps(nextProps: Readonly<RouterProps>, nextContext: any): void {
@@ -86,7 +87,7 @@ class Router extends React.Component<RouterProps, RouterState> {
     }
 
     public render() {
-        const {backgroundClass, ready, navLink} = this.state;
+        const {backgroundClass, navLink} = this.state;
         const {location} = this.props;
 
         // @ts-ignore
@@ -157,7 +158,7 @@ class Router extends React.Component<RouterProps, RouterState> {
                         </NavigationPanel>
                     )}
                 </Subscribe>
-                {ready && location && (
+                {location && (
                     <Transition
                         // native
                         config={{
@@ -227,7 +228,7 @@ interface RouterProps extends RouteProps, IRouterProps {
 
 interface RouterState {
     backgroundClass:string;
-    ready:boolean;
+    // ready:boolean;
     navLink: (props:RouterProps, socket:SocketContainer) => string;
 }
 

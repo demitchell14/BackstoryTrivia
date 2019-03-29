@@ -1,46 +1,37 @@
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import * as React from "react";
+import * as ReactGA from "react-ga";
 import {Link} from "react-router-dom";
 // import {Link} from "react-router-dom";
-import FAIcon from "../../FontAwesome";
 
 export function GameNav(props:GameNavProps) {
     return (
         <div className={"game-nav"}>
             {props.tabs && props.tabs.map((tab, idx) => (
-                <Link  key={idx} to={tab.to} className={`nav-item ${tab.to === props.active ? "active" : ""}`}>
-                    <FAIcon className={"icon"} icon={tab.icon} />
+                <Link onClick={sendActivity(tab.to)} key={idx} to={tab.to} className={`nav-item ${tab.to === props.active ? "active" : ""}`}>
+                    <FontAwesomeIcon className={"icon"} icon={tab.icon} />
                     <span className={"text"}>{tab.text}</span>
                 </Link>
             ))}
         </div>
     )
-    return (
-        <div className={"game-nav"}>
-            <Link to={"#"} className={"nav-item active"}>
-                <FAIcon className={"icon"} icon={["far", "play"]} />
-                <span className={"text"}>Play</span>
-            </Link>
-            <Link to={"#info"} className={"nav-item"}>
-                <FAIcon className={"icon"} icon={["far", "info"]} />
-                <span>Info</span>
-            </Link>
-            <Link to={"#teams"} className={"nav-item"}>
-                <FAIcon className={"icon"} icon={["far", "users"]} />
-                <span>Teams</span>
-            </Link>
-            <Link to={"#history"} className={"nav-item"}>
-                <FAIcon className={"icon"} icon={["far", "history"]} />
-                <span>History</span>
-            </Link>
-        </div>
-    )
+}
+
+const sendActivity = (link:string) => {
+    return () => {
+        ReactGA.event({
+            category: "Game Session",
+            action: "View Tab",
+            label: link
+        });
+    };
 }
 
 export interface GameNavProps {
     active: string;
     tabs: Array<{
         to: string;
-        icon: string[];
+        icon: string[]|any;
         text: string;
     }>;
 } 

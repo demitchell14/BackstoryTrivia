@@ -1,3 +1,4 @@
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {RefObject, SyntheticEvent} from "react";
 import * as React from "react";
 import {RouterProps} from "react-router";
@@ -5,7 +6,6 @@ import {animated} from 'react-spring/renderprops';
 import {Card, CardBody, Container, Loading, Snackbar} from "../../components";
 import {PlayerContainer, SocketContainer, StorageContainer} from "../../containers";
 import {BrowserQRCodeReader} from "@zxing/library";
-import FAIcon from "../../FontAwesome";
 import Timeout = NodeJS.Timeout;
 
 export class Play extends React.Component<PlayProps, PlayState> {
@@ -117,7 +117,7 @@ export class Play extends React.Component<PlayProps, PlayState> {
             <CardBody>
                 <h4>Joining Game...</h4>
                 <p>Trying to join `{props.response.name || "Unknown Name"}`</p>
-                <button onClick={this.reset} className={"close btn btn-secondary-outline-primary"}><FAIcon icon={["far", "times"]} /></button>
+                <button onClick={this.reset} className={"close btn btn-secondary-outline-primary"}><FontAwesomeIcon icon={["far", "times"]} /></button>
                 <div>
                     <p>If this is the game you are trying to join, Simply wait 5 seconds or click the button below.</p>
                     <button type={"button"} className={"btn btn-block btn-primary"} onClick={props.onJoin}>Proceed</button>

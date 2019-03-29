@@ -1,8 +1,8 @@
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {SyntheticEvent} from "react";
 import * as React from "react";
 //import {} from "react"
 import "./navigation.css"
-import FAIcon from "../../FontAwesome";
 import {findChild} from "../index";
 
 export class NavigationPanel extends React.Component<NavigationPanelProps, NavigationPanelState> {
@@ -37,7 +37,7 @@ export class NavigationPanel extends React.Component<NavigationPanelProps, Navig
 
         return (
             <div className={classes.join(" ")} draggable>
-                {!props.locked && props.visible && (<div onClick={this.toggleExpanded} className={"controller"}><FAIcon icon={["fal", "bars"]} /></div>)}
+                {!props.locked && props.visible && (<div onClick={this.toggleExpanded} className={"controller"}><FontAwesomeIcon icon={["fal", "bars"]} /></div>)}
                 {props.visible && title}
                 {props.visible && expanded && items}
             </div>
