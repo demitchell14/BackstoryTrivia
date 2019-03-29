@@ -1,4 +1,5 @@
 import * as React from "react";
+import {animated} from 'react-spring/renderprops';
 import {Card} from "../../../components";
 import {GameObject} from "../../../containers";
 
@@ -7,14 +8,15 @@ export class WaitView extends React.Component<WaitViewProps, WaitViewState> {
         super(props);
         this.state = {} as WaitViewState;
 
-        console.log(props);
     }
 
     public render() {
+
+        // console.log(this.props);
         const {data} = this.props;
         if (data) {
             return (
-                <div style={this.props.style} className={"wait-view"}>
+                <animated.div style={this.props.style} className={"wait-view"}>
                     <Card fullWidth display={"flex"} className={"p-3 mb-3"} variant={"outlined"} color={"secondary"}>
                         {data.name.length < 20 ?
                             (<h4 className={"mb-0"}>{data.name}</h4>)
@@ -52,7 +54,7 @@ export class WaitView extends React.Component<WaitViewProps, WaitViewState> {
                             </div>
                         )}
                     </Card>
-                </div>
+                </animated.div>
             );
         }
 

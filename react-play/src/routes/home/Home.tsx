@@ -1,6 +1,7 @@
 import * as React from "react";
 import {RouterProps} from "react-router";
 import {Link} from "react-router-dom";
+import {animated} from 'react-spring/renderprops';
 import {Container, SplashOption} from "../../components";
 import {PlayerContainer, SocketContainer, StorageContainer} from "../../containers";
 
@@ -32,6 +33,9 @@ export class Home extends React.Component<HomeProps, HomeState> {
     }
 
     public render() {
+        // @ts-ignore
+        const AnimatedContainer = animated(Container) as any;
+        //console.log(this.props.style);
         return (
             <Container
                 fullWidth
@@ -42,7 +46,9 @@ export class Home extends React.Component<HomeProps, HomeState> {
                     //content: "center"
                 }}
                 justifyContent={"around"}
-                flex={{grow:1}}>
+                flex={{grow:1}}
+                style={this.props.style}
+            >
 
                 {this.state.show && [
                     <SplashOption key={"new"} reverse
@@ -67,6 +73,7 @@ interface HomeProps extends RouterProps{
         socket: SocketContainer;
     }
     state?: HomeState;
+    style?: any;
 }
 
 interface HomeState {

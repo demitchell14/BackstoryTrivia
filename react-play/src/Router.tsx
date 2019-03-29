@@ -3,6 +3,7 @@ import {SyntheticEvent} from "react";
 import * as React from "react";
 import {Route, Switch, withRouter, RouteProps, RouterProps as IRouterProps} from "react-router";
 import {Link} from "react-router-dom";
+import { Transition } from 'react-spring/renderprops'
 import {Subscribe} from "unstated";
 import {Container, NavigationItem, NavigationItems, NavigationPanel, NavigationTitle} from "./components";
 
@@ -22,7 +23,16 @@ class Router extends React.Component<RouterProps, RouterState> {
         this.state = {
             backgroundClass: "bg-core",
             ready: false,
-            navLink: "/"
+            navLink: (props:RouterProps, socket:SocketContainer) => {
+                if (props.location && props.location.pathname) {
+                    const str = props.location.pathname;
+                    const matches = str.match(/^\/(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i);
+                    if (matches && socket.connected() && socket.state.status === "authenticated") {
+                        return str;
+                    }
+                }
+                return "/";
+            }
         } as RouterState;
     }
     
@@ -76,21 +86,63 @@ class Router extends React.Component<RouterProps, RouterState> {
     }
 
     public render() {
-        const {backgroundClass, ready, navLink} = this.state
+        const {backgroundClass, ready, navLink} = this.state;
+        const {location} = this.props;
+
+        // @ts-ignore
+        const routes = [
+            {
+                key: "/",
+                path: "/",
+                exact: true,
+                component: withContainer(Home, StorageContainer, PlayerContainer, SocketContainer)
+            },
+            {
+                key: "/register",
+                path: "/register",
+                exact: true,
+                component: withContainer(Register, StorageContainer, PlayerContainer)
+            },
+            {
+                key: "/login",
+                path: "/login",
+                exact: true,
+                component: withContainer(Login, StorageContainer, PlayerContainer)
+            },
+            {
+                key: "/play",
+                path: "/play",
+                exact: true,
+                component: withContainer(Play, StorageContainer, PlayerContainer, SocketContainer)
+            },
+            {
+                key: "/:live",
+                path: "/:live",
+                exact: true,
+                component: withContainer(Live, StorageContainer, PlayerContainer, SocketContainer)
+            },
+        ]
+
+        // <Route path={"/"} exact={true} component={withContainer(Home, StorageContainer, PlayerContainer, SocketContainer)} />
+        // <Route path={"/register"} exact={true} component={withContainer(Register, StorageContainer, PlayerContainer)} />
+        // <Route path={"/login"} exact={true} component={withContainer(Login, StorageContainer, PlayerContainer)} />
+        // <Route path={"/play"} exact={true} component={withContainer(Play, StorageContainer, PlayerContainer, SocketContainer)} />
+        // <Route path={"/:live"} exact={true} component={withContainer(Live, StorageContainer, PlayerContainer, SocketContainer)} />
 
         return (
             <Container
                 fullHeight fullWidth
                 display={"flex"}
                 direction={"column"}
-                className={"bg-core px-0 " + backgroundClass}
+                className={"bg-core no-overflow-x px-0 " + backgroundClass}
             >
                 <Subscribe to={[SocketContainer, StorageContainer]}>
                     {(socket:SocketContainer, storage:StorageContainer) => (
                         <NavigationPanel visible>
                             <NavigationTitle component={Link} className={"h2 text-dark text-decoration-none"} componentProps={{
                                 //to: (inGame && inGame.match(/^\/(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i)) ? inGame : "/"
-                                to: navLink
+                                to: navLink(this.props, socket),
+                                onDoubleClick: (evt:SyntheticEvent) => this.props.history.push("/")
                             }}>Backstory Trivia</NavigationTitle>
                             {/*<NavigationSubtitle>Another String Possible?</NavigationSubtitle>*/}
                             <NavigationItems>
@@ -105,14 +157,33 @@ class Router extends React.Component<RouterProps, RouterState> {
                         </NavigationPanel>
                     )}
                 </Subscribe>
-                {ready && (
-                    <Switch>
-                        <Route path={"/"} exact={true} component={withContainer(Home, StorageContainer, PlayerContainer, SocketContainer)} />
-                        <Route path={"/register"} exact={true} component={withContainer(Register, StorageContainer, PlayerContainer)} />
-                        <Route path={"/login"} exact={true} component={withContainer(Login, StorageContainer, PlayerContainer)} />
-                        <Route path={"/play"} exact={true} component={withContainer(Play, StorageContainer, PlayerContainer, SocketContainer)} />
-                        <Route path={"/:live"} exact={true} component={withContainer(Live, StorageContainer, PlayerContainer, SocketContainer)} />
-                    </Switch>
+                {ready && location && (
+                    <Transition
+                        // native
+                        config={{
+                            // duration: 10000,
+                        }}
+                        items={location}
+                        keys={location.pathname.split("/")[1]}
+                                from={{ position: "absolute", transform: 'translateX(200px)', opacity: 0 }}
+                                enter={{ position: "relative", transform: 'translateX(0px)', opacity: 1 }}
+                                leave={{ height: "100%", position: "absolute", transform: 'translateX(-200px)', opacity: 0 }}
+                    >
+                        {(loc, state) => style => {
+                            return (
+                                <Switch location={state === 'update' ? location : loc}>
+                                    <Route path={"/"} exact={true} render={(props) => {
+                                        return withContainer(Home, StorageContainer, PlayerContainer, SocketContainer)({... props, style})
+                                    }} />
+                                    <Route path={"/register"} exact={true} render={props => withContainer(Register, StorageContainer, PlayerContainer)({... props, style})} />
+                                    <Route path={"/login"} exact={true} render={props => withContainer(Login, StorageContainer, PlayerContainer)({... props, style})} />
+                                    <Route path={"/play"} exact={true} render={props => withContainer(Play, StorageContainer, PlayerContainer, SocketContainer)({... props, style})} />
+                                    <Route path={"/:live"} exact={true} render={props => withContainer(Live, StorageContainer, PlayerContainer, SocketContainer)({... props, style})} />
+                                </Switch>
+                            )
+                        }}
+                    </Transition>
+
                 )}
             </Container>
         );
@@ -147,7 +218,7 @@ class Router extends React.Component<RouterProps, RouterState> {
 }
 
 interface RouterProps extends RouteProps, IRouterProps {
-    state?: RouterState;
+    state: RouterState;
     // containers: {
     //     socket: SocketContainer;
     //     storage: StorageContainer;
@@ -157,7 +228,7 @@ interface RouterProps extends RouteProps, IRouterProps {
 interface RouterState {
     backgroundClass:string;
     ready:boolean;
-    navLink: string;
+    navLink: (props:RouterProps, socket:SocketContainer) => string;
 }
 
 export default withRouter(Router);

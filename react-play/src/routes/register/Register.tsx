@@ -1,6 +1,7 @@
 import {SyntheticEvent} from "react";
 import * as React from "react";
 import {RouterProps} from "react-router";
+import {animated} from 'react-spring/renderprops';
 import {Container} from "../../components";
 import {StorageContainer, PlayerContainer, RegisterFormData} from "../../containers";
 
@@ -45,6 +46,8 @@ export class Register extends React.Component<RegisterProps, RegisterState> {
     }
 
     public render() {
+        // @ts-ignore
+        const AnimatedContainer = animated(Container);
         const {password, email, passwordConfirm, teamName} = this.state.form;
         return (
             <Container
@@ -57,7 +60,9 @@ export class Register extends React.Component<RegisterProps, RegisterState> {
                     method: "POST",
                     onSubmit: this.sendRegister
                 }}
-                flex={{grow:1}}>
+                flex={{grow:1}}
+                style={this.props.style}
+            >
                 <p className={"mb-0 text-light"}>
                     In order to play, you will need to create an account.
                     Your account will have pretty basic information.
@@ -128,7 +133,8 @@ interface RegisterProps extends RouterProps {
     containers: {
         player: PlayerContainer;
         storage: StorageContainer
-    }
+    };
+    style?: any;
 }
 
 interface RegisterState {

@@ -19,6 +19,9 @@
 .env.test.local
 .env.production.local
 
+*.back.ts
+*.back.tsx
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

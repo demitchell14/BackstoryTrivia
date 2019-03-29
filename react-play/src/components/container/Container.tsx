@@ -1,5 +1,7 @@
 import * as React from "react"
 import "./container.css";
+import {animated} from 'react-spring/renderprops';
+// import {} from "react-spring";
 
 export function Container(props:ContainerProps) {
     let classes:string[] = [];
@@ -45,11 +47,21 @@ export function Container(props:ContainerProps) {
     }
 
     let myProps = {
-        className: classes.join(" ")
+        className: classes.join(" "),
     }
 
     if (props.componentProps) {
         Object.assign(myProps, props.componentProps)
+    }
+    if (props.style) {
+        if (props.style.position && typeof props.style.position.getValue === "function") {
+            console.log(props.style);
+            // @ts-ignore
+            const component = animated(props.component||"div");
+            return React.createElement(component, {...myProps, style: props.style}, props.children)
+        } else {
+            return React.createElement(props.component||"div", {...myProps, style: props.style}, props.children)
+        }
     }
 
     return React.createElement(props.component||"div", myProps, props.children)
@@ -72,4 +84,5 @@ export interface ContainerProps<T = React.ReactNode> {
     display?:string;
     direction?: string;
     className?: string;
+    style?: React.CSSProperties|any;
 }
