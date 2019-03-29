@@ -6,7 +6,8 @@
 @import "../../node_modules/bootstrap/scss/reboot";
 @import "../../node_modules/bootstrap/scss/type";
 @import "../../node_modules/bootstrap/scss/custom-forms";
-//@import "../../node_modules/bootstrap/scss/images";
+@import "../../node_modules/bootstrap/scss/card";
+@import "../../node_modules/bootstrap/scss/images";
 //@import "../../node_modules/bootstrap/scss/code";
 @import "../../node_modules/bootstrap/scss/grid";
 //@import "../../node_modules/bootstrap/scss/jumbotron";
@@ -31,7 +32,6 @@
 @import "transitions";
 @import "input-group";
 @import "custom-forms";
-@import "card";
 @import "breadcrumb";
 @import "pagination";
 @import "progress";

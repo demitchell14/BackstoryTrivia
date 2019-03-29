@@ -3,6 +3,9 @@ $primary: color-level("teal", -5);
 $secondary: #d5a4e9;
 // $secondary: #e9a4b8;
 
+$white:   #f1f1ef; // white;
+//$white:   #e6e9f0; // white;
+
 $theme-colors: ();
 $theme-colors: map-merge(
   (
