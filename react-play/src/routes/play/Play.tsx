@@ -1,6 +1,7 @@
 import {RefObject, SyntheticEvent} from "react";
 import * as React from "react";
 import {RouterProps} from "react-router";
+import {animated} from 'react-spring/renderprops';
 import {Card, CardBody, Container, Loading, Snackbar} from "../../components";
 import {PlayerContainer, SocketContainer, StorageContainer} from "../../containers";
 import {BrowserQRCodeReader} from "@zxing/library";
@@ -135,6 +136,8 @@ export class Play extends React.Component<PlayProps, PlayState> {
 
 
     public render() {
+        // @ts-ignore
+        const AnimatedContainer = animated(Container)
         let content;
         switch (this.state.view) {
             case "find":
@@ -167,7 +170,9 @@ export class Play extends React.Component<PlayProps, PlayState> {
                     //content: "center"
                 }}
                 justifyContent={"around"}
-                flex={{grow:1}}>
+                flex={{grow:1}}
+                style={this.props.style}
+            >
 
                 {content}
 
@@ -219,6 +224,7 @@ export class Play extends React.Component<PlayProps, PlayState> {
 
     onGameChange = (evt:SyntheticEvent) => {
         const target = evt.currentTarget as HTMLInputElement;
+        // if (Math.abs(target.value.length - this.state.game.length) > 1)
         this.setState({game: target.value});
     }
 
@@ -295,6 +301,7 @@ interface PlayProps extends RouterProps {
         player: PlayerContainer;
         socket:SocketContainer;
     }
+    style?: any;
 }
 
 interface PlayState {

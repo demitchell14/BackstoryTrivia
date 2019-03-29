@@ -4,9 +4,9 @@ import {SplashOption} from "../../../components";
 import {GameObject} from "../../../containers";
 
 const formatDate = (str: string) => {
-    const date = new Date(str);
-    console.log(Date.parse(str));
-    console.log(date);
+    // const date = new Date(str);
+    // console.log(Date.parse(str));
+    // console.log(date);
 
     // if (date.)
     return str;

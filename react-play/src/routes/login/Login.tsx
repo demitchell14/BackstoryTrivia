@@ -1,6 +1,7 @@
 import {RefObject, SyntheticEvent} from "react";
 import * as React from "react";
 import {RouterProps} from "react-router";
+import {animated} from 'react-spring/renderprops';
 import {Container} from "../../components";
 import {PlayerContainer, StorageContainer} from "../../containers";
 
@@ -142,6 +143,8 @@ export class Login extends React.Component<LoginProps, LoginState> {
     }
 
     public render() {
+        // @ts-ignore
+        const AnimatedContainer = animated(Container);
         //const {storage} = this.props.containers;
         const {mode,form} = this.state;
         
@@ -168,7 +171,9 @@ export class Login extends React.Component<LoginProps, LoginState> {
                     method: "POST",
                     onSubmit: this.sendLogin,
                 }}
-                flex={{grow:1}}>
+                flex={{grow:1}}
+                style={this.props.style}
+            >
 
                 {this.state.error && this.state.error.length > 0 && (
                     <div className={"alert alert-warning"}>
@@ -210,7 +215,8 @@ interface LoginProps extends RouterProps {
     containers: {
         player: PlayerContainer;
         storage: StorageContainer;
-    }
+    };
+    style?: any;
 }
 
 interface LoginState {

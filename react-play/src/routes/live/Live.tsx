@@ -1,8 +1,8 @@
 import * as React from "react";
 import {SyntheticEvent} from "react";
 import * as ReactGA from "react-ga";
-import {RouteProps, RouterProps} from "react-router";
-import {Transition} from "react-spring/renderprops-universal";
+import {RouteProps,RouterProps} from "react-router";
+import {animated, Transition} from 'react-spring/renderprops';
 import {Container, Loading, Snackbar} from "../../components";
 import {PlayerContainer, SocketContainer, StorageContainer} from "../../containers";
 import FAIcon from "../../FontAwesome";
@@ -114,15 +114,17 @@ export class Live extends React.Component<LiveProps, LiveState> {
     };
 
     componentWillReceiveProps(nextProps: Readonly<LiveProps>, nextContext: any): void {
+        // console.log("Props Received", nextProps);
         if (nextProps.location) {
-            if (nextProps.location.hash && nextProps.location.hash !== this.state.tab) {
+            if (nextProps.location.hash !== this.state.tab) {
                 // if (this.tabs[nextProps.location.hash])
                 ReactGA.event({
                     category: "Game Session",
                     action: "View Tab",
                     label: nextProps.location.hash
                 });
-                this.setState({tab: nextProps.location.hash});
+                this.setState({tab: nextProps.location.hash || "#"});
+                console.log(this.state)
             }
         }
         const {socket} = nextProps.containers;
@@ -195,89 +197,54 @@ export class Live extends React.Component<LiveProps, LiveState> {
     };
 
 
-    public render() {
-        const {socket} = this.props.containers;
-        const {loading, view, tab} = this.state;
-        let content: {
-            component: React.ReactNode | React.Component,
-            props: any
-        };
-        // switch (view) {
-        //     case "playing":
-        //         content = <PlayView socket={socket} />
-        //         break;
-        //     default:
-        //         content = <WaitView data={socket.state.game} />;
-        // }
-        switch (view) {
-            case "playing":
-                content = {
-                    component: PlayView,
-                    props: {socket}
-                };
-                break;
-            default:
-                content = {
-                    component: WaitView,
-                    props: {data: socket.state.game}
-                }
-        }
+    views = (socket:SocketContainer) => [
+        {
+            key: "#",
+            component: socket.state.game
+            && socket.state.game.started
+            && !socket.state.game.paused
+            && socket.state.gameStatus
+            && socket.state.gameStatus.started
+            && !socket.state.gameStatus.paused ? PlayView : WaitView,
 
-        if (this.state.tab !== "#") {
-            const {socket} = this.props.containers;
-            switch (this.state.tab) {
-                case "#teams":
-                    if (socket.state.game && socket.state.gameStatus) {
-                        content = {
-                            component: TeamView,
-                            props: {
-                                game: socket.state.game,
-                                teams: socket.state.gameStatus.teams
-                            }
-                        }
-
-                    }
-                    break;
-                case "#info":
-                    if (socket.state.game) {
-                        content = {
-                            component: InfoView,
-                            props: {
-                                game: socket.state.game
-                            }
-                        }
-                    }
-                    break;
-                case "#history":
-                    break;
+            props: {socket, data: socket.state.game}
+        },
+        {
+            key: "#teams",
+            component: TeamView,
+            props: {
+                game: socket.state.game,
+                teams: socket.state.gameStatus ? socket.state.gameStatus.teams : []
             }
-        }
+        },
+        {
+            key: "#info",
+            component: InfoView,
+            props: {
+                game: socket.state.game
+            }
+        },
+        {
+            key: "#history",
+            component: WaitView, // TODO Create View
+            props: {data:socket.state.game}
+        },
+    ]
 
-        // if (this.state.tab !== "#") {
-        //     const {socket} = this.props.containers;
-        //     switch (this.state.tab) {
-        //         case "#teams":
-        //             if (socket.state.game && socket.state.gameStatus) {
-        //                 content = <TeamView game={socket.state.game} teams={socket.state.gameStatus.teams}/>
-        //                 // content = this.tabs[this.state.tab]({
-        //                 //     game: socket.state.game,
-        //                 //     teams: socket.state.gameStatus.teams
-        //                 // })
-        //             }
-        //             break;
-        //         case "#info":
-        //             if (socket.state.game) {
-        //                 content = <InfoView game={socket.state.game} />
-        //             }
-        //             break;
-        //         case "#history":
-        //             break;
-        //     }
-        // }
 
-        const ContentComponent = content.component as any;
+    public render() {
+        // @ts-ignore
+        const AnimatedContainer = animated(Container) as any;
+        const {socket} = this.props.containers;
+        const {loading, tab} = this.state;
+        const {location} = this.props;
+
+        const views = this.views(socket);
+
+        console.log(views, tab,);
+
         return (
-            <Container className={"head-pad px-0 no-overflow-y"}
+            <Container className={"head-pad px-0 no-overflow-x"}
                 fullWidth
                 display={"flex"}
                 direction={"column"}
@@ -286,7 +253,9 @@ export class Live extends React.Component<LiveProps, LiveState> {
                     //content: "center"
                 }}
                 justifyContent={"between"}
-                flex={{grow:1}}>
+                flex={{grow:1}}
+                style={this.props.style}
+            >
 
                 <Loading visible={loading} full />
 
@@ -301,15 +270,40 @@ export class Live extends React.Component<LiveProps, LiveState> {
                     minimized={false}
                 />
 
-                <Transition
-                    items={content}
-                    from={{opacity: 0}}
-                    enter={{opacity: 1}}
-                    leave={{opacity: 0}}
-                >
-                    {show => (show && ContentComponent && !loading) && (style => (
-                        <ContentComponent style={style} {...content.props} />))}
-                </Transition>
+                {!loading && location && (
+                    <Transition unique
+                        // native
+                        items={views.find(v => v.key === tab)}
+                        key={tab}
+                        keys={(v:any) => v.key}
+                        from={{ position: "absolute", transform: 'translateX(200px)', opacity: 0 }}
+                        enter={{ position: "relative", transform: 'translateX(0px)', opacity: 1 }}
+                        leave={{ position: "absolute", transform: 'translateX(-200px)', opacity: 0 }}
+                    >
+                        {(view, state, index) => style => {
+                            // console.log({loc, state, style});
+                            // console.log({view, state, style, index});
+                            return React.createElement(view.component, {...view.props, style})
+                            // return views.map((view, key) => {
+                            //     // @ts-ignore
+                            //     return React.createElement(view.component, {...view.props, style, key})
+                            // })
+                        }}
+                    </Transition>
+                )}
+
+                {/*<Transition*/}
+                {/*    items={content}*/}
+                {/*    from={{opacity: 0}}*/}
+                {/*    enter={{opacity: 1}}*/}
+                {/*    leave={{opacity: 0}}*/}
+                {/*>*/}
+                {/*    {show => (show && ContentComponent && !loading) && (style => (*/}
+                {/*        <ContentComponent style={style} {...content.props} />))}*/}
+                {/*</Transition>*/}
+
+
+
                 {/*{loading || typeof content.component === "undefined" ? (<div/>) : <ContentComponent {...content.props} />}*/}
 
                 {socket.state.notification && socket.state.showNotification && (
@@ -353,6 +347,7 @@ interface LiveProps extends RouterProps, RouteProps {
         player: PlayerContainer;
         socket: SocketContainer;
     }
+    style?: any;
 }
 
 interface LiveState {
