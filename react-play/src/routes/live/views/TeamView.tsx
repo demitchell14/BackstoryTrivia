@@ -7,7 +7,7 @@ export function TeamView(props:TeamViewProps) {
 
     // console.log(game, teams)
     return (
-        <div className={"teams-view"}>
+        <div style={props.style} className={"teams-view"}>
             <Card className={"mb-3"} variant={"outlined"} fullWidth>
                 <ul className="list-group list-group-flush">
                     {teams.map((team, idx) => (
@@ -38,4 +38,5 @@ export function TeamView(props:TeamViewProps) {
 export interface TeamViewProps {
     game:GameObject;
     teams: TeamObject[];
+    style?: React.CSSProperties;
 }

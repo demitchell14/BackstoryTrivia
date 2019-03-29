@@ -1,11 +1,12 @@
 import * as React from "react";
+import {SyntheticEvent} from "react";
+import {SvgClock} from "./";
 
 import './live.css';
-import {SvgClock} from "./";
 
 export function ActivityStream(props:ActivityStreamProps) {
     return (
-        <div className={"activity-stream"}>
+        <div onClick={props.onClick} className={"activity-stream"}>
             <div className={"activity-icon"}>
                 {props.timer ? (
                     <SvgClock active limit={props.timer.limit} showNumber={props.timer.showNumber} current={props.timer.timeLeft}/>
@@ -25,4 +26,5 @@ export interface ActivityStreamProps {
         showNumber?: boolean;
     };
     minimized?: boolean;
+    onClick?: (evt: SyntheticEvent) => any;
 }

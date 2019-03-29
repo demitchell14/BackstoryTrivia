@@ -1,11 +1,12 @@
-import {SyntheticEvent} from "react";
 import * as React from "react";
+import {SyntheticEvent} from "react";
 import * as ReactGA from "react-ga";
 import {RouteProps, RouterProps} from "react-router";
+import {Transition} from "react-spring/renderprops-universal";
 import {Container, Loading, Snackbar} from "../../components";
 import {PlayerContainer, SocketContainer, StorageContainer} from "../../containers";
-import {ActivityStream, GameNav, TeamView, WaitView} from "./";
 import FAIcon from "../../FontAwesome";
+import {ActivityStream, GameNav, InfoView, PlayView, TeamView, WaitView} from "./";
 
 import "./live.css";
 
@@ -17,7 +18,7 @@ export class Live extends React.Component<LiveProps, LiveState> {
             view: "loading",
             loading: props.containers.socket.state.status !== "authenticated",
             tab: props.location && props.location.hash ? props.location.hash : "#",
-        } as LiveState
+        } as LiveState;
 
         props.containers.player.attachStorage(props.containers.storage);
 
@@ -33,7 +34,7 @@ export class Live extends React.Component<LiveProps, LiveState> {
     componentDidMount(): void {
         const {player, socket} = this.props.containers;
 
-        console.log(socket)
+        console.log(socket);
 
         player.check()
             .then((success:boolean) => {
@@ -61,7 +62,7 @@ export class Live extends React.Component<LiveProps, LiveState> {
     }
 
     initiate = async () => {
-        console.log("Initiated")
+        console.log("Initiated");
         const {socket, player, storage} = this.props.containers;
         if (socket.state.status !== "authenticated") {
             // TODO Check to see if we already have stored values and cross check
@@ -69,8 +70,9 @@ export class Live extends React.Component<LiveProps, LiveState> {
 
             console.debug("Socket not authenticated, so authenticate!");
 
-            if (!socket.connected())
-                await socket.connect()
+            if (!socket.connected()) {
+                await socket.connect();
+            }
 
             if (player.hasSession()) {
                 // console.log(storage.getToken(), storage.getGameID(), storage.getTeamKey())
@@ -85,11 +87,12 @@ export class Live extends React.Component<LiveProps, LiveState> {
         if (socket.state.status === "authenticated") {
             // TODO Initiate game
             if (typeof socket.state.game === "undefined") {
+                console.debug("Live is requesting Game Data");
                 const response = await socket.requestGame(storage.getGameID());
                 if (response.success) {
                     this.setState({
                         loading: false,
-                        view: "waiting",
+                        view: socket.state.gameStatus && socket.state.gameStatus.started && !socket.state.gameStatus.paused ? "playing" : "waiting",
                     })
                 }
             } else {
@@ -102,13 +105,13 @@ export class Live extends React.Component<LiveProps, LiveState> {
         } else {
             throw false
         }
-    }
+    };
 
     handleGameState = () => {
         const {socket} = this.props.containers;
         // const {} = this.state
         console.log(socket.state);
-    }
+    };
 
     componentWillReceiveProps(nextProps: Readonly<LiveProps>, nextContext: any): void {
         if (nextProps.location) {
@@ -122,11 +125,29 @@ export class Live extends React.Component<LiveProps, LiveState> {
                 this.setState({tab: nextProps.location.hash});
             }
         }
+        const {socket} = nextProps.containers;
+        if (socket.state.game && socket.state.gameStatus) {
+            if (socket.state.game.started
+                && !socket.state.game.paused
+                && socket.state.gameStatus.started
+                && !socket.state.gameStatus.paused) {
+                if (this.state.view !== "playing") {
+                    console.debug("Question is playing, setting view");
+                    this.setState({view: "playing"});
+                }
+            } else {
+                if (this.state.view === "playing") {
+                    console.debug("Question stopped, resetting view");
+                    this.setState({view: "waiting"});
+                }
+            }
+        }
     }
 
     handleNotification = (evt?:SyntheticEvent) => {
-        if (evt)
-            evt.preventDefault()
+        if (evt) {
+            evt.preventDefault();
+        }
         const {socket} = this.props.containers;
         if (typeof socket.state.showNotification !== "undefined") {
             if (typeof socket.state.showNotification === "number")
@@ -135,7 +156,7 @@ export class Live extends React.Component<LiveProps, LiveState> {
                 || typeof socket.state.showNotification === "boolean")
                 socket.setState({showNotification: false, notification: undefined});
         }
-    }
+    };
 
     generateStatus = () => {
         const {socket} = this.props.containers;
@@ -171,18 +192,35 @@ export class Live extends React.Component<LiveProps, LiveState> {
             status: "Waiting for game...",
             icon: <FAIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>
         };
-    }
+    };
+
 
     public render() {
         const {socket} = this.props.containers;
         const {loading, view, tab} = this.state;
-        let content:React.ReactNode;
+        let content: {
+            component: React.ReactNode | React.Component,
+            props: any
+        };
+        // switch (view) {
+        //     case "playing":
+        //         content = <PlayView socket={socket} />
+        //         break;
+        //     default:
+        //         content = <WaitView data={socket.state.game} />;
+        // }
         switch (view) {
-            case "waiting":
-                content = <WaitView data={socket.state.game} />;
+            case "playing":
+                content = {
+                    component: PlayView,
+                    props: {socket}
+                };
                 break;
             default:
-                content = <WaitView data={socket.state.game} />;
+                content = {
+                    component: WaitView,
+                    props: {data: socket.state.game}
+                }
         }
 
         if (this.state.tab !== "#") {
@@ -190,20 +228,54 @@ export class Live extends React.Component<LiveProps, LiveState> {
             switch (this.state.tab) {
                 case "#teams":
                     if (socket.state.game && socket.state.gameStatus) {
-                        content = <TeamView game={socket.state.game} teams={socket.state.gameStatus.teams}/>
-                        // content = this.tabs[this.state.tab]({
-                        //     game: socket.state.game,
-                        //     teams: socket.state.gameStatus.teams
-                        // })
+                        content = {
+                            component: TeamView,
+                            props: {
+                                game: socket.state.game,
+                                teams: socket.state.gameStatus.teams
+                            }
+                        }
+
                     }
                     break;
                 case "#info":
+                    if (socket.state.game) {
+                        content = {
+                            component: InfoView,
+                            props: {
+                                game: socket.state.game
+                            }
+                        }
+                    }
                     break;
                 case "#history":
                     break;
             }
         }
 
+        // if (this.state.tab !== "#") {
+        //     const {socket} = this.props.containers;
+        //     switch (this.state.tab) {
+        //         case "#teams":
+        //             if (socket.state.game && socket.state.gameStatus) {
+        //                 content = <TeamView game={socket.state.game} teams={socket.state.gameStatus.teams}/>
+        //                 // content = this.tabs[this.state.tab]({
+        //                 //     game: socket.state.game,
+        //                 //     teams: socket.state.gameStatus.teams
+        //                 // })
+        //             }
+        //             break;
+        //         case "#info":
+        //             if (socket.state.game) {
+        //                 content = <InfoView game={socket.state.game} />
+        //             }
+        //             break;
+        //         case "#history":
+        //             break;
+        //     }
+        // }
+
+        const ContentComponent = content.component as any;
         return (
             <Container className={"head-pad px-0 no-overflow-y"}
                 fullWidth
@@ -224,10 +296,21 @@ export class Live extends React.Component<LiveProps, LiveState> {
                 {/*/>*/}
 
                 <ActivityStream
-                    {...this.generateStatus()}  minimized={false}
+                    {...this.generateStatus()}
+                    onClick={(evt) => this.props.history.push("#")}
+                    minimized={false}
                 />
 
-                {loading ? (<div/>) : content}
+                <Transition
+                    items={content}
+                    from={{opacity: 0}}
+                    enter={{opacity: 1}}
+                    leave={{opacity: 0}}
+                >
+                    {show => (show && ContentComponent && !loading) && (style => (
+                        <ContentComponent style={style} {...content.props} />))}
+                </Transition>
+                {/*{loading || typeof content.component === "undefined" ? (<div/>) : <ContentComponent {...content.props} />}*/}
 
                 {socket.state.notification && socket.state.showNotification && (
                     <Snackbar variant={"info"} position={"bottom"} onClose={this.handleNotification}>
