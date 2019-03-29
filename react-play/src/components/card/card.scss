@@ -13,12 +13,14 @@
     &.card-color-#{$color}-dark {
       background: theme-color-level($color, 5);
       color: theme-color-level($color, -9);
+      box-shadow: 2px 2px 1px 2px theme-color-level(primary, 6);
       // @include button-secondary-outline-variant($value);
     }
     &.card-color-#{$color} {
       $col: theme-color-level($color);
       background: $col;
       color: color-yiq($col);
+      box-shadow: 2px 2px 1px 2px theme-color-level($color, 3);
       // color: theme-color-level($color, -9);
       // @include button-secondary-outline-variant($value);
     }

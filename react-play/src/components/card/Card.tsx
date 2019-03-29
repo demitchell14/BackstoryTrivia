@@ -230,7 +230,7 @@ export interface CardState {
 }
 
 export interface CardProps {
-    ref?: React.RefObject<HTMLDivElement>;
+    ref?: React.RefObject<any>;
     children: React.ReactNode|React.ReactNodeArray;
     component?: string|React.FunctionComponent<any>|React.ComponentClass;
     componentProps?: any;
