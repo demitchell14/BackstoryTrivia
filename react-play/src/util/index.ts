@@ -11,8 +11,9 @@ export function generateColor(letter?:string) {
         color = color.lighten(.8);
     }
 
-    // console.log(color.toString())
+    // logger.log(color.toString())
 
     return color;
 }
 
+export * from "./logger";

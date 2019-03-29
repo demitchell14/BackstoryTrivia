@@ -4,7 +4,7 @@ import "./button.css"
 
 export function Button(props:ButtonProps) {
     const classes:string[] = ["btn"];
-    // console.log(props)
+    // logger.log(props)
     let component = "button"
 
     if (props.variant) {

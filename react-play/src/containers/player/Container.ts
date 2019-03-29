@@ -1,6 +1,7 @@
 import {Container} from "unstated";
 import {StorageContainer} from "..";
 import * as ReactGA from "react-ga";
+import logger from "../../util/logger";
 
 export class PlayerContainer extends Container<any>{
     static containerName:string = "player";
@@ -32,7 +33,7 @@ export class PlayerContainer extends Container<any>{
                 }
 
                 if (!success) {
-                    console.debug(json.message);
+                    logger.debug(json.message);
                     storage.clearToken();
                     delete json.message;
                 }
@@ -77,7 +78,7 @@ export class PlayerContainer extends Container<any>{
 
         const json = await response.json() as LoginResponse;
 
-        console.log(json);
+        logger.log(json);
         if (response.status === 200) {
             if (json.token && json.email) {
                 if (this.storage) {

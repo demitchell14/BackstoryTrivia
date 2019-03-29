@@ -5,7 +5,7 @@ import {GameObject, TeamObject} from "../../../containers";
 export function TeamView(props:TeamViewProps) {
     const { teams} = props;
 
-    // console.log(game, teams)
+    // logger.log(game, teams)
     return (
         <div style={props.style} className={"teams-view"}>
             <Card className={"mb-3"} variant={"outlined"} fullWidth>

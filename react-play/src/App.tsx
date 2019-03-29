@@ -3,6 +3,7 @@ import {BrowserRouter} from "react-router-dom";
 import {Provider} from "unstated";
 import {PlayerContainer, SocketContainer, StorageContainer} from "./containers";
 import Router from "./Router";
+import logger from "./util/logger";
 
 class App extends React.Component<any, AppState> {
     public constructor(props:any) {
@@ -21,7 +22,7 @@ class App extends React.Component<any, AppState> {
         import(/* webpackChunkName: "fa" */"./FontAwesome")
             .then(fa => fa.default())
             .then(() => this.setState({ready:true}))
-            .catch(err => console.error(err));
+            .catch(err => logger.error(err));
     }
 
     public render() {

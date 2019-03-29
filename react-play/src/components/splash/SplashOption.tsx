@@ -5,6 +5,7 @@ import * as React from "react";
 import "./splash.css";
 
 import {Card} from "..";
+import logger from "../../util/logger";
 
 export function SplashOption(props:SplashOptionProps) {
 
@@ -19,7 +20,7 @@ export function SplashOption(props:SplashOptionProps) {
     }
 
     const onMouseEnter = (obj:Card) => {
-        console.log("Mouse Entered")
+        logger.log("Mouse Entered")
         let style = Object.assign({}, obj.state.style) as any;
 
         Object.assign(style, obj.applyBorderRadius(flipRounded));
@@ -28,7 +29,7 @@ export function SplashOption(props:SplashOptionProps) {
     }
 
     const onMouseLeave = (obj:Card) => {
-        console.log("Mouse Leave")
+        logger.log("Mouse Leave")
         let style = Object.assign({}, obj.state.style) as any;
 
         Object.assign(style, obj.applyBorderRadius(rounded));

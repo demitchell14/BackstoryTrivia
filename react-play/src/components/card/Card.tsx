@@ -1,6 +1,7 @@
 import {SyntheticEvent} from "react";
 import * as React from "react";
 import "./card.css";
+import logger from "../../util/logger";
 
 export class Card extends React.Component<CardProps, CardState> {
 
@@ -13,7 +14,7 @@ export class Card extends React.Component<CardProps, CardState> {
                 if (typeof val === "number")
                     return `${val}rem`;
                 if (typeof val === "object") {
-                    console.log(val);
+                    logger.log(val);
                     // @ts-ignore
                     return `${val.getValue()}rem`;
                 }
@@ -119,7 +120,7 @@ export class Card extends React.Component<CardProps, CardState> {
 }
 
 // export function Card2(props:CardProps) {
-//     console.log(props)
+//     logger.log(props)
 //     const classes = ["card"];
 //     const style = {} as React.CSSProperties;
 //
@@ -155,7 +156,7 @@ export class Card extends React.Component<CardProps, CardState> {
 //                 if (typeof val === "number")
 //                     return `${val}rem`;
 //                 if (typeof val === "object") {
-//                     console.log(val);
+//                     logger.log(val);
 //                     // @ts-ignore
 //                     return `${val.getValue()}rem`;
 //                 }

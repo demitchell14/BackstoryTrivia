@@ -5,6 +5,7 @@ import {RouteProps,RouterProps} from "react-router";
 import {animated, Transition} from 'react-spring/renderprops';
 import {Container, Loading, Snackbar} from "../../components";
 import {PlayerContainer, SocketContainer, StorageContainer} from "../../containers";
+import logger from "../../util/logger";
 import {ActivityStream, GameNav, InfoView, PlayView, TeamView, WaitView} from "./";
 
 import "./live.css";
@@ -33,7 +34,7 @@ export class Live extends React.Component<LiveProps, LiveState> {
     componentDidMount(): void {
         const {player, socket} = this.props.containers;
 
-        console.log(socket);
+        logger.log(socket);
 
         player.check()
             .then((success:boolean) => {
@@ -56,25 +57,25 @@ export class Live extends React.Component<LiveProps, LiveState> {
                     }
                 }
             })
-            .catch(err => console.log(err))
+            .catch(err => logger.log(err))
 
     }
 
     initiate = async () => {
-        console.log("Initiated");
+        logger.log("Initiated");
         const {socket, player, storage} = this.props.containers;
         if (socket.state.status !== "authenticated") {
             // TODO Check to see if we already have stored values and cross check
             // TODO so we do not have to reauthorize access
 
-            console.debug("Socket not authenticated, so authenticate!");
+            logger.debug("Socket not authenticated, so authenticate!");
 
             if (!socket.connected()) {
                 await socket.connect();
             }
 
             if (player.hasSession()) {
-                // console.log(storage.getToken(), storage.getGameID(), storage.getTeamKey())
+                // logger.log(storage.getToken(), storage.getGameID(), storage.getTeamKey())
                 const success = await socket.authenticate(storage.getToken(), storage.getGameID(), storage.getTeamKey());
                 if (!success) {
                     throw success;
@@ -86,7 +87,7 @@ export class Live extends React.Component<LiveProps, LiveState> {
         if (socket.state.status === "authenticated") {
             // TODO Initiate game
             if (typeof socket.state.game === "undefined") {
-                console.debug("Live is requesting Game Data");
+                logger.debug("Live is requesting Game Data");
                 const response = await socket.requestGame(storage.getGameID());
                 if (response.success) {
                     this.setState({
@@ -109,16 +110,16 @@ export class Live extends React.Component<LiveProps, LiveState> {
     handleGameState = () => {
         const {socket} = this.props.containers;
         // const {} = this.state
-        console.log(socket.state);
+        logger.log(socket.state);
     };
 
     componentWillReceiveProps(nextProps: Readonly<LiveProps>, nextContext: any): void {
-        // console.log("Props Received", nextProps);
+        // logger.log("Props Received", nextProps);
         if (nextProps.location) {
             if (nextProps.location.hash !== this.state.tab) {
                 // if (this.tabs[nextProps.location.hash])
                 this.setState({tab: nextProps.location.hash || "#"});
-                console.log(this.state)
+                logger.log(this.state)
             }
         }
         const {socket} = nextProps.containers;
@@ -128,12 +129,12 @@ export class Live extends React.Component<LiveProps, LiveState> {
                 && socket.state.gameStatus.started
                 && !socket.state.gameStatus.paused) {
                 if (this.state.view !== "playing") {
-                    console.debug("Question is playing, setting view");
+                    logger.debug("Question is playing, setting view");
                     this.setState({view: "playing"});
                 }
             } else {
                 if (this.state.view === "playing") {
-                    console.debug("Question stopped, resetting view");
+                    logger.debug("Question stopped, resetting view");
                     this.setState({view: "waiting"});
                 }
             }
@@ -235,7 +236,7 @@ export class Live extends React.Component<LiveProps, LiveState> {
 
         const views = this.views(socket);
 
-        // console.log(views, tab,);
+        // logger.log(views, tab,);
 
         return (
             <Container className={"head-pad px-0 no-overflow-x"}
@@ -275,8 +276,8 @@ export class Live extends React.Component<LiveProps, LiveState> {
                         leave={{ position: "absolute", transform: 'translateX(-200px)', opacity: 0 }}
                     >
                         {(view, state, index) => style => {
-                            // console.log({loc, state, style});
-                            // console.log({view, state, style, index});
+                            // logger.log({loc, state, style});
+                            // logger.log({view, state, style, index});
                             return React.createElement(view.component, {...view.props, style})
                             // return views.map((view, key) => {
                             //     // @ts-ignore

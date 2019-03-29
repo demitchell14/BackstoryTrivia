@@ -6,6 +6,7 @@ import {animated} from 'react-spring/renderprops';
 import {Card, CardBody, Container, Loading, Snackbar} from "../../components";
 import {PlayerContainer, SocketContainer, StorageContainer} from "../../containers";
 import {BrowserQRCodeReader} from "@zxing/library";
+import logger from "../../util/logger";
 import Timeout = NodeJS.Timeout;
 
 export class Play extends React.Component<PlayProps, PlayState> {
@@ -54,7 +55,7 @@ export class Play extends React.Component<PlayProps, PlayState> {
                     view: "join", proceed: setTimeout(this.onJoin, 5000),
                 });
                 if (socket.state.status === "authenticated") {
-                    console.log(this.state)
+                    logger.log(this.state)
                 }
             }
         }
@@ -129,7 +130,7 @@ export class Play extends React.Component<PlayProps, PlayState> {
     componentWillUnmount(): void {
         const {socket} = this.props.containers;
         if (socket.connected() && this.state.proceed !== true) {
-            console.debug("Socket Disconnecting");
+            logger.debug("Socket Disconnecting");
             socket.disconnect();
         }
     }
@@ -249,7 +250,7 @@ export class Play extends React.Component<PlayProps, PlayState> {
 
                 if (storage.hasToken()) {
                     const response = await socket.requestGame(this.state.game) as any;
-                    //console.log(response)
+                    //logger.log(response)
                     if (response.success) {
                         this.setState({
                             gameData: response.game,
