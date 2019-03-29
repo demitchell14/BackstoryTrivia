@@ -68,6 +68,10 @@ export class SocketContainer extends Container<SocketState> {
         })
     }
 
+    receiveCountdown = (data:number) => {
+        console.log(data);
+    }
+
     receiveQuestion = (data:QuestionDetails) => {
         const {gameStatus, game} = this.state;
         if (gameStatus && game) {
@@ -79,11 +83,11 @@ export class SocketContainer extends Container<SocketState> {
         } else {
             this.setState({question: undefined});
         }
-        console.log(data);
+        // console.log(data);
     }
     
     receiveState = (state?:GameStatus) => {
-        console.log("State Received");
+        // console.log("State Received");
         // state.teams = state.teams.map(team => ({
         //     name: team.name,
         //     color: generateColor(team.name.toUpperCase().charAt(0))
@@ -170,6 +174,7 @@ export class SocketContainer extends Container<SocketState> {
                     this.socket.removeEventListener("authenticated");
                     this.socket.removeEventListener("game state");
                     this.socket.removeEventListener("question state");
+                    this.socket.removeEventListener("question countdown");
                     resolve(false);
                 }, 5000);
 
@@ -196,6 +201,7 @@ export class SocketContainer extends Container<SocketState> {
             console.debug("Socket Authenticated")
             this.socket.on("game state", this.receiveState);
             this.socket.on("question state", this.receiveQuestion);
+            this.socket.on("question countdown", this.receiveCountdown);
 
             this.setState({
                 status: "authenticated",
