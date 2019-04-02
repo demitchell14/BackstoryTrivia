@@ -1,5 +1,5 @@
 
-const AuthorizationString = "i'm technically authorized";
+const AuthorizationString = "";
 
 
 const Config = {
@@ -21,13 +21,13 @@ export const MongoDetails = {
 };
 
 export const MongooseDetails = {
-    baseurl: "ds029541.mlab.com:29541",
-    username: "trivia",
-    password: "trivia123",
-    db: "sockettrivia",
+    baseurl: "",
+    username: "",
+    password: "",
+    db: "",
 }
 
-export const JWT_SECRET = "I'm a string that needs to change";
+export const JWT_SECRET = "";
 
 export const AuthString = AuthorizationString;
 export default Config;
