@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto');
 
 // Required
-@import "./core";
+@import "./themes/primary/core";
 // Optional
 @import "../../node_modules/bootstrap/scss/reboot";
 @import "../../node_modules/bootstrap/scss/type";
@@ -42,7 +42,15 @@
 @import "carousel";
 */
 
-@import "./basic";
-@import "./buttons";
+@import "./themes/primary/basic";
+@import "./themes/primary/buttons";
+
+@import "./themes/primary/live";
+@import "./themes/primary/snackbar";
+@import "./themes/primary/navigation";
+@import "./themes/primary/loading";
+@import "./themes/primary/card";
+
+// @import "./themes/dark/theme";
 
 // @import "./form";

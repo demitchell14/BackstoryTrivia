@@ -1,10 +1,13 @@
-@import "../../style/core";
+@import "./core";
 
 
 .game-nav {
   $background: theme-color(secondary);
   display: flex;
   flex-wrap: nowrap;
+
+  position: fixed;
+  bottom: 0;
 
   justify-content:  space-around;
 
@@ -184,7 +187,7 @@
 .play-view {
   position: relative;
   flex-grow: 1;
-  padding: 5rem .5rem 1rem;
+  padding: 5rem .5rem 5rem;
   overflow-y: auto;
   width: 100%;
   display: flex;
@@ -193,14 +196,13 @@
 
 .wait-view {
   flex-grow: 1;
-  padding: 1rem;
+  padding: 5rem 1rem 5rem;
   overflow-y: auto;
-  padding-top: 5rem;
 }
 
 .info-view {
   flex-grow: 1;
-  padding: 5rem 1.5rem 1rem;
+  padding: 5rem 1.5rem 5rem;
   overflow-y: auto;
   // padding-top: 5rem;
   width: 100%;
@@ -233,7 +235,7 @@
 
 .teams-view {
   flex-grow: 1;
-  padding: 5rem 1.5rem 1rem;
+  padding: 5rem 1.5rem 5rem;
   overflow-y: auto;
   // padding-top: 5rem;
   width: 100%;
@@ -274,7 +276,7 @@
   //// flex-grow: .75;
 
   .choice {
-    background-color: theme-color(primary);
+    // background-color: theme-color(primary);
     padding: .5rem;
     display: flex;
     align-items: center;
@@ -287,7 +289,7 @@
     margin-bottom: 15px;
 
     &.active {
-      background-color: theme-color-level(primary, 6);
+      // background-color: theme-color-level(primary, 6);
     }
   }
 }
@@ -323,24 +325,13 @@
 //  }
 //}
 
-.test {
+.tint-secondary {
   position: relative;
   background: $white;
 
-  &1:after {
-    position: absolute;
-    content: '';
-    height: 40%;
-    width: 40%;
-    top: 60%;
-    left: 60%;
-    background: theme-color(primary);
-    border-top-left-radius: 100%;
-    opacity: .15;
-  }
-
   &:after {
     position: absolute;
+    pointer-events: none;
     content: '';
     overflow: hidden;
     top: calc(100% - 100px);
@@ -356,6 +347,7 @@
 
   &:before {
     position: absolute;
+    pointer-events: none;
     content: '';
     overflow: hidden;
     top: 0;
@@ -368,5 +360,52 @@
     z-index: 1;
     opacity: .15;
   }
-
 }
+
+.tint-primary {
+  position: relative;
+  background: $white;
+
+  &:after {
+    position: absolute;
+    pointer-events: none;
+    content: '';
+    overflow: hidden;
+    top: calc(100% - 100px);
+    left: calc(100% - 250px);
+    /* width: 40%; */
+    /* height: 10px; */
+    /* border-right: 30px solid black; */
+    border-bottom: 100px solid theme-color(primary);
+    border-left: 250px solid transparent;
+    z-index: 1;
+    opacity: .15;
+  }
+
+  &:before {
+    position: absolute;
+    pointer-events: none;
+    content: '';
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    /* width: 40%; */
+    /* height: 10px; */
+    /* border-right: 30px solid black; */
+    border-bottom: 100px solid transparent;
+    border-left: 250px solid theme-color(primary);
+    z-index: 1;
+    opacity: .15;
+  }
+}
+
+.alternate-primary {
+  & > *:nth-child(even) {
+    background: theme-color-level(primary, -5);
+  }
+}
+//@each $color, $value in $theme-colors {
+//  .alternate-#{$color} {
+//
+//  }
+//}

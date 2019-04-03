@@ -2,7 +2,6 @@ import * as React from "react";
 // import {animated, useSpring} from "react-spring";
 //import {Spring} from "react-spring/renderprops";
 
-import "./splash.css";
 
 import {Card} from "..";
 import logger from "../../util/logger";

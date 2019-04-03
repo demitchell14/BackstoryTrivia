@@ -8,7 +8,7 @@ import {PlayerContainer, SocketContainer, StorageContainer} from "../../containe
 import logger from "../../util/logger";
 import {ActivityStream, GameNav, InfoView, PlayView, TeamView, WaitView} from "./";
 
-import "./live.css";
+// import "./../../style/live.css";
 
 export class Live extends React.Component<LiveProps, LiveState> {
     public constructor(props:LiveProps) {
@@ -21,6 +21,8 @@ export class Live extends React.Component<LiveProps, LiveState> {
         } as LiveState;
 
         props.containers.player.attachStorage(props.containers.storage);
+        
+        // if (props.containers.player.gameInit())
 
     }
 
@@ -77,6 +79,8 @@ export class Live extends React.Component<LiveProps, LiveState> {
             if (player.hasSession()) {
                 // logger.log(storage.getToken(), storage.getGameID(), storage.getTeamKey())
                 const success = await socket.authenticate(storage.getToken(), storage.getGameID(), storage.getTeamKey());
+                player.gameInit(storage.getGameID(), storage.getTeamKey());
+                    // .then(socket.requestAnswerHistory);
                 if (!success) {
                     throw success;
                 }
@@ -129,14 +133,27 @@ export class Live extends React.Component<LiveProps, LiveState> {
                 && socket.state.gameStatus.started
                 && !socket.state.gameStatus.paused) {
                 if (this.state.view !== "playing") {
+                    this.vibrate();
                     logger.debug("Question is playing, setting view");
                     this.setState({view: "playing"});
                 }
             } else {
                 if (this.state.view === "playing") {
+                    this.vibrate();
                     logger.debug("Question stopped, resetting view");
                     this.setState({view: "waiting"});
+                    
                 }
+            }
+        }
+    }
+
+    vibrate = () => {
+        if ('vibrate' in navigator) {
+            const {storage} = this.props.containers;
+            // @ts-ignore
+            if (storage.settings("vibrate") !== false) {
+                navigator.vibrate([125,25,125,25,125]);
             }
         }
     }
@@ -168,7 +185,7 @@ export class Live extends React.Component<LiveProps, LiveState> {
                     // TODO handle active question Activity Streamer
                     if (socket.state.question) {
                         return {
-                            status: "Active Question!",
+                            status: `Question #${socket.state.question.questionIndex + 1} of ${socket.state.game.questions} is active.`,
                             timer: {
                                 limit: socket.state.question.timeLimit,
                                 timeLeft: socket.state.question.timeLeft,
@@ -192,7 +209,7 @@ export class Live extends React.Component<LiveProps, LiveState> {
     };
 
 
-    views = (socket:SocketContainer) => [
+    views = (socket:SocketContainer, player:PlayerContainer) => [
         {
             key: "#",
             component: socket.state.game
@@ -202,7 +219,18 @@ export class Live extends React.Component<LiveProps, LiveState> {
             && socket.state.gameStatus.started
             && !socket.state.gameStatus.paused ? PlayView : WaitView,
 
-            props: {socket, data: socket.state.game}
+            props: {
+                socket, 
+                data: socket.state.game, 
+                player,
+                onNotify: (message:string) => {
+                    socket.setState({
+                        showNotification: setTimeout(this.handleNotification, 2000),
+                        notification: message
+                    })
+                    //socket.state.sho
+                }
+            }
         },
         {
             key: "#teams",
@@ -230,16 +258,16 @@ export class Live extends React.Component<LiveProps, LiveState> {
     public render() {
         // @ts-ignore
         const AnimatedContainer = animated(Container) as any;
-        const {socket} = this.props.containers;
+        const {socket, player} = this.props.containers;
         const {loading, tab} = this.state;
         const {location} = this.props;
 
-        const views = this.views(socket);
+        const views = this.views(socket, player);
 
         // logger.log(views, tab,);
 
         return (
-            <Container className={"head-pad px-0 no-overflow-x"}
+            <Container className={"head-pad px-0 no-overflow-x no-overflow-y"}
                 fullWidth
                 display={"flex"}
                 direction={"column"}

@@ -11,8 +11,9 @@ import play from "./play";
 import {Database, GameObject, TeamObject, UserObject} from "../../util/db/DatabaseHandler";
 import {AuthorizedToken} from "../../util/jwt";
 import {ObjectID} from "bson";
-import {Cursor} from "mongodb";
+import {Cursor, UpdateQuery} from "mongodb";
 import {Game} from "../../notrivia";
+import * as rand from "seedrandom";
 //import {A} from "./UserSchema.mongoose";
 const router = express.Router();
 
@@ -34,10 +35,18 @@ export async function getUser(db:Database, jwt:AuthorizedToken) {
         delete user.passwordhash;
         delete user.pin;
         delete user.savedUIDs;
-        delete user._id;
+        // delete user._id;
         return user;
     }
     return undefined;
+}
+
+export async function updateUser(db:Database, jwt:AuthorizedToken, data:UpdateQuery<UserObject|TeamObject>) {
+    await db.openCollection(jwt.type + "s");
+    const success = await db.update({_id: typeof jwt._id === "string" ? ObjectID.createFromHexString(jwt._id) : jwt._id}, data);
+    if (success.modifiedCount === 1)
+        return success;
+    return false;
 }
 
 export async function getGame(db:Database, token:string) {
@@ -71,27 +80,55 @@ export function generateGameState(game:Game) {
     if (game.started) {
 
         const current = game.question().current();
-        state.questionId = current._id;
+        if (current) {
+            state.questionId = current._id;
 
-        if (game.paused === false) {
-            // game is running
-            state.question = {
-                started: current.started,
-                question: current.question,
-                image: current.questionImage || "",
-                description: current.questionDetails || "",
-                type: current.type,
-                choices: current.type === "Multiple Choice" ?
-                    current.choices.map(choice => choice.answer)
-                    : undefined,
-                points: current.points,
-                time: {
-                    limit: current.timeLimit,
-                    left: current.timeLeft,
-                },
+            if (game.paused === false) {
+                // game is running
+                state.question = {
+                    started: current.started,
+                    question: current.question,
+                    image: current.questionImage || "",
+                    description: current.questionDetails || "",
+                    type: current.type,
+                    choices: current.type === "Multiple Choice" ?
+                        current.choices.map(choice => choice.answer)
+                        : undefined,
+                    points: current.points,
+                    time: {
+                        limit: current.timeLimit,
+                        left: current.timeLeft,
+                    },
+                }
             }
         }
+
     }
 
     return state;
+}
+
+export function shuffle(array:any[], seed:string) {
+    const r = rand.alea(seed);
+    r.double();
+    // console.log(r, r.double());
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(r.double() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+export function shuffle2(array:any[], seed:string) {
+    const r = rand.alea(seed);
+    array = Object.assign({}, array);
+    var i = array.length, j, temp;
+    if ( i == 0 ) return array;
+    while ( --i ) {
+        j = Math.floor( r.double() * ( i + 1 ) );
+        temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
 }

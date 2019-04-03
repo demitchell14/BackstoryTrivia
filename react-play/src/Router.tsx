@@ -132,6 +132,7 @@ class Router extends React.Component<RouterProps, RouterState> {
 
         return (
             <Container
+            // <Container componentProps={{"data-theme": "dark"}}
                 fullHeight fullWidth
                 display={"flex"}
                 direction={"column"}
@@ -140,7 +141,7 @@ class Router extends React.Component<RouterProps, RouterState> {
                 <Subscribe to={[SocketContainer, StorageContainer]}>
                     {(socket:SocketContainer, storage:StorageContainer) => (
                         <NavigationPanel visible>
-                            <NavigationTitle component={Link} className={"h2 text-dark text-decoration-none"} componentProps={{
+                            <NavigationTitle component={Link} className={"h2 text-decoration-none"} componentProps={{
                                 //to: (inGame && inGame.match(/^\/(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i)) ? inGame : "/"
                                 to: navLink(this.props, socket),
                                 onDoubleClick: (evt:SyntheticEvent) => this.props.history.push("/")

@@ -35,8 +35,10 @@ class PlayRouting {
         const {decoded} = req;
         if (decoded.type === "moderator") {
             const {gameId, action} = req.body;
+            delete req.body.gameId;
+            delete req.body.action;
 
-            console.log("GameID is ", ObjectID.isValid(gameId));
+            // console.log("GameID is ", ObjectID.isValid(gameId));
             const instanceManager = GameInstanceManager.getInstance(gameId)
             const game = await instanceManager.instance()
                 .catch(err => res.status(500).json(err)) as Game;
@@ -44,14 +46,14 @@ class PlayRouting {
                 const socket = SocketHandler.handler();
 
                 if (socket) {
-                    const handled = await socket.handleAction(game, action);
+                    const handled = await socket.handleAction(action, game, req.body);
                     // if (handled)
                     //     console.log("Handled: ", handled);
                     // const res = await socket.broadcastState(gameId);
                     // socket.server.in(gameId).emit("game state")
                 }
 
-                console.log(socket);
+                // console.log(socket);
 
 
                 res.send("OK");

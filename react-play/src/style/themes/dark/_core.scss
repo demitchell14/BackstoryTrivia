@@ -1,6 +1,6 @@
-@import "../../node_modules/bootstrap/scss/functions";
-@import "../../node_modules/bootstrap/scss/variables";
-@import "../../node_modules/bootstrap/scss/mixins";
+@import "../../../../node_modules/bootstrap/scss/functions";
+@import "../../../../node_modules/bootstrap/scss/variables";
+@import "../../../../node_modules/bootstrap/scss/mixins";
 
 @function color-level($key: "blue", $level: 0) {
   $color: color($key);
@@ -11,6 +11,6 @@
 }
 
 
-@import "variables";
+@import "./variables";
 
 

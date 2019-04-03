@@ -26,7 +26,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
             } else {
                 this.setState({show: true});
             }
-        });
+        }).catch(err => logger.log(err))
         if (socket.connected()) {
             socket.disconnect();
         }

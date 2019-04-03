@@ -2,7 +2,6 @@ import * as React from "react";
 import {SyntheticEvent} from "react";
 import {SvgClock} from "./";
 
-import './live.css';
 
 export function ActivityStream(props:ActivityStreamProps) {
     return (

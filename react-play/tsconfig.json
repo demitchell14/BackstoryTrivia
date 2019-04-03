@@ -4,7 +4,11 @@
     "outDir": "build/dist",
     "module": "esnext",
     "target": "es5",
-    "lib": ["es6", "dom"],
+    "lib": [
+      "es6",
+      "dom",
+      "webworker"
+    ],
     "sourceMap": true,
     "allowJs": true,
     "jsx": "react",
@@ -17,6 +21,8 @@
     "importHelpers": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
     "noUnusedLocals": true
   },
   "exclude": [

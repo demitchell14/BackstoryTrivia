@@ -2,7 +2,6 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {SyntheticEvent} from "react";
 import * as React from "react";
 //import {} from "react"
-import "./navigation.css"
 import {findChild} from "../index";
 
 export class NavigationPanel extends React.Component<NavigationPanelProps, NavigationPanelState> {

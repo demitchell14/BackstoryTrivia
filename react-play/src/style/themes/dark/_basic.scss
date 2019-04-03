@@ -1,0 +1,58 @@
+@import "./core";
+
+html, body {
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  // font-family: Roboto;
+}
+
+#root {
+  height: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.bg-core {
+  transition: .25s ease background-color;
+  overflow-y: auto;
+  margin-bottom: 4rem;
+}
+
+&.bg {
+
+  &-main {
+    background-color: theme-color-level(dark, 2);
+  }
+  &-splash {
+    background-color: theme-color-level(dark, 2);
+  }
+  &-register {
+    background-color: theme-color-level(dark, 2);
+  }
+  &-login {
+    background-color: theme-color-level(dark, 2);
+  }
+
+}
+
+.head-pad {
+  margin-top: 3.5rem;
+}
+
+hr.primary {
+  width: 100%;
+  border-top: 1px solid theme-color-level(primary, 0);
+}
+.no-overflow-y {
+  overflow-y: hidden;
+}
+.no-overflow-x {
+  overflow-x: hidden;
+}
+
+.play {
+  color: $white;
+}

@@ -1,4 +1,5 @@
 import * as express from "express";
+import {Request, Response} from "express";
 
 import * as logger from "morgan";
 import * as path from "path";
@@ -36,11 +37,14 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(cookieParser());
 
+app.enable('trust proxy');
+
 //log(path.join(process.cwd(), "./react/build"))
 // app.use();
 if (process.env.NODE_ENV && process.env.NODE_ENV.trim() === "production") {
     app.use('/', React);
 }
+
 app.use('/api/v1', Middleware(), ApiV1);
 app.use('/api/v2', ApiV2);
 

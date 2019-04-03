@@ -2,7 +2,6 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {SyntheticEvent} from "react";
 import * as React from "react";
 
-import "./snackbar.css";
 
 export function Snackbar(props:SnackbarProps) {
     const classes = ["snackbar"];

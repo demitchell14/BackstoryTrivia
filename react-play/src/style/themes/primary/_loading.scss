@@ -1,0 +1,60 @@
+@import "./core";
+
+.loading {
+  position: absolute;
+  display: flex;
+  width: 200px;
+  min-height: 100px;
+  align-items: center;
+  opacity: 0;
+  transition: .15s ease all;
+  z-index: 2000;
+  margin: 0 auto;
+  color: transparent;
+
+  left: calc(50% - 100px);
+  top: calc(50% - 100px);
+
+  &.visible {
+    color: theme-color(dark);
+    display: flex;
+    opacity: .85;
+  }
+  &.dark {
+    background: theme-color-level(primary, 6);
+    color: theme-color-level(primary,-8);
+    border-radius: 1rem;
+    box-shadow: 1px 1px 2px 1px theme-color-level(primary, 8);
+  }
+
+  &.light {
+    background: fade_out(white, .2);
+    border-radius: 1rem;
+    box-shadow: 0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(0,0,0,0.14), 0px 1px 18px 0px rgba(0,0,0,0.12);
+  }
+
+  .text {
+    font-size: 1.4em;
+    flex-grow: 1;
+    text-align:center;
+  }
+
+  &.full {
+    width: 80%;
+    left: 10%;
+    height: calc(85% - 4rem);
+    top: 4rem;
+  }
+}
+.overlay {
+  position:absolute;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  //transition: .15s ease all;
+  &.active {
+    background: fade_out(black, .85);
+    width: 100%;
+    height: 100%;
+  }
+}

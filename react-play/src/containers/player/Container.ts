@@ -3,15 +3,87 @@ import {StorageContainer} from "..";
 import * as ReactGA from "react-ga";
 import logger from "../../util/logger";
 
-export class PlayerContainer extends Container<any>{
+export class PlayerContainer extends Container<PlayerContainerState>{
     static containerName:string = "player";
 
     private storage:StorageContainer;
 
     constructor() {
         super();
-
+        this.state = {};
         //StorageContainer.containerName = "storage"
+    }
+
+    isAnswered = (id:string) => {
+        // logger.log(id, this.state.answers);
+        if (this.state.answers) {
+            if (id.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i))
+                return this.state.answers.questions.findIndex(q => q._id === id) >= 0;
+            else
+                return this.state.answers.questions.findIndex(q => q.question === id) >= 0;
+        }
+        return false;
+    }
+
+    addAnswer = (props:AnswerResponse) => {
+        const {answers} = this.state;
+        if (answers) {
+            if (this.isAnswered(props._id||props.answer)) {
+                return false;
+            }
+            answers.questions.push(props)
+            logger.log(answers);
+            return answers.questions[answers.questions.length - 1];
+        }
+        return false;
+    }
+    
+    gameInit = async (gameID:string, teamKey:string) => {
+        logger.debug(`Player {gameInit} init in #${gameID}`)
+        if (this.state.answers) {
+            if (this.state.answers.gameID === gameID || this.state.answers.teamKey === teamKey)
+                return true;
+        }
+        await this.setState({
+            answers: {
+                teamKey, gameID,
+                questions: []
+            }
+        });
+
+        this.requestQuestionHistory()
+            .then((res:any) => logger.log(res))
+
+        return true;
+    }
+
+    requestQuestionHistory = async () => {
+        const storage = this.storage;
+        if (storage) {
+            if (storage.hasToken()
+                    && storage.hasTeamKey()
+                    && storage.hasGameID()) {
+                const data = await fetch("/api/v2/team/history", {
+                    headers: {
+                        "Authorization": `Bearer ${storage.getToken()}`,
+                        "Content-Type": "application/json",
+                    },
+                    method: "POST",
+                    body: JSON.stringify({
+                        team: storage.getTeamKey(),
+                        game: storage.getGameID(),
+                    })
+                });
+
+                logger.log({
+                    status: data.status,
+                    response: await data.text()
+                })
+            }
+
+            return undefined;
+        }
+        return false
     }
 
     check = async () => {
@@ -147,6 +219,10 @@ export class PlayerContainer extends Container<any>{
         }
     }
 
+    // attachSocket = (socket:SocketContainer) => {
+    //
+    // }
+
     reset = () => {
         if (this.storage) {
             this.storage.clearEmail();
@@ -154,6 +230,23 @@ export class PlayerContainer extends Container<any>{
             this.storage.clearToken();
         }
     }
+}
+
+export interface PlayerContainerState {
+    answers?:AnsweredQuestions
+}
+
+export interface AnsweredQuestions {
+    gameID: string;
+    teamKey: string;
+    questions: Array<AnswerResponse>;
+}
+
+export interface AnswerResponse {
+    _id?: string;
+    type: string;
+    answer: string;
+    question: string;
 }
 
 export interface LoginFormData {

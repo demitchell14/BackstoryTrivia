@@ -1,6 +1,6 @@
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import * as React from "react";
 
-import "./loading.css";
 export class Loading extends React.PureComponent<LoadingProps> {
     constructor(props:LoadingProps) {
         super(props);
@@ -24,7 +24,10 @@ export class Loading extends React.PureComponent<LoadingProps> {
         return (
             <div className={`overlay ${props.visible ? "active" : ""}`}>
                 <div className={classes.join(" ")}>
-                    <div className={"text"}>Loading...</div>
+                    <div className={"text"}>
+                        <FontAwesomeIcon icon={["fal", "spinner"]} spin className={"mr-3"} />
+                        <span>Loading...</span>
+                    </div>
                 </div>
             </div>
         )
