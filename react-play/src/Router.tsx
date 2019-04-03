@@ -131,8 +131,7 @@ class Router extends React.Component<RouterProps, RouterState> {
         // <Route path={"/:live"} exact={true} component={withContainer(Live, StorageContainer, PlayerContainer, SocketContainer)} />
 
         return (
-            <Container
-            // <Container componentProps={{"data-theme": "dark"}}
+            <Container componentProps={{"data-theme": this.state.theme}}
                 fullHeight fullWidth
                 display={"flex"}
                 direction={"column"}
@@ -152,7 +151,7 @@ class Router extends React.Component<RouterProps, RouterState> {
                                 <NavigationItem />
                                 <NavigationItem />
                                 <NavigationItem />
-                                <NavigationItem />
+                                <div onClick={this.toggleDark} className={"nav-item"}>{this.state.theme === "dark" ? "Light Mode" : "Dark Mode"}</div>
                                 <div onClick={this.handleLeave(socket, storage)} className={"nav-item"}>Leave Game Session</div>
                                 <div onClick={this.handleSignout(socket, storage)} className={"nav-item"}>Sign Out</div>
                             </NavigationItems>
@@ -189,6 +188,10 @@ class Router extends React.Component<RouterProps, RouterState> {
                 )}
             </Container>
         );
+    }
+
+    toggleDark = () => {
+        this.setState({theme: this.state.theme === "dark" ? undefined : "dark"});
     }
 
     handleLeave = (socket:SocketContainer, storage:StorageContainer, stay?:boolean) => {
@@ -231,6 +234,7 @@ interface RouterState {
     backgroundClass:string;
     // ready:boolean;
     navLink: (props:RouterProps, socket:SocketContainer) => string;
+    theme?: string;
 }
 
 export default withRouter(Router);
