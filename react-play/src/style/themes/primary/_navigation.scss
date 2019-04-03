@@ -1,5 +1,4 @@
-@import "../../style/core";
-
+@import "./core";
 .navigation-panel {
   position: absolute;
   display: flex;
@@ -35,6 +34,7 @@
     position: absolute;
     transition: top .2s;
     margin:0;
+    color: inherit;
   }
 
   .nav-items {

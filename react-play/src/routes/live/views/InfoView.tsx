@@ -19,8 +19,8 @@ export function InfoView(props: InfoPropsView) {
     return (
         <div style={props.style} className={"info-view"}>
             <div className={"card p-0"}>
-                <img src={props.game.image} className={"card-img-top"} alt={props.game.name + " image"}/>
-                <div className={"card-body test"}>
+                {props.game.image && (<img src={props.game.image} className={"card-img-top"} alt={props.game.name + " image"}/>)}
+                <div className={"card-body tint-secondary"}>
                     <p className={"lead text-capitalize"}>Welcome to {props.game.name}.</p>
                     <ul className={"list"}>
 

@@ -11,7 +11,6 @@ export * from "./navigation/NavigationTitle"
 export * from "./navigation/NavigationItems"
 export * from "./navigation/NavigationItem"
 
-export * from "./button/Button"
 
 export * from "./splash/SplashOption";
 

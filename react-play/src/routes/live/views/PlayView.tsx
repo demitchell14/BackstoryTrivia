@@ -1,11 +1,13 @@
+import {RefObject, SyntheticEvent} from "react";
 import * as React from "react";
 import {Transition} from "react-spring/renderprops-universal";
 import {MultipleChoice} from "../";
 import {Card} from "../../../components";
-import {GameObject, QuestionDetails, SocketContainer, SocketState} from "../../../containers";
+import {GameObject, PlayerContainer, QuestionDetails, SocketContainer, SocketState} from "../../../containers";
 import logger from "../../../util/logger";
 
 export class PlayView extends React.Component<PlayViewProps, PlayViewState> {
+    openEndedAnswer: RefObject<HTMLTextAreaElement>;
     type = {
         "Multiple Choice": MultipleChoice,
         "Multiple Choice2": (props: any) => {
@@ -22,21 +24,37 @@ export class PlayView extends React.Component<PlayViewProps, PlayViewState> {
             )
         },
         "Open Ended": (props: any) => (
-            <Card style={props.style} fullWidth display={"flex"} variant={"outlined"} color={"primary"}>
+            <form style={props.style} className={"card-secondary p-3 tint-secondary"}>
                 <p className={"mb-0"}>This question is open ended. Type your answer in the block below to submit your
                     answer.</p>
-                <textarea className={"form-control"} autoFocus placeholder={"Enter your answer here"}/>
-            </Card>
+                <hr />
+                <textarea ref={this.openEndedAnswer} className={"form-control mb-2"} placeholder={"Enter your answer here"}/>
+                <button onClick={this.submitAnswer} className={"btn btn-block btn-primary"} type={"button"}>Submit Answer</button>
+            </form>
         )
     }
 
     public constructor(props: PlayViewProps) {
         super(props);
-        this.state = {} as PlayViewState
+        this.state = {
+            isSubmitted: false,
+        } as PlayViewState
+
+        this.openEndedAnswer = React.createRef();
     }
 
     componentDidMount(): void {
         logger.log(this);
+
+    }
+
+    componentWillReceiveProps(nextProps: Readonly<PlayViewProps>, nextContext: any): void {
+        const state = this.simplify(nextProps.socket.state);
+        if (state.question) {
+            const question = state.question;
+            const isAnswered = this.props.player.isAnswered(question._id||question.question);
+            this.setState({isSubmitted: isAnswered});
+        }
     }
 
     simplify = (state: SocketState): SimplifiedSocketState => {
@@ -55,7 +73,27 @@ export class PlayView extends React.Component<PlayViewProps, PlayViewState> {
         return ret;
     };
 
+    submitAnswer = (answer:string|SyntheticEvent) => {
+        const {socket, player} = this.props;
+        if (typeof answer === "string") {
+            socket.sendAnswer(player, answer);
+        } else {
+            if (this.openEndedAnswer.current) {
+                answer.preventDefault();
+                let ans = this.openEndedAnswer.current;
+                if (ans.value.length > 0) {
+                    socket.sendAnswer(player, ans.value);
+                } else {
+                    if (this.props.onNotify) {
+                        this.props.onNotify("Please enter an answer to submit.");
+                    }
+                }
+            }
+        }
+    }
+
     public render() {
+        const {isSubmitted} = this.state;
         const socketState = this.simplify(this.props.socket.state);
         if (socketState.question && socketState.game) {
             const {question} = socketState;
@@ -89,8 +127,8 @@ export class PlayView extends React.Component<PlayViewProps, PlayViewState> {
                             enter={{opacity: 1}}
                             leave={{opacity: 0}}
                         >
-                            {(Show: MultipleChoice | any) => Show && (props => <Show style={props}
-                                                                                     onSubmit={(ans: any) => logger.log(`Answer: '${ans}'`)} {...question} />)}
+                            {(Show: MultipleChoice | any) => Show && (props => <Show style={props} isSubmitted={isSubmitted}
+                                                                                     onSubmit={this.submitAnswer} {...question} />)}
                         </Transition>
 
                         {/*{typeof Obj === "function" && (<Obj onSubmit={(ans:any) => logger.log(`Answer: '${ans}'`)} {...question}  />)}*/}
@@ -115,11 +153,13 @@ interface SimplifiedSocketState {
 interface PlayViewProps {
     state?: PlayViewState;
     socket: SocketContainer;
+    player: PlayerContainer;
     style?: React.CSSProperties;
+    onNotify?: (message:string) => any;
 }
 
 interface PlayViewState {
-
+    isSubmitted: boolean;
 }
 
 export default PlayView

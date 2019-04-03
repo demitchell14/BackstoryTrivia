@@ -1,6 +1,7 @@
 import {Container} from "unstated";
 import * as io from "socket.io-client";
 import * as ReactGA from "react-ga";
+import {PlayerContainer} from "..";
 import {generateColor} from "../../util";
 import logger from "../../util/logger";
 import Timeout = NodeJS.Timeout;
@@ -20,6 +21,7 @@ export class SocketContainer extends Container<SocketState> {
         super();
         this.state = {
             status: "",
+            timeouts: {},
         }
         
     }
@@ -53,7 +55,7 @@ export class SocketContainer extends Container<SocketState> {
             }
             logger.debug("Socket Connected");
 
-            const socket = io.connect();
+            const socket = io.connect({secure: process.env.NODE_ENV === "production"});
             socket.on("connect", () => {
                 this.socket = socket;
                 this.socket.on("error", this.handleError);
@@ -69,22 +71,56 @@ export class SocketContainer extends Container<SocketState> {
         })
     }
 
+    roomJoined = (room:any) => this.setState({room});
+
     receiveCountdown = (data:number) => {
         logger.log(data);
     }
 
     receiveQuestion = (data:QuestionDetails) => {
-        const {gameStatus, game} = this.state;
+        const {gameStatus, game, timeouts} = this.state;
+        timeouts.question = this.resetQuestionTimeout();
         if (gameStatus && game) {
             if (game.started && !game.paused) {
-                this.setState({question: data});
+                this.setState({question: data, timeouts});
             } else {
-                this.setState({question: undefined});
+                this.setState({question: undefined, timeouts});
             }
         } else {
-            this.setState({question: undefined});
+            this.setState({question: undefined, timeouts});
         }
-        // logger.log(data);
+    }
+
+    resetQuestionTimeout = () => {
+        const {timeouts} = this.state;
+        if (timeouts.question) {
+            clearTimeout(timeouts.question);
+        }
+        return setTimeout(() => {
+            let {question, game, gameStatus} = this.state;
+            if (question) question = undefined;
+            // if (game && game.started) game.started = false;
+            if (game && !game.paused) game.paused = true;
+            if (gameStatus && !gameStatus.paused) gameStatus.paused = true;
+
+            this.setState({
+                question, game, gameStatus
+            })
+        }, 5000)
+    }
+
+    resetTimeout = (name:string) => {
+        const {timeouts} = this.state;
+        if (timeouts[name]) {
+            clearTimeout(timeouts[name]);
+        }
+        return setTimeout(() => {
+            if (this.state[name]) {
+                this.setState({[name]: undefined})
+                    .then(() => logger.log(this.state));
+            }
+            // this.setState({[name]: undefined})
+        }, 5000);
     }
     
     receiveState = (state?:GameStatus) => {
@@ -137,6 +173,7 @@ export class SocketContainer extends Container<SocketState> {
         }
     }
 
+
     requestState = (game:string) => {
         if (this.socket) {
             this.socket.emit("request game state", game);
@@ -164,6 +201,49 @@ export class SocketContainer extends Container<SocketState> {
         })
     }
 
+
+    sendAnswer = (player:PlayerContainer, answer:string) => {
+        const question = this.state.question;
+        const teamKey = this.state.activeKey;
+        const gameId = this.state.room;
+        if (this.socket && question) {
+
+            // this.socket.once(`${question._id} answered`, (args:any) => {
+            //     logger.log(args)
+            // });
+
+            this.socket.emit("answer question", {
+                question,
+                teamKey,
+                gameId,
+                answer
+            }, (args:any) => {
+                if (args.error) {
+                    logger.error(args);
+                    return;
+                }
+                // logger.log(args);
+                player.addAnswer(args);
+            })
+        }
+
+        // logger.log({question, answer, teamKey, gameId});
+    }
+
+    // requestAnswerHistory = () => {
+    //     const {activeKey, room} = this.state;
+    //     if (activeKey && room) {
+    //         logger.log({
+    //             activeKey, room
+    //         })
+    //     }
+    // }
+    //
+    // receiveQuestionHistory = (data:AnswerResponse[]) => {
+    //     logger.log(data);
+    // }
+
+
     authenticate = (token:string, gameToken:string, teamKey?: string) => {
         if (this.socket) {
             this.setState({status: "authenticating"});
@@ -186,6 +266,7 @@ export class SocketContainer extends Container<SocketState> {
                     this.socket.once("room joined", (room:any) => {
                         this.roomJoined(room)
                             .then(() => {
+                                logger.log(props)
                                 resolve(props.success);
                             })
                     })
@@ -203,6 +284,8 @@ export class SocketContainer extends Container<SocketState> {
             this.socket.on("game state", this.receiveState);
             this.socket.on("question state", this.receiveQuestion);
             this.socket.on("question countdown", this.receiveCountdown);
+            // this.socket.on("question history", this.receiveQuestionHistory);
+            // this.socket.on("question history", this.receiveQuestionHistory);
 
             this.setState({
                 status: "authenticated",
@@ -220,21 +303,6 @@ export class SocketContainer extends Container<SocketState> {
         logger.error(props);
     }
 
-    roomJoined = (room:any) => this.setState({room});
-
-    startPolling = () => {
-        logger.log("Polling");
-        if (this.connected()) {
-            logger.log("Starting Poller");
-            const id =  setInterval(() => {
-                this.socket.emit("poller");
-            }, 2500);
-            this.poller = id;
-            return id;
-        }
-        return -1;
-    }
-
 }
 
 export declare namespace SocketResponses {
@@ -250,6 +318,8 @@ export declare namespace SocketResponses {
 }
 
 export interface QuestionDetails {
+    _id: string;
+    questionIndex: number;
     question: string;
     type: string;
     started: boolean;
@@ -301,4 +371,7 @@ export interface SocketState {
     question?: QuestionDetails;
     notification?: string;
     showNotification?: Timeout|boolean;
+    timeouts: {
+        question?:Timeout;
+    }
 }

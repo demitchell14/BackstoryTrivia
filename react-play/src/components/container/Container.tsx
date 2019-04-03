@@ -1,5 +1,4 @@
-import * as React from "react"
-import "./container.css";
+import * as React from "react";
 import {animated} from 'react-spring/renderprops';
 import logger from "../../util/logger";
 // import {} from "react-spring";

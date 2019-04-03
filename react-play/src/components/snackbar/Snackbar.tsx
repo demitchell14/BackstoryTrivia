@@ -1,8 +1,7 @@
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {SyntheticEvent} from "react";
 import * as React from "react";
 
-import "./snackbar.css";
-import FAIcon from "../../FontAwesome";
 
 export function Snackbar(props:SnackbarProps) {
     const classes = ["snackbar"];
@@ -23,7 +22,7 @@ export function Snackbar(props:SnackbarProps) {
                 {props.children}
             </div>
             <div className={"close"}>
-                <button onClick={props.onClose} className={`btn ${btnClass}`}><FAIcon icon={["far", "times"]} /></button>
+                <button onClick={props.onClose} className={`btn ${btnClass}`}><FontAwesomeIcon icon={["far", "times"]} /></button>
             </div>
         </div>
     )

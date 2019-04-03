@@ -22,7 +22,7 @@ export class MultipleChoice extends React.Component<MultipleChoiceProps, Multipl
 
         this.state = {
             isConfirming: false,
-            isSubmitted: false,
+            isSubmitted: props.isSubmitted || false,
         } as MultipleChoiceState;
         logger.log(props);
     }
@@ -111,8 +111,8 @@ export class MultipleChoice extends React.Component<MultipleChoiceProps, Multipl
                 {this.props.choices && this.props.choices.map((choice, idx) => (
                     <div key={idx} className={"col-6"}>
                         <div
+                            className={`choice card ${this.state.selected === idx? "card-color-primary-dark" : "card-color-primary"}`}
                             onClick={this.sendConfirmChoice(idx)}
-                            className={`choice ${this.state.selected === idx ? "active" : ""}`}
                             ref={this.choiceRefs[typeof choice === "string" ? choice : ""]}
                             data-id={idx}
                         >
@@ -126,6 +126,27 @@ export class MultipleChoice extends React.Component<MultipleChoiceProps, Multipl
                 ))}
             </div>
         )
+
+        // return (
+        //     <div className={"answers row"} style={this.props.style}>
+        //         {this.props.choices && this.props.choices.map((choice, idx) => (
+        //             <div key={idx} className={"col-6"}>
+        //                 <div
+        //                     onClick={this.sendConfirmChoice(idx)}
+        //                     className={`choice ${this.state.selected === idx ? "active" : ""}`}
+        //                     ref={this.choiceRefs[typeof choice === "string" ? choice : ""]}
+        //                     data-id={idx}
+        //                 >
+        //                     <span style={{
+        //                         fontSize: this.fontSize(choice.length)
+        //                     }}>
+        //                         {choice}
+        //                     </span>
+        //                 </div>
+        //             </div>
+        //         ))}
+        //     </div>
+        // )
 
         // return (
         //     <Card fullWidth className={"answers p-0 mx-0"} color={"primary"}>
@@ -152,6 +173,7 @@ interface MultipleChoiceProps extends QuestionDetails {
     // choices: Array<any>;
     onSubmit: (answer: any) => any;
     style?: React.CSSProperties
+    isSubmitted?: boolean;
 }
 
 interface MultipleChoiceState {

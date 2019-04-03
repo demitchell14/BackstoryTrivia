@@ -69,6 +69,15 @@ export class StorageContainer extends Container<any>{
 
     clearGameID = () => sessionStorage.removeItem(`${VER}-gametoken`);
 
+
+    settings = (key:string) => {
+        // TODO setup settings to be saved on device
+        switch (key) {
+            case "vibrate": return true;
+        }
+        return undefined;
+    }
+
     
     test = async () => {
         logger.log("Hello From Storage Container");

@@ -1,6 +1,5 @@
 import {SyntheticEvent} from "react";
 import * as React from "react";
-import "./card.css";
 import logger from "../../util/logger";
 
 export class Card extends React.Component<CardProps, CardState> {
