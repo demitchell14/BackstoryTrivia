@@ -35,16 +35,16 @@ class Router extends React.Component<RouterProps, RouterState> {
             }
         } as RouterState;
     }
-    
+
     sendActivity = (location:Location) => {
         ReactGA.pageview(location.pathname);
     }
-    
+
 
     componentWillMount(): void {
         if (this.props.location) {
             this.sendActivity(this.props.location)
-            
+
             this.applyBackground(this.props.location.pathname);
         }
 
@@ -54,7 +54,7 @@ class Router extends React.Component<RouterProps, RouterState> {
     }
 
     componentWillReceiveProps(nextProps: Readonly<RouterProps>, nextContext: any): void {
-        
+
         if (nextProps.location) {
             // logger.log(nextProps);
             this.sendActivity(nextProps.location);
@@ -69,7 +69,7 @@ class Router extends React.Component<RouterProps, RouterState> {
     }
 
     applyBackground = (location:string) => {
-        
+
         let bg = "bg-main";
         switch (location) {
             case "/":
@@ -130,12 +130,11 @@ class Router extends React.Component<RouterProps, RouterState> {
         // <Route path={"/:live"} exact={true} component={withContainer(Live, StorageContainer, PlayerContainer, SocketContainer)} />
 
         return (
-            <Container
-            // <Container componentProps={{"data-theme": "dark"}}
-                fullHeight fullWidth
-                display={"flex"}
-                direction={"column"}
-                className={"bg-core no-overflow-x px-0 " + backgroundClass}
+            <Container componentProps={{"data-theme": this.state.theme}}
+                       fullHeight fullWidth
+                       display={"flex"}
+                       direction={"column"}
+                       className={"bg-core no-overflow-x px-0 " + backgroundClass}
             >
                 <Subscribe to={[SocketContainer, StorageContainer]}>
                     {(socket:SocketContainer, storage:StorageContainer) => (
@@ -151,7 +150,7 @@ class Router extends React.Component<RouterProps, RouterState> {
                                 <NavigationItem />
                                 <NavigationItem />
                                 <NavigationItem />
-                                <NavigationItem />
+                                <div onClick={this.toggleDark} className={"nav-item"}>{this.state.theme === "dark" ? "Light Mode" : "Dark Mode"}</div>
                                 <div onClick={this.handleLeave(socket, storage)} className={"nav-item"}>Leave Game Session</div>
                                 <div onClick={this.handleSignout(socket, storage)} className={"nav-item"}>Sign Out</div>
                             </NavigationItems>
@@ -166,9 +165,9 @@ class Router extends React.Component<RouterProps, RouterState> {
                         }}
                         items={location}
                         keys={location.pathname.split("/")[1]}
-                                from={{ position: "absolute", transform: 'translateX(200px)', opacity: 0 }}
-                                enter={{ position: "relative", transform: 'translateX(0px)', opacity: 1 }}
-                                leave={{ height: "100%", position: "absolute", transform: 'translateX(-200px)', opacity: 0 }}
+                        from={{ position: "absolute", transform: 'translateX(200px)', opacity: 0 }}
+                        enter={{ position: "relative", transform: 'translateX(0px)', opacity: 1 }}
+                        leave={{ height: "100%", position: "absolute", transform: 'translateX(-200px)', opacity: 0 }}
                     >
                         {(loc, state) => style => {
                             return (
@@ -188,6 +187,10 @@ class Router extends React.Component<RouterProps, RouterState> {
                 )}
             </Container>
         );
+    }
+
+    toggleDark = () => {
+        this.setState({theme: this.state.theme === "dark" ? undefined : "dark"});
     }
 
     handleLeave = (socket:SocketContainer, storage:StorageContainer, stay?:boolean) => {
@@ -230,6 +233,7 @@ interface RouterState {
     backgroundClass:string;
     ready:boolean;
     navLink: (props:RouterProps, socket:SocketContainer) => string;
+    theme?: string;
 }
 
 export default withRouter(Router);
