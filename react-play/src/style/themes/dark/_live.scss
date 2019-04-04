@@ -377,6 +377,11 @@
     background: theme-color-level(primary, 0);
   }
 }
+.alternate-secondary {
+  & > *:nth-child(even) {
+    background: theme-color-level(secondary, 0);
+  }
+}
 //@each $color, $value in $theme-colors {
 //  .alternate-#{$color} {
 //

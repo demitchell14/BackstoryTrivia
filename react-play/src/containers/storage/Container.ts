@@ -47,27 +47,27 @@ export class StorageContainer extends Container<any>{
     clearPin = () => localStorage.removeItem(`${VER}-pin`);
     
     setTeamKey = (key:string) => {
-        sessionStorage.setItem(`${VER}-teamkey`, key);
-        return sessionStorage.getItem(`${VER}-teamkey`);
+        localStorage.setItem(`${VER}-teamkey`, key);
+        return localStorage.getItem(`${VER}-teamkey`);
     } 
     
-    getTeamKey = () => sessionStorage.getItem(`${VER}-teamkey`) || "";
+    getTeamKey = () => localStorage.getItem(`${VER}-teamkey`) || "";
     
-    hasTeamKey = () => sessionStorage.getItem(`${VER}-teamkey`) !== null;
+    hasTeamKey = () => localStorage.getItem(`${VER}-teamkey`) !== null;
     
-    clearTeamKey = () => sessionStorage.removeItem(`${VER}-teamkey`);
+    clearTeamKey = () => localStorage.removeItem(`${VER}-teamkey`);
 
 
     setGameID = (key:string) => {
-        sessionStorage.setItem(`${VER}-gametoken`, key);
-        return sessionStorage.getItem(`${VER}-gametoken`);
+        localStorage.setItem(`${VER}-gametoken`, key);
+        return localStorage.getItem(`${VER}-gametoken`);
     }
 
-    getGameID = () => sessionStorage.getItem(`${VER}-gametoken`) || "";
+    getGameID = () => localStorage.getItem(`${VER}-gametoken`) || "";
 
-    hasGameID = () => sessionStorage.getItem(`${VER}-gametoken`) !== null;
+    hasGameID = () => localStorage.getItem(`${VER}-gametoken`) !== null;
 
-    clearGameID = () => sessionStorage.removeItem(`${VER}-gametoken`);
+    clearGameID = () => localStorage.removeItem(`${VER}-gametoken`);
 
 
     settings = (key:string) => {
