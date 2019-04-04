@@ -2,7 +2,6 @@ import {RefObject, SyntheticEvent} from "react";
 import * as React from "react";
 import {Transition} from "react-spring/renderprops-universal";
 import {MultipleChoice} from "../";
-import {Card} from "../../../components";
 import {GameObject, PlayerContainer, QuestionDetails, SocketContainer, SocketState} from "../../../containers";
 import logger from "../../../util/logger";
 
@@ -10,25 +9,12 @@ export class PlayView extends React.Component<PlayViewProps, PlayViewState> {
     openEndedAnswer: RefObject<HTMLTextAreaElement>;
     type = {
         "Multiple Choice": MultipleChoice,
-        "Multiple Choice2": (props: any) => {
-            const choices = ["A", "B", "C", "D", "E"];
-
-            return (
-                <Card fullWidth className={"answers p-0 mx-0"} color={"primary"}>
-                    {choices.map((c, i) => (
-                        <div key={i} className={"choice"}>
-                            <span>Choice {c}</span>
-                        </div>
-                    ))}
-                </Card>
-            )
-        },
         "Open Ended": (props: any) => (
             <form style={props.style} className={"card-secondary p-3 tint-secondary"}>
                 <p className={"mb-0"}>This question is open ended. Type your answer in the block below to submit your
                     answer.</p>
                 <hr />
-                <textarea ref={this.openEndedAnswer} className={"form-control mb-2"} placeholder={"Enter your answer here"}/>
+                <textarea ref={this.openEndedAnswer} defaultValue={props.defaultAnswer} className={"form-control mb-2"} placeholder={"Enter your answer here"}/>
                 <button onClick={this.submitAnswer} className={"btn btn-block btn-primary"} type={"button"}>Submit Answer</button>
             </form>
         )
@@ -50,10 +36,15 @@ export class PlayView extends React.Component<PlayViewProps, PlayViewState> {
 
     componentWillReceiveProps(nextProps: Readonly<PlayViewProps>, nextContext: any): void {
         const state = this.simplify(nextProps.socket.state);
-        if (state.question) {
+        const answers = this.props.player.state.answers;
+        if (state.question && answers) {
             const question = state.question;
             const isAnswered = this.props.player.isAnswered(question._id||question.question);
-            this.setState({isSubmitted: isAnswered});
+            this.setState({isSubmitted: isAnswered >= 0});
+            if (isAnswered >= 0) {
+                this.setState({answer: answers.questions[isAnswered].answer});
+            }
+            
         }
     }
 
@@ -127,8 +118,10 @@ export class PlayView extends React.Component<PlayViewProps, PlayViewState> {
                             enter={{opacity: 1}}
                             leave={{opacity: 0}}
                         >
-                            {(Show: MultipleChoice | any) => Show && (props => <Show style={props} isSubmitted={isSubmitted}
-                                                                                     onSubmit={this.submitAnswer} {...question} />)}
+                            {(Show: MultipleChoice | any) => Show && (props => 
+                                <Show style={props} {...question} defaultAnswer={this.state.answer}
+                                      isSubmitted={isSubmitted}                                      
+                                      onSubmit={this.submitAnswer} />)}
                         </Transition>
 
                         {/*{typeof Obj === "function" && (<Obj onSubmit={(ans:any) => logger.log(`Answer: '${ans}'`)} {...question}  />)}*/}
@@ -159,6 +152,7 @@ interface PlayViewProps {
 }
 
 interface PlayViewState {
+    answer?: string;
     isSubmitted: boolean;
 }
 
