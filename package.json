@@ -1,6 +1,6 @@
 {
   "name": "backstorytrivia-server",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "description": "Websocket enabled trivia games",
   "main": "./dist/www/server.js",
