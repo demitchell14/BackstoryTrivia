@@ -404,6 +404,12 @@
     background: theme-color-level(primary, -5);
   }
 }
+
+.alternate-secondary {
+  & > *:nth-child(even) {
+    background: theme-color-level(secondary, -5);
+  }
+}
 //@each $color, $value in $theme-colors {
 //  .alternate-#{$color} {
 //

@@ -1,6 +1,7 @@
 import {Container} from "unstated";
 import {StorageContainer} from "..";
 import * as ReactGA from "react-ga";
+import {Api} from "../../../api";
 import logger from "../../util/logger";
 
 export class PlayerContainer extends Container<PlayerContainerState>{
@@ -18,21 +19,37 @@ export class PlayerContainer extends Container<PlayerContainerState>{
         // logger.log(id, this.state.answers);
         if (this.state.answers) {
             if (id.match(/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i))
-                return this.state.answers.questions.findIndex(q => q._id === id) >= 0;
+                return this.state.answers.questions.findIndex(q => q._id === id);
             else
-                return this.state.answers.questions.findIndex(q => q.question === id) >= 0;
+                return this.state.answers.questions.findIndex(q => q.question === id);
         }
-        return false;
+        return -1;
     }
 
-    addAnswer = (props:AnswerResponse) => {
+    addAnswer = (props:AnswerResponse, interactive:boolean = true) => {
         const {answers} = this.state;
         if (answers) {
-            if (this.isAnswered(props._id||props.answer)) {
-                return false;
+            const idx = this.isAnswered(props._id||props.question);
+            if (this.state.answers && idx >= 0) {
+                if (this.state.answers.questions[idx].answer === props.answer)
+                    return false;
+                else {
+                    this.state.answers.questions.splice(idx, 1, props);
+                    return idx;
+                }
+
             }
             answers.questions.push(props)
-            logger.log(answers);
+            console.log(answers);
+
+            if (interactive) {
+                ReactGA.event({
+                    category: "Team",
+                    action: "Answered Question",
+                    label: `Question ID: ${props._id}`
+                })
+            }
+
             return answers.questions[answers.questions.length - 1];
         }
         return false;
@@ -51,8 +68,12 @@ export class PlayerContainer extends Container<PlayerContainerState>{
             }
         });
 
-        this.requestQuestionHistory()
-            .then((res:any) => logger.log(res))
+        this.getQuestionHistory(gameID)
+            .then((res) => {
+                if (res) {
+                    res.answers.map(ans => this.addAnswer(ans, false));
+                }
+            })
 
         return true;
     }
@@ -84,6 +105,41 @@ export class PlayerContainer extends Container<PlayerContainerState>{
             return undefined;
         }
         return false
+    }
+
+    getQuestionHistory = async (game:string):Promise<Api.QuestionHistory|false> => {
+        if (this.storage) {
+            const storage = this.storage;
+            const request = await fetch(`/api/v2/play/${game}/history`, {
+                headers: {
+                    "Authorization": `Bearer ${storage.getToken()}`
+                }
+            });
+
+            if (request.status === 200) {
+                const response = await request.json();
+                if (this.storage && this.storage.getGameID() === response.token) {
+                    return response;
+                }
+            }
+        }
+        return false;
+    }
+
+    getGameStatus = async (game:string):Promise<Api.PlayStatus|false> => {
+        if (this.storage) {
+            const storage = this.storage;
+            const request = await fetch(`/api/v2/play/${game}/status`, {
+                headers: {
+                    "Authorization": `Bearer ${storage.getToken()}`
+                }
+            });
+            
+            if (request.status === 200) {
+                return await request.json();
+            }
+        }
+        return false;
     }
 
     check = async () => {
