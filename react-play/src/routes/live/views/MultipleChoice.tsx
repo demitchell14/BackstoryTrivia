@@ -18,13 +18,20 @@ export class MultipleChoice extends React.Component<MultipleChoiceProps, Multipl
                     this.choiceRefs[ch] = React.createRef();
                 }
             })
+
+            if (props.defaultAnswer) {
+                // const idx = props.choices.findIndex(ans => props.defaultAnswer === ans);
+
+            }
         }
 
         this.state = {
             isConfirming: false,
             isSubmitted: props.isSubmitted || false,
+            selected: props.choices && props.choices.findIndex(c => c === props.defaultAnswer),
         } as MultipleChoiceState;
-        logger.log(props);
+
+
     }
 
 
@@ -45,12 +52,12 @@ export class MultipleChoice extends React.Component<MultipleChoiceProps, Multipl
 
     sendConfirmChoice = (index: number) => {
         return (evt: SyntheticEvent) => {
-            if (this.state.isSubmitted) {
-                if (this.props.onSubmit && typeof this.state.selected === "number" && this.props.choices) {
-                    this.props.onSubmit(this.props.choices[this.state.selected]);
-                }
-                return;
-            }
+            // if (this.state.isSubmitted) {
+            //     if (this.props.onSubmit && typeof this.state.selected === "number" && this.props.choices) {
+            //         this.props.onSubmit(this.props.choices[this.state.selected]);
+            //     }
+            //     return;
+            // }
             // const question = evt.currentTarget as HTMLDivElement;
             // logger.log(evt.currentTarget);
             this.setState({selected: index});
@@ -86,11 +93,11 @@ export class MultipleChoice extends React.Component<MultipleChoiceProps, Multipl
                 // logger.log(this.state);
 
                 document.removeEventListener("click", confirmClick);
-                if (this.state.isSubmitted) {
-                    // TODO
-                    logger.log(this);
-                    return;
-                }
+                // if (this.state.isSubmitted) {
+                //     // TODO
+                //     logger.log(this);
+                //     return;
+                // }
                 this.setState({isConfirming: false});
             };
             if (!this.state.isConfirming) {
@@ -126,45 +133,6 @@ export class MultipleChoice extends React.Component<MultipleChoiceProps, Multipl
                 ))}
             </div>
         )
-
-        // return (
-        //     <div className={"answers row"} style={this.props.style}>
-        //         {this.props.choices && this.props.choices.map((choice, idx) => (
-        //             <div key={idx} className={"col-6"}>
-        //                 <div
-        //                     onClick={this.sendConfirmChoice(idx)}
-        //                     className={`choice ${this.state.selected === idx ? "active" : ""}`}
-        //                     ref={this.choiceRefs[typeof choice === "string" ? choice : ""]}
-        //                     data-id={idx}
-        //                 >
-        //                     <span style={{
-        //                         fontSize: this.fontSize(choice.length)
-        //                     }}>
-        //                         {choice}
-        //                     </span>
-        //                 </div>
-        //             </div>
-        //         ))}
-        //     </div>
-        // )
-
-        // return (
-        //     <Card fullWidth className={"answers p-0 mx-0"} color={"primary"}>
-        //         {this.props.choices && this.props.choices.map((choice, idx) => (
-        //             <div
-        //                 className={`choice${idx === selected ? " active" : ""}`}
-        //                 key={idx}
-        //                 ref={this.choiceRefs[typeof choice === "string" ? choice : ""]}
-        //                 onClick={this.handleSelect(choice, idx)}
-        //                 style={typeof selected === "number" && selected >= 0 && idx === selected ? style : undefined}
-        //             >
-        //                 <span style={{
-        //                     fontSize: this.fontSize(choice.length)
-        //                 }}>{choice}</span>
-        //             </div>
-        //         ))}
-        //     </Card>
-        // );
     }
 }
 
@@ -174,6 +142,7 @@ interface MultipleChoiceProps extends QuestionDetails {
     onSubmit: (answer: any) => any;
     style?: React.CSSProperties
     isSubmitted?: boolean;
+    defaultAnswer?: string;
 }
 
 interface MultipleChoiceState {

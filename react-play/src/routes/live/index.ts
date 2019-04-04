@@ -12,4 +12,6 @@ export * from "./views/MultipleChoice";
 
 export * from "./views/InfoView";
 
+export * from "./views/HistoryView";
+
 export * from "./SvgClock";

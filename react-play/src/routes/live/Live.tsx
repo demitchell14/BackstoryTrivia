@@ -6,7 +6,7 @@ import {animated, Transition} from 'react-spring/renderprops';
 import {Container, Loading, Snackbar} from "../../components";
 import {PlayerContainer, SocketContainer, StorageContainer} from "../../containers";
 import logger from "../../util/logger";
-import {ActivityStream, GameNav, InfoView, PlayView, TeamView, WaitView} from "./";
+import {ActivityStream, GameNav, HistoryView, InfoView, PlayView, TeamView, WaitView} from "./";
 
 // import "./../../style/live.css";
 
@@ -249,8 +249,8 @@ export class Live extends React.Component<LiveProps, LiveState> {
         },
         {
             key: "#history",
-            component: WaitView, // TODO Create View
-            props: {data:socket.state.game}
+            component: HistoryView, // TODO Create View
+            props: {answers: player.state.answers}
         },
     ]
 
