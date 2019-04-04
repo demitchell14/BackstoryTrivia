@@ -12,6 +12,7 @@ import Timeout = NodeJS.Timeout;
 export class Play extends React.Component<PlayProps, PlayState> {
     qr:BrowserQRCodeReader;
     cameraRef:RefObject<HTMLVideoElement>;
+
     public constructor(props:PlayProps) {
         super(props);
         this.state = {
@@ -44,20 +45,40 @@ export class Play extends React.Component<PlayProps, PlayState> {
     }
 
     checkStorage = async () => {
-        const {storage, socket} = this.props.containers;
+        const {storage, socket, player} = this.props.containers;
         if (storage.hasGameID() && storage.hasTeamKey() && storage.hasToken()) {
             this.setState({loading: true});
-            await socket.connect();
-            const request = await socket.requestGame(storage.getGameID()) as any;
-            if (request.success) {
-                // await socket.authenticate(storage.getToken(), storage.getGameID(), storage.getTeamKey())
-                this.setState({
-                    loading: false, gameData: request.game, game: request.game.token,
-                    view: "join", proceed: setTimeout(this.onJoin, 5000),
-                });
-                if (socket.state.status === "authenticated") {
-                    logger.log(this.state)
+            const status = await player.getGameStatus(storage.getGameID())
+            if (!status)
+                throw "ERROR";
+
+            if (!status.completed) {
+                await socket.connect();
+                const request = await socket.requestGame(storage.getGameID()) as any;
+                if (request.success) {
+                    // await socket.authenticate(storage.getToken(), storage.getGameID(), storage.getTeamKey())
+                    this.setState({
+                        loading: false, gameData: request.game, game: request.game.token,
+                        view: "join", proceed: setTimeout(this.onJoin, 5000),
+                    });
+                    if (socket.state.status === "authenticated") {
+                        logger.log(this.state)
+                    }
                 }
+            } else {
+                // TODO Uncomment to clear session when game is complete
+                // storage.clearTeamKey();
+                // storage.clearGameID()
+
+                this.setState({
+                    loading: false,
+                    message: (
+                        <div className={"alert alert-secondary"}>
+                            <span onClick={() => this.setState({message: undefined})} className={"close"}><FontAwesomeIcon icon={["far", "times"]} /></span>
+                            <p className={"mb-0 pr-3"}>The last game you were a part of has been completed.</p>
+                        </div>
+                    )
+                })
             }
         }
     }
@@ -69,11 +90,11 @@ export class Play extends React.Component<PlayProps, PlayState> {
                     if (controllers.length > 0) {
                         // this.setState({activeCameraId: controllers.length-1})
                         const targetController = controllers[this.state.activeCameraId];
-                        // this.setState({});
+                        this.setState({camera: targetController.deviceId});
                         if (this.cameraRef.current) {
                             this.qr.decodeFromInputVideoDevice(targetController.deviceId, this.cameraRef.current)
                                 .then(res => {
-                                    this.setState({camera: targetController.deviceId, game: res.getText()});
+                                    this.setState({game: res.getText()});
                                     this.onJoin();
                                     this.sendViewSettings();
                                 })
@@ -85,6 +106,7 @@ export class Play extends React.Component<PlayProps, PlayState> {
             if (this.cameraRef.current) {
                 this.qr.unbindVideoSrc(this.cameraRef.current);
             }
+            this.qr.reset();
         }
     }
 
@@ -103,6 +125,7 @@ export class Play extends React.Component<PlayProps, PlayState> {
 
     findView = (props:any) => (
         <form onSubmit={props.onJoin}>
+            {this.state.message}
             {props.withCamera ? (
                 <div>
                     <p className={"mb-0"}>We detected a camera on your device.</p>
@@ -150,7 +173,6 @@ export class Play extends React.Component<PlayProps, PlayState> {
         this.setState({view: ""});
         this.sendViewSettings();
     }
-
 
     public render() {
         // @ts-ignore
@@ -205,7 +227,7 @@ export class Play extends React.Component<PlayProps, PlayState> {
         );
     }
 
-    reset = (evt:SyntheticEvent) => {
+    reset = (evt?:SyntheticEvent) => {
         const {socket, storage} = this.props.containers;
         if (typeof this.state.proceed === "object")
             clearTimeout(this.state.proceed);
@@ -239,7 +261,6 @@ export class Play extends React.Component<PlayProps, PlayState> {
         this.setState({showError: false, error: undefined});
     }
 
-
     onGameChange = (evt:SyntheticEvent) => {
         const target = evt.currentTarget as HTMLInputElement;
         // if (Math.abs(target.value.length - this.state.game.length) > 1)
@@ -254,8 +275,8 @@ export class Play extends React.Component<PlayProps, PlayState> {
             this.setState({proceed: false});
         }
 
+        const {storage, socket, player} = this.props.containers;
 
-        const {storage, socket} = this.props.containers;
 
         await socket.connect()
             .catch((err) => this.setState({error: err}));
@@ -264,6 +285,26 @@ export class Play extends React.Component<PlayProps, PlayState> {
             if (this.state.view === "find") {
                 // Send game off and get response
                 this.setState({loading: true});
+
+                const status = await player.getGameStatus(this.state.game)
+
+                if (!status)
+                    throw "ERRROR";
+
+                if (status.completed) {
+                    this.setState({
+                        loading: false,
+                        message: (
+                            <div className={"alert alert-danger"}>
+                                <span onClick={() => this.setState({message: undefined})} className={"close"}><FontAwesomeIcon icon={["far", "times"]} /></span>
+                                <p className={"mb-0 pr-4"}>The game you are searching for has already been completed.</p>
+                            </div>
+                        )
+                    });
+                    socket.disconnect();
+                    // this.reset();
+                    return;
+                }
 
                 if (storage.hasToken()) {
                     const response = await socket.requestGame(this.state.game.toLowerCase()) as any;
@@ -334,6 +375,7 @@ interface PlayState {
     proceed?: Timeout|boolean;
     connected?: boolean;
     activeCameraId: number;
+    message?: React.ReactNode|string;
 }
 
 export default Play
