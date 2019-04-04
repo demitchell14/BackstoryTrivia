@@ -195,10 +195,10 @@ class SocketHandler {
 
     handleAction = async (action:string, game:Game, additional?: any) => {
         if (this.actions[action]) {
-            console.log({
-                action, exists: typeof this.actions[action],
-                additional
-            });
+            // console.log({
+            //     action, exists: typeof this.actions[action],
+            //     additional
+            // });
             const success = this.actions[action](game, {...additional});
 
             if (success) {
@@ -224,7 +224,7 @@ class SocketHandler {
         socket.on("authenticate", connection.authenticate);
 
         connection.on("authenticated", () => {
-            console.log("Authentication Successful ");
+            // console.log("Authentication Successful ");
             // Attach additional listeners / emitters for game handling
             socket.on("request game state", connection.requestState);
             socket.on("answer question", connection.handleAnswer);
@@ -273,6 +273,7 @@ class Connection extends EventEmitter {
 
 
                 if (team.activeKey) {
+                    console.error("This should NOT HAPPEN");
                     // TODO Handle ActiveKey
                     // Team has an active session
                     // If this game contains a team with the session key, we are good
@@ -286,11 +287,10 @@ class Connection extends EventEmitter {
                     // Team does not have an active session
                     // If this game contains a team with the same name, remove the current, and replace (effectively a ban by removing current score)
                     // Otherwise, add the team the game as a new team
-                    if (game.hasTeam(team.teamName)) {
-                        game.removeTeam(team.teamName);
+                    if (!game.hasTeam(team._id)) {
+                        game.addTeam(new Team({name: team.teamName, key: team._id}));
                     }
-                    game.addTeam(new Team({name: team.teamName, key: team._id}));
-                    console.log(game.teams, team);
+                    // console.log(game.teams, team);
                     success = true;
                 }
                 this.socket.join(token, (err) => {
@@ -303,7 +303,7 @@ class Connection extends EventEmitter {
                 this.emit("authenticated");
                 this.socket.emit("authenticated", {
                     success: success,
-                    key: team.activeKey && success ? team.activeKey : game.getTeam(team.teamName).key,
+                    key: team.activeKey && success ? team.activeKey : game.getTeam(team._id).key,
                     message: success ? undefined : "Please register your team first."
                 });
 
@@ -343,33 +343,35 @@ class Connection extends EventEmitter {
             if (game.started) {
 
                 const current = game.question().current();
-                state.questionId = current._id;
+                if (current) {
+                    state.questionId = current._id;
 
-                if (game.paused === false) {
-                    // game is running
-                    state.question = {
-                        started: current.started,
-                        question: current.question,
-                        image: current.questionImage || "",
-                        description: current.questionDetails || "",
-                        type: current.type,
-                        choices: current.type === "Multiple Choice" ?
-                            current.choices.map(choice => choice.answer)
-                            : undefined,
-                        points: current.points,
-                        time: {
-                            limit: current.timeLimit,
-                            left: current.timeLeft,
-                        },
+                    if (game.paused === false) {
+                        // game is running
+                        state.question = {
+                            started: current.started,
+                            question: current.question,
+                            image: current.questionImage || "",
+                            description: current.questionDetails || "",
+                            type: current.type,
+                            choices: current.type === "Multiple Choice" ?
+                                current.choices.map(choice => choice.answer)
+                                : undefined,
+                            points: current.points,
+                            time: {
+                                limit: current.timeLimit,
+                                left: current.timeLeft,
+                            },
+                        }
                     }
                 }
             }
 
-            console.log("Socket State Requested: ", {
-                room: typeof game._id === "string" ? game._id : game._id.toHexString(),
-                token,
-                socket: this.socket
-            });
+            // console.log("Socket State Requested: ", {
+            //     room: typeof game._id === "string" ? game._id : game._id.toHexString(),
+            //     token,
+            //     socket: this.socket
+            // });
             const room = this.socket.server.in(typeof game._id === "string" ? game._id : game._id.toHexString());
 
 
@@ -386,7 +388,7 @@ class Connection extends EventEmitter {
         const instanceManager = await GameInstanceManager.getInstance(gameToken);
         const game = await instanceManager.instance() as Game;
         if (game) {
-            console.log("Success");
+
             const response = {
                 success: true,
                 game: {
@@ -404,7 +406,6 @@ class Connection extends EventEmitter {
 
             callback(response);
         } else {
-            console.log("Fail");
             callback({
                 success: false,
                 message: "Could not find game"
@@ -417,21 +418,27 @@ class Connection extends EventEmitter {
         const game = await instanceManager.instance() as Game;
         console.log(args);
         if (game) {
-            if (game.hasTeam(args.teamKey)) {
-                const team = game.getTeam(args.teamKey);
+            if (ObjectID.createFromHexString(args.teamKey)) {
+                const team = game.getTeam(ObjectID.createFromHexString(args.teamKey));
                 const question = game.question().current();
+                if (typeof question === "undefined")
+                    return;
+
                 let questionKey = typeof question._id === "string" ? question._id : question._id.toHexString();
 
-                if (team.answers.findIndex(ans => ans.question === question.question) >= 0) {
-                    if (typeof callback === "function") {
-                        callback({error: "This question was already answered your team!"});
-                    } else {
-                        this.socket.emit(`${questionKey} answered`, {error: "This question was already answered your team!"});
-                    }
-                    return;
-                }
+                // const idx = team.answers.findIndex(ans => ans.question === question.question);
+                //
+                // if (idx >= 0) {
+                //     team.answers[idx].setAnswer(args.answer);
+                //     if (typeof callback === "function") {
+                //         callback({error: "This question was already answered your team!"});
+                //     } else {
+                //         this.socket.emit(`${questionKey} answered`, {error: "This question was already answered your team!"});
+                //     }
+                //     return;
+                // }
 
-                const answer = team.answer(question, args.answer);
+                const answer = Object.assign({}, team.answer(question, args.answer));
 
                 // TODO Send to admin here as well
 
