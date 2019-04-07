@@ -28,9 +28,9 @@ class Main extends React.Component<MainProps, MainState> {
     }
 
     componentWillMount(): void {
-        import(/* webpackChunkName: "fa" */"./FontAwesome")
-            .then(fa => fa.init())
-            .then(() => this.forceUpdate());
+        // import(/* webpackChunkName: "fa" */"./FontAwesome")
+        //     .then(fa => fa.init())
+        //     .then(() => this.forceUpdate());
     }
 
     render() {
