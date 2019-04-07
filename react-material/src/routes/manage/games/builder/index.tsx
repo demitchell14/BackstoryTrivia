@@ -2,14 +2,14 @@ import * as React from "react";
 import {SyntheticEvent} from "react";
 import classnames from "classnames";
 import {
-    Button,
+    Button, Card, CardActionArea, CardActions, CardMedia,
     Divider,
-    Grid,
+    Grid, IconButton,
     Paper,
     Step,
     StepButton,
     Stepper,
-    TextField,
+    TextField, Tooltip,
     Typography,
     withStyles
 } from "@material-ui/core";
@@ -19,7 +19,9 @@ import UserContainer from "../../../../containers/UserContainer";
 import withContainer from "../../../../containers/withContainer";
 import {Question} from "../../../../containers";
 
-const FAIcon = React.lazy(() => import("../../../../FontAwesome"));
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
+import InputAdornment from "@material-ui/core/InputAdornment";
+// const FAIcon = React.lazy(() => import("../../../../FontAwesome"));
 
 const styles = theme => ({
     paper: {
@@ -42,7 +44,22 @@ const styles = theme => ({
         alignItems: "center",
         textAlign: "center",
         padding: ".5rem"
-    }
+    },
+    imageUploader: {
+        display: "flex",
+        flexGrow: 1,
+        margin: "auto",
+        minHeight: 140,
+        textAlign: "center",
+    },
+    imagesContainer: {
+        flexDirection: "column",
+        display: "flex",
+        minHeight: 60
+    },
+    image: {
+        height: 140
+    },
 });
 
 
@@ -141,8 +158,8 @@ class Builder extends React.Component<BuilderProps, BuilderState> {
         switch (step) {
             case 0:
                 return <BasicInfo
+                    classes={classes}
                     spacing={theme.spacing.unit}
-                    className={classes.fieldCls}
                     form={forms.basic}
                     onChange={this.basicChanges}
                 />;
@@ -153,6 +170,8 @@ class Builder extends React.Component<BuilderProps, BuilderState> {
                     classes={classes}
                     select={this.addQuestion}
                     unselect={this.removeQuestion}
+                    onOrderChanged={this.onOrderChanged}
+                    onUpdateQuestion={this.updateQuestion}
                     selectedQuestions={forms.questions}
                     questions={questions}/>;
 
@@ -163,6 +182,43 @@ class Builder extends React.Component<BuilderProps, BuilderState> {
                 return "No Stage Selected";
         }
     };
+
+    onOrderChanged = (evt, id, direction) => {
+        const state = Object.assign({}, this.state);
+        const questions = state.forms.questions;
+
+        const target = questions.findIndex(q => q._id === id);
+        if (target >= 0) {
+            const question = questions.splice(target, 1);
+            if (direction === "up") {
+                questions.splice(target-1, 0, question[0]);
+            } else {
+                questions.splice(target+1, 0, question[0]);
+            }
+            // @ts-ignore
+            this.setState({...state});
+        }
+        // console.log({id, direction})
+    }
+    
+    public updateQuestion = (evt, id, target) => {
+        // const {containers} = this.props;
+        const ele = evt.currentTarget as HTMLInputElement;
+        const {forms} = this.state;
+        let questions = Array.from(forms.questions);
+
+        const question = questions.find(question => question._id === id);
+        if (question && ele) {
+            let value = ele.value as number|string;
+            const num = Number.parseInt(ele.value);
+            if (Number.isInteger(num))
+                value = num;
+            question[target] = value;
+            this.setState({forms});
+        }
+
+        // console.log(id, target);
+    }
 
     public addQuestion = (evt, id) => {
         const {containers} = this.props;
@@ -178,8 +234,8 @@ class Builder extends React.Component<BuilderProps, BuilderState> {
                     }
 
                     forms.questions.push(question);
-
-                    // console.log(forms.questions)
+                    
+                    console.log(forms.questions)
                     this.setState({forms});
                 }
             }
@@ -211,7 +267,7 @@ class Builder extends React.Component<BuilderProps, BuilderState> {
 }
 
 const BasicInfo = (props) => {
-    const {className, spacing, onChange} = props;
+    const {classes, spacing, onChange} = props;
     const form = props.form as IBasicForm;
 
     return (
@@ -219,7 +275,28 @@ const BasicInfo = (props) => {
             <Grid item md={8} xs={12}>
                 <TextField
                     fullWidth
-                    className={className}
+                    className={classes.fieldCls}
+                    label={"Game Token"}
+                    helperText={"You can generate a random token, or enter a custom token. This is what the players will have to type in to join the game session."}
+                    name={"token"}
+                    onChange={onChange}
+                    defaultValue={form.token}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position={"start"}>
+                                <Tooltip title={<span>Generate Token</span>}>
+                                    <IconButton color={"secondary"}>
+                                        <FontAwesomeIcon style={{fontSize:".7em"}} icon={["fas", "cogs"]} />
+                                    </IconButton>
+                                </Tooltip>
+                            </InputAdornment>
+                        )
+                    }}
+                />
+
+                <TextField
+                    fullWidth
+                    className={classes.fieldCls}
                     label={"Game Title"}
                     helperText={"This will be the name of the trivia game and should be how you identify the game."}
                     name={"title"}
@@ -230,7 +307,7 @@ const BasicInfo = (props) => {
                 <TextField
                     multiline fullWidth
                     rows={2} rowsMax={4}
-                    className={className}
+                    className={classes.fieldCls}
                     label={"Game Description"}
                     helperText={"If your game requires any kind of notes, or you would like to tell the players ahead of time what the game covers, this is where you should do so."}
                     name={"description"}
@@ -239,9 +316,10 @@ const BasicInfo = (props) => {
                 />
             </Grid>
             <Grid item md={4} xs={12}>
+
                 <TextField
                     fullWidth
-                    className={className}
+                    className={classes.fieldCls}
                     label={"Start Time"}
                     type={"datetime-local"}
                     helperText={"This is simply used to show the players when the game is scheduled to start."}
@@ -251,17 +329,48 @@ const BasicInfo = (props) => {
                     InputLabelProps={{
                         shrink: true,
                     }}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position={"end"}>
+                                <Tooltip title={<span>Reset to Today</span>}>
+                                    <IconButton color={"secondary"}>
+                                        <FontAwesomeIcon style={{fontSize:".7em"}} icon={["fal", "undo"]} />
+                                    </IconButton>
+                                </Tooltip>
+                            </InputAdornment>
+                        )
+                    }}
                 />
 
-                <TextField
-                    fullWidth
-                    className={className}
-                    label={"Image"}
-                    helperText={"Soon we will be able to upload images directly, however for now, if you want an image for attention grabbing purposes, you'll need to copy/paste the image link here."}
-                    name={"image"}
-                    onChange={onChange}
-                    defaultValue={form.image}
-                />
+                {/*<TextField*/}
+                {/*    fullWidth*/}
+                {/*    className={classes.fieldCls}*/}
+                {/*    label={"Image"}*/}
+                {/*    helperText={"Soon we will be able to upload images directly, however for now, if you want an image for attention grabbing purposes, you'll need to copy/paste the image link here."}*/}
+                {/*    name={"image"}*/}
+                {/*    onChange={onChange}*/}
+                {/*    defaultValue={form.image}*/}
+                {/*/>*/}
+
+                <Card className={classes.imagesContainer}>
+                    <CardActionArea className={classes.imageUploader}>
+                        {form && form.image ? (
+                            <CardMedia className={classes.image} image={form.image}/>
+                        ) : (
+                            <div>
+                                <Typography color={"primary"}>
+                                    <FontAwesomeIcon size={"3x"} icon={["far", "image"]}/><br/>
+                                    Upload Game image (optional)
+                                </Typography>
+                            </div>
+                        )}
+                    </CardActionArea>
+                    <CardActions>
+                        <Button size={"small"}>
+                            Upload
+                        </Button>
+                    </CardActions>
+                </Card>
 
             </Grid>
         </Grid>
@@ -270,7 +379,7 @@ const BasicInfo = (props) => {
 
 const QuestionSelection = (props) => {
     // const questions = props.questions as Question[];
-    const {selectedQuestions, questions, classes} = props;
+    const {selectedQuestions, questions, classes, onOrderChanged} = props;
     return (
         <Grid container>
             <Grid item xs={12} md={5}>
@@ -278,13 +387,16 @@ const QuestionSelection = (props) => {
                     contentStyles={{maxHeight: 400}}
                     questions={selectedQuestions}
                     showUnselect showDetails
+                    showOrderModifier 
+                    onOrderChanged={onOrderChanged}
                     onUnselected={props.unselect}
+                    onUpdateDetails={props.onUpdateQuestion}
                     title={"Selected Questions"}
                     emptyMessage={"Select questions from the menu on the right and they will be added here!"}
                 />
             </Grid>
             <Grid className={classes.collectionDivider} item xs={12} md={2}>
-                <FAIcon size={"3x"} icon={["far", "exchange"]}/>
+                <FontAwesomeIcon size={"3x"} icon={["far", "exchange"]}/>
                 <Typography variant={"subtitle1"}>Choose questions from the right to add to your trivia
                     game!</Typography>
             </Grid>
@@ -315,6 +427,10 @@ const Summary = (props) => {
                             <Typography variant={"subtitle1"}>{basic.title || "No Name Set"}</Typography>
                         </Grid>
                         <Grid item xs={12}>
+                            <Typography variant={"title"}>Game Token:</Typography>
+                            <Typography variant={"subtitle1"}>{basic.token|| "No Token Set"}</Typography>
+                        </Grid>
+                        <Grid item xs={12}>
                             <Typography variant={"title"}>Game Description:</Typography>
                             <Typography variant={"subtitle1"}>{basic.description || "No Description Set"}</Typography>
                         </Grid>
@@ -325,15 +441,17 @@ const Summary = (props) => {
                         </Grid>
                         <Grid item xs={12}>
                             <Typography variant={"title"}>Game Image:</Typography>
-                            {basic.image && (
+                            {basic.image ? (
                                 <img src={basic.image}/>
+                            ) : (
+                                <Typography variant={"subtitle1"}>No Image Set</Typography>
                             )}
                         </Grid>
                     </Grid>
                 </Paper>
             </Grid>
             <Grid item xs={12} md={6}>
-                <QuestionListPanel
+                <QuestionListPanel showDetails
                     styles={{maxHeight: 800}}
                     questions={questions}
                     title={"Selected Questions"}
@@ -381,11 +499,12 @@ interface BuilderState {
     step: number;
     forms: {
         basic: IBasicForm
-        questions: Question[];
+        questions: Partial<Question>[];
     }
 }
 
 interface IBasicForm {
+    token?: string;
     title?: string;
     description?: string;
     startDate?: string;
