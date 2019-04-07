@@ -374,10 +374,9 @@ class Connection extends EventEmitter {
             // });
             const room = this.socket.server.in(typeof game._id === "string" ? game._id : game._id.toHexString());
 
-
-            this.socket.emit("game state", state);
-            // room.emit("game state", state);
-            // room.emit("game state", state);
+            // console.log(this.socket.rooms);
+            // this.socket.emit("game state", state);
+            room.emit("game state", state);
 
 
             // console.log(state);
@@ -448,6 +447,8 @@ class Connection extends EventEmitter {
                 } else {
                     this.socket.emit(`${questionKey} answered`, answer);
                 }
+                console.log(args.gameId);
+                this.requestState(args.gameId)
             }
         }
     }
