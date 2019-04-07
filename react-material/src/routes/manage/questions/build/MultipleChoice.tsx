@@ -16,7 +16,8 @@ import {
     Typography
 } from "@material-ui/core";
 
-const FAIcon = React.lazy(() => import("../../../../FontAwesome"));
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
+// const FAIcon = React.lazy(() => import("../../../../FontAwesome"));
 
 class MultipleChoice extends React.Component<MultipleChoiceProps, MultipleChoiceState> {
 
@@ -126,14 +127,14 @@ class MultipleChoice extends React.Component<MultipleChoiceProps, MultipleChoice
                             {choices && choices.length > 0 ? choices.map((opt, i) => (
                                 <ListItem key={i} selected={selected === i} dense button divider onClick={this.changeSelected(i)}>
                                     <Checkbox checked={opt.correct || false} onClick={this.correctChanged(i)}
-                                              icon={<FAIcon icon={["fas", "times-circle"]}/>}
-                                              checkedIcon={<FAIcon icon={["fas", "check-circle"]}/>}
+                                              icon={<FontAwesomeIcon icon={["fas", "times-circle"]}/>}
+                                              checkedIcon={<FontAwesomeIcon icon={["fas", "check-circle"]}/>}
                                     />
                                     <Typography>{opt.answer}</Typography>
                                     {selected === i ? (
                                         <ListItemSecondaryAction>
                                             <IconButton onClick={this.reset}>
-                                                <FAIcon fixedWidth icon={["fal", "unlink"]}/>
+                                                <FontAwesomeIcon fixedWidth icon={["fal", "unlink"]}/>
                                             </IconButton>
                                         </ListItemSecondaryAction>
                                     ) : undefined}
@@ -150,8 +151,8 @@ class MultipleChoice extends React.Component<MultipleChoiceProps, MultipleChoice
                             <Chip
                                 style={{marginTop: ".5rem"}}
                                 clickable
-                                avatar={<Avatar>{active.correct ? <FAIcon icon={["far", "check"]}/> :
-                                    <FAIcon icon={["far", "times"]}/>}</Avatar>}
+                                avatar={<Avatar>{active.correct ? <FontAwesomeIcon icon={["far", "check"]}/> :
+                                    <FontAwesomeIcon icon={["far", "times"]}/>}</Avatar>}
                                 onClick={this.chipClicked(selected)}
                                 color={active.correct ? "primary" : "secondary"}
                                 label={active.correct ? "Choice is correct!" : "Choice is wrong!"}
@@ -173,12 +174,12 @@ class MultipleChoice extends React.Component<MultipleChoiceProps, MultipleChoice
                         <div style={{textAlign:"right"}}>
                             <Tooltip placement={"top"} title={<span>{typeof selected === "number" ? "Edit" : "Add"} Choice</span>}>
                                 <IconButton onClick={this.addChoice(selected)} color={"primary"}>
-                                    <FAIcon icon={["fal", typeof selected === "number" ? "edit" : "file"]} fixedWidth/>
+                                    <FontAwesomeIcon icon={["fal", typeof selected === "number" ? "edit" : "file"]} fixedWidth/>
                                 </IconButton>
                             </Tooltip>
                             <Tooltip placement={"top"} title={<span>Delete Choice</span>}>
                                 <IconButton onClick={this.removeChoice(selected)} color={"secondary"}>
-                                    <FAIcon icon={["fal", "trash"]} fixedWidth/>
+                                    <FontAwesomeIcon icon={["fal", "trash"]} fixedWidth/>
                                 </IconButton>
                             </Tooltip>
                         </div>
