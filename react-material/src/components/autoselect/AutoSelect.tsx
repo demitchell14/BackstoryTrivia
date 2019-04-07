@@ -68,7 +68,7 @@ function NoOptionsMessage(props) {
             className={props.selectProps.classes.noOptionsMessage}
             {...props.innerProps}
         >
-            <Button type={"text"} fullWidth>Add Category</Button>
+            <Button type={"button"} fullWidth>Add Category</Button>
         </Typography>
     );
 }
