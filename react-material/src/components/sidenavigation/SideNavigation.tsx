@@ -7,8 +7,8 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft"
 import ChevronRightIcon from "@material-ui/icons/ChevronRight"
 
 import {RouterProps, withRouter} from "react-router";
-
-const FAIcon = React.lazy(() => import("../../FontAwesome"));
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
+// const FAIcon = React.lazy(() => import("../../FontAwesome"));
 
 const drawerWidth = 240;
 
@@ -91,12 +91,12 @@ class SideNavigation extends React.Component<SideNavigationProps, SideNavigation
 
                 <List onClick={this.handleStandardRoutes}>
                     <ListItem value={"/"} button>
-                        <ListItemIcon><FAIcon fixedWidth className={classes.menuIcon}
+                        <ListItemIcon><FontAwesomeIcon fixedWidth className={classes.menuIcon}
                                               icon={["fal", "home"]}/></ListItemIcon>
                         <ListItemText primary={"Home"} />
                     </ListItem>
                     <ListItem value={"/games"} button>
-                        <ListItemIcon><FAIcon fixedWidth className={classes.menuIcon}
+                        <ListItemIcon><FontAwesomeIcon fixedWidth className={classes.menuIcon}
                                               icon={["fal", "poll-h"]}/></ListItemIcon>
                         <ListItemText primary={"Find Game"} />
                     </ListItem>
@@ -118,12 +118,12 @@ class SideNavigation extends React.Component<SideNavigationProps, SideNavigation
                     <Divider />
                     <List onClick={this.handleAuthorizedRoutes}>
                         <ListItem value={"/manage/games"} button>
-                            <ListItemIcon><FAIcon fixedWidth className={classes.menuIcon}
+                            <ListItemIcon><FontAwesomeIcon fixedWidth className={classes.menuIcon}
                                                   icon={["fal", "clipboard-list-check"]}/></ListItemIcon>
                             <ListItemText primary={"Manage Games"} />
                         </ListItem>
                         <ListItem value={"/manage/questions"} button>
-                            <ListItemIcon><FAIcon fixedWidth className={classes.menuIcon}
+                            <ListItemIcon><FontAwesomeIcon fixedWidth className={classes.menuIcon}
                                                   icon={["fal", "chart-network"]}/></ListItemIcon>
                             <ListItemText primary={"Manage Questions"} />
                         </ListItem>
@@ -143,12 +143,12 @@ class SideNavigation extends React.Component<SideNavigationProps, SideNavigation
                     <Divider />
                     <List onClick={this.handleAuthorizedRoutes}>
                         <ListItem value={"/"} button>
-                            <ListItemIcon><FAIcon fixedWidth className={classes.menuIcon}
+                            <ListItemIcon><FontAwesomeIcon fixedWidth className={classes.menuIcon}
                                                   icon={["fal", "sliders-v-square"]}/></ListItemIcon>
                             <ListItemText primary={"Manage Account"} />
                         </ListItem>
                         <ListItem value={"/"} button>
-                            <ListItemIcon><FAIcon fixedWidth className={classes.menuIcon}
+                            <ListItemIcon><FontAwesomeIcon fixedWidth className={classes.menuIcon}
                                                   icon={["fal", "sign-out-alt"]}/></ListItemIcon>
                             <ListItemText primary={"Sign Out"} />
                         </ListItem>
