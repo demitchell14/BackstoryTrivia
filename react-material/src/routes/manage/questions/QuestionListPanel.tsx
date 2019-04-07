@@ -23,7 +23,8 @@ import {
 import {Api, Question} from "../../../containers";
 import MenuIcon from "@material-ui/icons/Menu";
 
-const FAIcon = React.lazy(() => import("../../../FontAwesome"));
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
+// const FAIcon = React.lazy(() => import("../../../FontAwesome"));
 //import {Api} from "../../../containers";
 
 const styles = theme => ({
@@ -72,6 +73,11 @@ const styles = theme => ({
     dflex: {
         display: "flex",
         width: "100%"
+    },
+    orderContainer: {
+        display: "flex",
+        flexDirection: "column",
+        marginRight: ".75rem"
     }
 });
 
@@ -109,7 +115,7 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
 
     public render() {
         // console.log("List Rendered");
-        const {classes, questions, title, showSearch, showActions, showSelect, showUnselect, emptyMessage, showDetails} = this.props;
+        const {classes, questions, title, showSearch, showActions, showSelect, showUnselect, emptyMessage, showDetails, onUpdateDetails, showOrderModifier} = this.props;
 
         const answer = (question:Question) => {
             if (question.type === "Open Ended") {
@@ -161,10 +167,24 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
                                           className={classes.questionContainer}>
                                     <ExpansionPanel style={{width: "100%"}}>
                                         <ExpansionPanelSummary>
-                                            <ListItemAvatar>
-                                                <Avatar>{question.timeLimit || ""}</Avatar>
+                                            {showOrderModifier && (
+                                                <div style={{alignSelf:"center"}} className={classes.orderContainer}>
+                                                    <IconButton disabled={idx === 0}
+                                                        onClick={this.handleAction("order-changed", question, "up")}
+                                                        style={{padding: ".5rem"}} color={"primary"}>
+                                                        <FontAwesomeIcon fixedWidth icon={["fas", "caret-up"]} style={{fontSize: ".5em"}} />
+                                                    </IconButton>
+                                                    <IconButton disabled={idx === filteredQuestions.length-1}
+                                                        onClick={this.handleAction("order-changed", question, "down")}
+                                                        style={{padding: ".5rem"}} color={"primary"}>
+                                                        <FontAwesomeIcon fixedWidth icon={["fas", "caret-down"]} style={{fontSize: ".5em"}} />
+                                                    </IconButton>
+                                                </div>
+                                            )}
+                                            <ListItemAvatar style={{alignSelf:"center"}}>
+                                                <Avatar>{question.points || question.timeLimit || ""}</Avatar>
                                             </ListItemAvatar>
-                                            <ListItemText
+                                            <ListItemText style={{alignSelf:"center"}}
                                                 primary={(
                                                     <React.Fragment>
                                                         <Typography variant={"subtitle1"}
@@ -188,10 +208,12 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
 
                                             {showDetails && (
                                                 <div className={classes.dflex}>
-                                                    <TextField fullWidth
+                                                    <TextField fullWidth disabled={typeof onUpdateDetails === "undefined"}
+                                                               onChange={this.handleAction("update-details", {_id: question._id, target: "timeLimit"})}
                                                                defaultValue={question.timeLimit}
                                                                type={"number"} label={"Time Limit"}/>
-                                                    <TextField fullWidth
+                                                    <TextField fullWidth disabled={typeof onUpdateDetails === "undefined"}
+                                                               onChange={this.handleAction("update-details", {_id: question._id, target: "points"})}
                                                                defaultValue={question.points}
                                                                type={"number"} label={"Points"}/>
                                                 </div>
@@ -202,19 +224,19 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
                                                     <Tooltip title={"View / Edit"}>
                                                         <IconButton color={"primary"}
                                                                     onClick={this.handleAction("view", question)}>
-                                                            <FAIcon icon={["fal", "eye"]} fixedWidth/>
+                                                            <FontAwesomeIcon icon={["fal", "eye"]} fixedWidth/>
                                                         </IconButton>
                                                     </Tooltip>
                                                     <Tooltip title={"Copy As / Clone"}>
                                                         <IconButton color={"primary"}
                                                                     onClick={this.handleAction("clone", question)}>
-                                                            <FAIcon icon={["fal", "clone"]} fixedWidth/>
+                                                            <FontAwesomeIcon icon={["fal", "clone"]} fixedWidth/>
                                                         </IconButton>
                                                     </Tooltip>
                                                     <Tooltip title={<span>Delete Question. <b>Permanent!</b></span>}>
                                                         <IconButton color={"secondary"}
                                                                     onClick={this.handleAction("delete", question)}>
-                                                            <FAIcon icon={["fal", "trash"]} fixedWidth/>
+                                                            <FontAwesomeIcon icon={["fal", "trash"]} fixedWidth/>
                                                         </IconButton>
                                                     </Tooltip>
                                                 </div>
@@ -229,7 +251,7 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
                                                 placement={"left"} color={"primary"}>
                                                 <IconButton color={"default"}
                                                             onClick={this.handleAction(showSelect ? "select" : showUnselect ? "unselect" : "", question)}>
-                                                    <FAIcon fixedWidth
+                                                    <FontAwesomeIcon fixedWidth
                                                             icon={["far", showSelect ? "plus" : showUnselect ? "minus" : "check"]}/>
                                                 </IconButton>
                                             </Tooltip>
@@ -256,7 +278,7 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
         );
     }
 
-    public handleAction = (type:string, obj:Question) => {
+    public handleAction = (type:string, obj:Partial<Question>&{target?:any}, other?:any) => {
         return (evt:SyntheticEvent) => {
             switch (type) {
                 case "view":
@@ -284,6 +306,19 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
                         this.props.onUnselected(evt, obj._id)
                     }
                     break;
+                case "update-details":
+                    // TODO
+
+                    if (this.props.onUpdateDetails) {
+                        this.props.onUpdateDetails(evt, obj._id, obj.target);
+                    }
+                    break;
+                case "order-changed":
+                    evt.stopPropagation();
+                    if (this.props.onOrderChanged) {
+                        this.props.onOrderChanged(evt, obj._id, other);
+                    }
+                    break;
             }
         }
     }
@@ -306,15 +341,19 @@ interface QuestionListPanelProps {
     onUnselected?: (evt: SyntheticEvent, target: any) => any;
     onDeleted?: (evt: SyntheticEvent, target: any) => any;
     onCloned?: (evt: SyntheticEvent, target: any) => any;
+    onUpdateDetails?: (evt:SyntheticEvent, target: any, value: any) => any;
     styles?: React.CSSProperties;
     contentStyles?: React.CSSProperties;
     maxHeight?: string | number;
+    showOrderModifier?: boolean;
+    onOrderChanged?: (evt:SyntheticEvent, target:any, direction?: any) => any;
 }
 
 interface QuestionListPanelState {
     filter: {
         question?: string;
     }
+    order?: string[];
 }
 
 //@ts-ignore

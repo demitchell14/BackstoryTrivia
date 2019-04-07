@@ -1,6 +1,7 @@
 import * as React from "react";
 import {SyntheticEvent} from "react";
 import {
+    BottomNavigation, BottomNavigationAction,
     Button,
     Dialog,
     DialogActions,
@@ -21,6 +22,12 @@ import {Api, Question} from "../../../containers";
 import QuestionListPanel from "./QuestionListPanel";
 import Builder from "./build/Builder";
 import Home from "./home/Home";
+
+// @ts-ignore
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {match as MatchProps, RouteProps, RouterProps, withRouter} from "react-router";
+
+const drawerWidth = 400;
 
 const styles = theme => ({
     toolbar: {
@@ -44,12 +51,16 @@ const styles = theme => ({
         width: "auto",
     },
     drawerPaper: {
-        width: 400,
-        right: 0,
-        left: "unset"
+        paddingTop: "4rem",
+        width: drawerWidth,
+    },
+    mainContainer: {
+        // display: "flex",
+        // flexDirection: "column"
     },
     questionsDrawer: {
-        width: 400,
+        // marginTop: "3rem",
+        width: drawerWidth,
         flexShrink: 0
     },
     input: {
@@ -72,10 +83,32 @@ const styles = theme => ({
 
 class Questions extends React.Component<QuestionsProps, QuestionsState> {
     private questionSubscription:any;
-    public tabs = [
+    public tabs2 = [
         Home,
         Builder
     ];
+
+    public tabs = (self:this) => [
+        {
+            component: Home,
+            label: "Home",
+            path: "/manage/questions",
+            props: {}
+        },
+        {
+            component: Builder,
+            label: "Builder",
+            path: "/manage/questions/builder",
+            props: {
+                // onChange: this.builderStateChanged,
+                onSubmit: self.props.containers ? self.builderSubmit(self.props.containers.question) : undefined,
+                handleCategories: self.props.containers ? self.handleCategories(self.props.containers.question) : undefined,
+                sendAction: self.choiceAction,
+                selectedId: self.state.selectedTarget ? self.state.selectedTarget : undefined
+                // data: this.state.builder.data,
+            }
+        }
+    ]
     public constructor(props) {
         super(props);
         this.state = {
@@ -199,20 +232,123 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
     };
 
     public render() {
+
+        // [
+        //     {label: "Home", icon: <FontAwesomeIcon className={classes.navIcon} fixedWidth icon={["far", "home"]} />},
+        //     {label: "Games", icon: <FontAwesomeIcon className={classes.navIcon} fixedWidth icon={["fal", "clipboard-list-check"]} />},
+        //     {label: "Builder", icon: <FontAwesomeIcon className={classes.navIcon} fixedWidth icon={["fas", "plus-circle"]} />},
+        //     //{label: "Home", icon: <FontAwesomeIcon className={classes.navIcon} icon={["far", "home"]} />}
+        // ]
+        const {classes, match} = this.props;
+        const tabs = this.tabs(this);
+
+        // {React.createElement(this.tabs[this.state.tab], {
+        //     ...tabsProps[this.state.tab]
+        // })}
+
+        const target = tabs.find(t => t.path === match.url);
+        if (target) {
+            return (
+                <main className={classes.content}>
+
+                    <Dialog
+                        open={this.state.deleteModalActive}
+                        onClose={() => this.setState({deleteModalActive: false})}
+                    >
+                        <DialogTitle>Are you sure you want to delete this question?</DialogTitle>
+                        <DialogContent>
+                            {this.state.deleteTarget ? this.state.deleteTarget.component : undefined}
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => this.setState({deleteModalActive: false})}>Cancel</Button>
+                            <Button
+                                onClick={this.deleteQuestion(this.state.deleteTarget ? this.state.deleteTarget.target : undefined)}
+                                color={"primary"}>Continue</Button>
+                        </DialogActions>
+                    </Dialog>
+
+
+                    <div className={classes.toolbar}/>
+                    <Navigator style={{marginBottom: 0}}
+                               classes={classes}
+                               active={target.label}
+                               tabs={tabs.map(tab => ({
+                                   label: tab.label,
+                                   icon: <span/>
+                               }))}
+                               onChange={this.handleTabChange}
+                    />
+                    <div className={classes.mainContainer}>
+                        <div style={{position: "relative"}}>
+                            {target && React.createElement(target.component, {
+                                ...target.props
+                            })}
+                            {/*<TransitionGroup>*/}
+                            {/*<CSSTransition key={target ? target.name : -1} timeout={500} classNames={"slide-down"}>*/}
+                            {/**/}
+                            {/*</CSSTransition>*/}
+                            {/*</TransitionGroup>*/}
+                        </div>
+
+                        <Drawer
+                            anchor={"right"}
+                            className={classes.questionsDrawer}
+                            classes={{
+                                paper: classes.drawerPaper
+                            }}
+                            variant={"permanent"}
+                        >
+                            <QuestionListPanel
+                                showSearch showActions contentStyles={{maxHeight: "100%"}}
+                                onSelected={this.questionSelected}
+                                onDeleted={this.questionDeleted}
+                                onCloned={this.questionCloned}
+                                questions={this.state.questions}
+                            />
+                        </Drawer>
+
+                        {/*<Drawer variant={"permanent"}*/}
+                        {/*        className={classes.questionsDrawer}*/}
+                        {/*        classes={{*/}
+                        {/*            paper: classes.drawerPaper*/}
+                        {/*        }}*/}
+                        {/*>*/}
+                        {/*    */}
+                        {/*</Drawer>*/}
+                    </div>
+                </main>
+            );
+        } else {
+            return (<span />)
+        }
+    }
+
+    handleTabChange = (evt, n) => {
+        const {history, match} = this.props;
+        const tabs = this.tabs(this);
+        const target = tabs.find(t => t.label === n);
+        if (target && match.url !== target.path) {
+            history.push(target.path);
+        }
+    };
+
+    public render2() {
         const {classes} = this.props;
 
+        const tabs = this.tabs(this);
 
-        const tabsProps = [
-            {},
-            {
-                // onChange: this.builderStateChanged,
-                onSubmit: this.props.containers ? this.builderSubmit(this.props.containers.question) : undefined,
-                handleCategories: this.props.containers ? this.handleCategories(this.props.containers.question) : undefined,
-                sendAction: this.choiceAction,
-                selectedId: this.state.selectedTarget ? this.state.selectedTarget : undefined
-                // data: this.state.builder.data,
-            }
-        ];
+
+        // const tabsProps = [
+        //     {},
+        //     {
+        //         // onChange: this.builderStateChanged,
+        //         onSubmit: this.props.containers ? this.builderSubmit(this.props.containers.question) : undefined,
+        //         handleCategories: this.props.containers ? this.handleCategories(this.props.containers.question) : undefined,
+        //         sendAction: this.choiceAction,
+        //         selectedId: this.state.selectedTarget ? this.state.selectedTarget : undefined
+        //         // data: this.state.builder.data,
+        //     }
+        // ];
         
         return (
             <main className={classes.content}>
@@ -243,9 +379,11 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
                     </Tabs>
                 </Paper>
 
-                {React.createElement(this.tabs[this.state.tab], {
-                    ...tabsProps[this.state.tab]
-                })}
+                {/*{React.createElement(this.tabs[this.state.tab], {*/}
+                {/*    ...tabsProps[this.state.tab]*/}
+                {/*})}*/}
+
+                {React.createElement(tabs[this.state.tab].component, {...tabs[this.state.tab].props})}
 
                 <Drawer variant={"permanent"}
                         className={classes.questionsDrawer}
@@ -371,13 +509,14 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
     }
 }
 
-interface QuestionsProps {
+interface QuestionsProps extends RouterProps, RouteProps {
     state?: QuestionsState;
     containers?: {
         question:QuestionContainer;
         user:UserContainer;
     }
     classes?: any;
+    match: MatchProps;
 }
 
 interface QuestionsState {
@@ -400,5 +539,27 @@ interface QuestionsState {
     deleteModalActive: boolean;
 }
 
+const Navigator = props => {
+    const {classes, tabs, active, onChange, style} = props;
+    if (window.innerWidth > 425) {
+        return (
+            <Paper elevation={1} className={classes.tabOffset}>
+                <Tabs value={active} variant={"fullWidth"} onChange={onChange}
+                      classes={{scrollable: classes.scroller}} style={style}>
+                    {tabs ? tabs.map((tab, id) => <Tab key={id} value={tab.label} label={tab.label}
+                                                       icon={tab.icon}/>) : undefined}
+                </Tabs>
+            </Paper>
+        )
+    }
+    return (
+        <BottomNavigation value={active} className={props.classes.bottomNav} onChange={onChange}>
+            {tabs ? tabs.map((tab, id) => <BottomNavigationAction key={id} value={tab.label} label={tab.label}
+                                                                  icon={tab.icon}/>) : undefined}
+        </BottomNavigation>
+    )
+};
 
-export default withStyles(styles, {withTheme: true})(withContainer(Questions, [UserContainer, QuestionContainer]));
+
+// @ts-ignore
+export default withStyles(styles, {withTheme: true})(withRouter(withContainer(Questions, [UserContainer, QuestionContainer])));
