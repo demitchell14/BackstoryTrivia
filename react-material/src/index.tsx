@@ -6,6 +6,8 @@ import {Provider} from "unstated";
 import QuestionContainer from "./containers/QuestionContainer";
 import UserContainer from "./containers/UserContainer";
 // import {BrowserRouter} from "react-router-dom";
+import {init as FAInit} from "./FontAwesome";
+import GamesContainer from "./containers/GamesContainer";
 
 
 //import {} from "@fortawesome/pro-regular-svg-icons";
@@ -13,12 +15,17 @@ import UserContainer from "./containers/UserContainer";
 
 const questionContainer = new QuestionContainer();
 const userContainer = new UserContainer();
+const gamesContainer = new GamesContainer();
+gamesContainer.attachUser(userContainer);
 
 const Container = props => (
-    <Provider inject={[questionContainer, userContainer]}>
+    <Provider inject={[questionContainer, userContainer, gamesContainer]}>
         <Main/>
     </Provider>
 );
 
 
-ReactDOM.render(<Container/>, document.getElementById("root"));
+FAInit()
+    .then(() => {
+        ReactDOM.render(<Container/>, document.getElementById("root"));
+    })
