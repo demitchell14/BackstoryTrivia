@@ -5,6 +5,8 @@ import {Middleware, Mongo} from "../../middleware/Mongo";
 import {getUser, updateUser} from "./index";
 // import _GameManager, {GameManager as GMR} from "../../middleware/GameManager";
 import GameInstanceManager, {GameManagerRequest} from "../../util/GameInstanceManager";
+import {ObjectID} from "bson";
+import {GameObject} from "../../util/db/DatabaseHandler";
 
 const gameMiddleware = GameInstanceManager.middleware();
 const router = express.Router();
@@ -15,13 +17,21 @@ class GamesController {
     }
 
     list = async (req:RequestTypes.List, res:Response) => {
-        const {db} = req;
+        const {db, decoded} = req;
         await db.openCollection("games")
-        db.find({})
-        res.json({
-            decoded: req.decoded,
-            body: req.body
-        })
+        const games = await db.find({_creator: ObjectID.createFromHexString(decoded._id)})
+
+        if (await games.count() > 0) {
+            const list = await games.toArray() as GameObject[];
+            res.json({
+                games: list.map(game => {
+                    delete game._creator;
+                    return game;
+                })
+            })
+        } else {
+            res.json({games: []});
+        }
     }
 
     add = async (req:RequestTypes.Add, res:Response) => {
