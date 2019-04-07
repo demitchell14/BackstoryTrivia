@@ -1,7 +1,7 @@
-import * as React from "react";
+// import * as React from "react";
 
-import {findIconDefinition, library} from "@fortawesome/fontawesome-svg-core";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {library} from "@fortawesome/fontawesome-svg-core";
+// import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 import {
     faArrowFromRight,
@@ -19,7 +19,7 @@ import {
     faSlidersVSquare,
     faTimes,
     faTrash,
-    faUnlink
+    faUnlink, faUndo
 } from "@fortawesome/pro-light-svg-icons";
 
 import {
@@ -33,7 +33,9 @@ import {
     faTimes as farTimes
 } from "@fortawesome/pro-regular-svg-icons"
 
-import {faCheckCircle, faPlusCircle, faTimesCircle} from "@fortawesome/pro-solid-svg-icons"
+import {faCheckCircle, faPlusCircle, faTimesCircle, faCogs,
+    faCaretUp, faCaretDown
+} from "@fortawesome/pro-solid-svg-icons"
 
 export async function init() {
     //
@@ -43,7 +45,7 @@ export async function init() {
 
     library.add(faArrowFromLeft, faCheck, farHome, faImage, faMinus, faPlus, faExchange, farTimes);
 
-    library.add(faCheckCircle, faTimesCircle, faPlusCircle)
+    library.add(faCaretUp, faCaretDown, faCogs, faUndo, faCheckCircle, faTimesCircle, faPlusCircle)
 
     // const fal = [
     //     import(/* webpackChunkName: "fa" */"@fortawesome/pro-light-svg-icons/faHome"),
@@ -84,29 +86,29 @@ export async function init() {
     //     library.add(...each.map(e => e.definition));
     // });
 }
-
-export function FAIcon(props: any) {
-
-    let lookup = {} as any;
-    if (props.icon) {
-        if (props.icon instanceof Array) {
-            lookup = {prefix: props.icon[0], iconName: props.icon[1]};
-        }
-    }
-
-
-    if (lookup && findIconDefinition && findIconDefinition(lookup)) {
-        return React.createElement(FontAwesomeIcon, {
-            ...props
-        })
-    }
-    const spanProps = {} as any;
-    if (props.fixedWidth) {
-        spanProps.style = {
-            width: "1.25rem"
-        }
-    }
-    return React.createElement("span", spanProps);
-}
-
-export default FAIcon;
+//
+// export function FAIcon(props: any) {
+//
+//     let lookup = {} as any;
+//     if (props.icon) {
+//         if (props.icon instanceof Array) {
+//             lookup = {prefix: props.icon[0], iconName: props.icon[1]};
+//         }
+//     }
+//
+//
+//     if (lookup && findIconDefinition && findIconDefinition(lookup)) {
+//         return React.createElement(FontAwesomeIcon, {
+//             ...props
+//         })
+//     }
+//     const spanProps = {} as any;
+//     if (props.fixedWidth) {
+//         spanProps.style = {
+//             width: "1.25rem"
+//         }
+//     }
+//     return React.createElement("span", spanProps);
+// }
+//
+// export default FAIcon;
