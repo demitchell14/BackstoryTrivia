@@ -2,6 +2,9 @@ import {Request} from "express";
 import {Readable} from "stream";
 import * as csv from "csv-parser";
 import {UploadedFile} from "express-fileupload";
+import {AuthorizedToken, isAuthorized} from "./Authorization";
+import * as mongo from "mongodb";
+import {Collection, MongoClient, ObjectID} from "mongodb";
 
 const convert = (val:string, type:string) => {
     if (type === "number") {
@@ -17,10 +20,47 @@ const convert = (val:string, type:string) => {
     return undefined;
 }
 
-export default async function(req:Request, res, next) {
+const __db = async ():Promise<MongoClient> => {
+    const {MONGO_URL2, MONGO_PASS2, MONGO_USER2, MONGO_DB2} = process.env
+    const connstr = `mongodb+srv://${MONGO_USER2}:${MONGO_PASS2}@${MONGO_URL2}/${MONGO_DB2}`;
+    return await mongo.MongoClient.connect(connstr, {
+        useNewUrlParser: true,
+    });
+}
+
+const insertCollection = async (db:Collection<any>, records:Question[]) => {
+    const x = await db.insertMany(records);
+    return x;
+}
+
+export async function exec(req:Request, res, next) {
     let file;
     if (req.files)
         file = req.files.csv as UploadedFile;
+
+    const db = await __db();
+    const userDB = db.db().collection("moderators");
+    const questionDB = db.db().collection("questions");
+    const user = await isAuthorized(req) as AuthorizedToken;
+    if (!user) {
+        res.status(403).send("Unauthorized Access");
+        return;
+    }
+    const currentUser = await userDB.findOne({_id: ObjectID.createFromHexString(user._id)})
+    if (!currentUser) {
+        res.status(403).send("Unauthorized Access");
+        return;
+    }
+
+    // console.log(req);
+    if (req.body instanceof Buffer) {
+        let tmp = req.body.toString("UTF-8");
+        tmp = tmp.substr(tmp.indexOf("# DO NOT DELETE"));
+        //tmp = tmp.substr(0, tmp.lastIndexOf("---------------------"));
+        // console.log(tmp)
+        file = {data: tmp};
+    }
+
     let timeout;
 
     const complete = (results:Row[]) => {
@@ -29,7 +69,11 @@ export default async function(req:Request, res, next) {
 
         try {
             results.map(row => {
-                const question = {} as any;
+                const question = {} as Question;
+                if (!row.question) {
+                    return;
+                }
+                question._creator = ObjectID.createFromHexString(user._id);
                 question.question = row.question;
                 question.points = convert(row.points, "number");
                 question.timeLimit = convert(row.timeLimit, "number");
@@ -39,17 +83,17 @@ export default async function(req:Request, res, next) {
                 question.category = row.category.split(/,\\s*/);
 
                 if (question.type === "Open Ended") {
-                    question.answer = row.answer;
+                    question.answer = row.choice1;
                 }
                 if (question.type === "Multiple Choice") {
                     question.choices = [];
                     const choiceKeys = Object.keys(row).filter(k => k.toLowerCase().match(/choice/));
-                    choiceKeys.unshift("answer");
+                    // choiceKeys.unshift();
                     choiceKeys.map(k => {
                         if (row[k]) {
                             question.choices.push({
                                 answer: row[k],
-                                correct: k === "answer"
+                                correct: k === "choice1"
                             });
                         }
                     })
@@ -63,12 +107,18 @@ export default async function(req:Request, res, next) {
         if (timeout)
             clearTimeout(timeout);
 
-        res.json({
-            total: collection.length,
-            questionsAdded: collection.map(q => q.question)
-        })
-    }
+        insertCollection(questionDB, collection)
+            .then((data) => {
 
+                res.json({
+                    ...data
+                    // inserted: false,
+                    // total: collection.length,
+                    // questionsAdded: collection.map(q => q.question),
+                    // collection
+                })
+            })
+    }
 
     let readable;
     timeout = setTimeout(() => {
@@ -83,11 +133,34 @@ export default async function(req:Request, res, next) {
         readable.push(file.data);
         readable.push(null);
         const results = [];
-        readable.pipe(csv())
-            .on("data", (data) => results.push(data))
+        readable.pipe(csv({skipLines: 1}))
+            .on("data", (data) => {
+                results.push(data)
+                // console.log(results)
+            }).on("error", (err) => {
+                console.error(err);
+            })
             .on("end", () => complete(results));
-    } catch (err) {}
+    } catch (err) {
+        clearTimeout(timeout);
+        // console.error(err);
+        res.status(501).send("The CSV you selected is not in a usable format.");
+    }
 
+}
+
+interface Question {
+    _creator: ObjectID;
+    question: string;
+    points: number;
+    timeLimit: number;
+    type: string;
+    category: string[];
+    answer: string;
+    choices: {
+        answer: string;
+        correct: boolean;
+    }[]
 }
 
 interface Row {
@@ -96,7 +169,7 @@ interface Row {
     timeLimit:string;
     type:string;
     category: string;
-    answer: string;
+    choice1: string;
     choice2: string;
     choice3: string;
     choice4: string;

@@ -1,11 +1,13 @@
 {
-
   "compilerOptions": {
-    "target": "esnext",
+    "target": "es6",
     "module": "commonjs",
+    "rootDir": "./",
+    "outDir": "./lib",
     "allowJs": false,
     "sourceMap": true,
     "declaration": true,
-    "moduleResolution": "node"
-  },
+    "moduleResolution": "node",
+    "skipLibCheck": true
+  }
 }
