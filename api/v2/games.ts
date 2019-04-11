@@ -34,6 +34,27 @@ class GamesController {
         }
     }
 
+    find = async (req:RequestTypes.List, res:Response) => {
+        const {db, decoded, params} = req;
+
+        if (params.id) {
+            await db.openCollection("games");
+            const game = await db.find({_creator: ObjectID.createFromHexString(decoded._id), _id: ObjectID.createFromHexString(params.id)});
+
+            if (await game.count() === 1) {
+                let g = await game.next() as GameObject;
+                delete g._creator;
+                res.json({
+                    game: g
+                })
+            } else {
+                res.sendStatus(404);
+            }
+        } else {
+            res.sendStatus(404);
+        }
+    }
+
     add = async (req:RequestTypes.Add, res:Response) => {
         const {db,decoded, game} = req;
         const errors = [];
@@ -44,10 +65,18 @@ class GamesController {
             errors.push("Please add questions to your game otherwise this is a waste!");
         }
 
+        if (decoded.type !== "moderator") {
+            res.sendStatus(404);
+            return;
+        }
+
         if (errors.length > 0) {
             res.json(errors);
             return;
         }
+
+        // @ts-ignore
+        game._creator = ObjectID.createFromHexString(decoded._id);
 
         const user = await getUser(db, decoded);
         await db.openCollection("games");
@@ -55,9 +84,9 @@ class GamesController {
         const done = await db.insert((game as any));
         if (done && done.insertedCount > 0 && done.insertedId) {
             const userUpdated = await updateUser(db, decoded, {$push: { games: done.insertedId }})
-            // const userUpdated = await updateUser(db, decoded, { games: {$push: done.insertedId}})
             if (userUpdated) {
-                res.json({msg: "DD", user, game: {...game, _id: done.insertedId} });
+                res.sendStatus(201);
+                // res.json({msg: "DD", user, game: {...game, _id: done.insertedId} });
                 return;
             }
         }
@@ -78,6 +107,7 @@ const controller = new GamesController();
 router.get("/", jwt.authorized, controller.index);
 router.post("/", jwt.authorized, Mongo(), gameMiddleware.Manager, controller.add);
 router.get('/list', jwt.authorized, Mongo(), controller.list);
+router.get('/:id', jwt.authorized, Mongo(), controller.find)
 
 
 export default router;
