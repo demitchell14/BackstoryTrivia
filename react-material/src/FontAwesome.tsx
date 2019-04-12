@@ -34,7 +34,7 @@ import {
 } from "@fortawesome/pro-regular-svg-icons"
 
 import {faCheckCircle, faPlusCircle, faTimesCircle, faCogs,
-    faCaretUp, faCaretDown
+    faCaretUp, faCaretDown, faPencil
 } from "@fortawesome/pro-solid-svg-icons"
 
 export async function init() {
@@ -45,7 +45,7 @@ export async function init() {
 
     library.add(faArrowFromLeft, faCheck, farHome, faImage, faMinus, faPlus, faExchange, farTimes);
 
-    library.add(faCaretUp, faCaretDown, faCogs, faUndo, faCheckCircle, faTimesCircle, faPlusCircle)
+    library.add(faCaretUp, faCaretDown, faCogs, faUndo, faCheckCircle, faTimesCircle, faPlusCircle, faPencil);
 
     // const fal = [
     //     import(/* webpackChunkName: "fa" */"@fortawesome/pro-light-svg-icons/faHome"),
