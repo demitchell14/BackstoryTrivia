@@ -1,7 +1,7 @@
 import * as en from "dotenv";
+import * as parser from "body-parser";
 import * as express from "express";
 import {Request} from "express";
-import * as parser from "body-parser";
 en.config();
 
 // import * as fileUpload from "express-fileupload";
