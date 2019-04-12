@@ -49,8 +49,14 @@ export class Play extends React.Component<PlayProps, PlayState> {
         if (storage.hasGameID() && storage.hasTeamKey() && storage.hasToken()) {
             this.setState({loading: true});
             const status = await player.getGameStatus(storage.getGameID())
-            if (!status)
-                throw "ERROR";
+            if (!status) {
+                this.setState({
+                    error: "Unable to find selected game.",
+                    loading: false,
+                    showError: setTimeout(() => this.reset(), 5000),
+                })
+                return;
+            }
 
             if (!status.completed) {
                 await socket.connect();
@@ -288,8 +294,14 @@ export class Play extends React.Component<PlayProps, PlayState> {
 
                 const status = await player.getGameStatus(this.state.game)
 
-                if (!status)
-                    throw "ERRROR";
+                if (!status) {
+                    this.setState({
+                        error: "Unable to find selected game.",
+                        loading: false,
+                        showError: setTimeout(() => this.reset(), 5000),
+                    })
+                    return;
+                }
 
                 if (status.completed) {
                     this.setState({
