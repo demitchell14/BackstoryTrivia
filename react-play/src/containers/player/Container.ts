@@ -40,7 +40,6 @@ export class PlayerContainer extends Container<PlayerContainerState>{
 
             }
             answers.questions.push(props)
-            console.log(answers);
 
             if (interactive) {
                 ReactGA.event({

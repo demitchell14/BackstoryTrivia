@@ -8,7 +8,6 @@ import {PlayerContainer, SocketContainer, StorageContainer} from "../../containe
 import logger from "../../util/logger";
 import {ActivityStream, GameNav, HistoryView, InfoView, PlayView, TeamView, WaitView} from "./";
 
-// import "./../../style/live.css";
 
 export class Live extends React.Component<LiveProps, LiveState> {
     public constructor(props:LiveProps) {
@@ -21,17 +20,8 @@ export class Live extends React.Component<LiveProps, LiveState> {
         } as LiveState;
 
         props.containers.player.attachStorage(props.containers.storage);
-        
-        // if (props.containers.player.gameInit())
 
     }
-
-    // tabs = {
-    //     "#info": (<div className={"wait-view"}>a</div>),
-    //     "#teams": (props:TeamViewProps) => (<TeamView {...props} />)
-    // };
-
-
 
     componentDidMount(): void {
         const {player, socket} = this.props.containers;
@@ -77,15 +67,12 @@ export class Live extends React.Component<LiveProps, LiveState> {
             }
 
             if (player.hasSession()) {
-                // logger.log(storage.getToken(), storage.getGameID(), storage.getTeamKey())
                 const success = await socket.authenticate(storage.getToken(), storage.getGameID(), storage.getTeamKey());
                 player.gameInit(storage.getGameID(), storage.getTeamKey());
-                    // .then(socket.requestAnswerHistory);
                 if (!success) {
                     throw success;
                 }
             }
-            // this.props.history.push("/");
         }
 
         if (socket.state.status === "authenticated") {
@@ -104,7 +91,6 @@ export class Live extends React.Component<LiveProps, LiveState> {
                     loading: false, view: "waiting"
                 })
             }
-            // socket.subscribe(this.handleGameState);
             socket.requestState(storage.getGameID());
         } else {
             throw false
@@ -113,15 +99,12 @@ export class Live extends React.Component<LiveProps, LiveState> {
 
     handleGameState = () => {
         const {socket} = this.props.containers;
-        // const {} = this.state
         logger.log(socket.state);
     };
 
     componentWillReceiveProps(nextProps: Readonly<LiveProps>, nextContext: any): void {
-        // logger.log("Props Received", nextProps);
         if (nextProps.location) {
             if (nextProps.location.hash !== this.state.tab) {
-                // if (this.tabs[nextProps.location.hash])
                 this.setState({tab: nextProps.location.hash || "#"});
                 logger.log(this.state)
             }
@@ -191,7 +174,6 @@ export class Live extends React.Component<LiveProps, LiveState> {
                                 timeLeft: socket.state.question.timeLeft,
                                 showNumber: true
                             },
-                            // icon: <FontAwesomeIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>
                         };
                     } else {
                         return {
@@ -228,7 +210,6 @@ export class Live extends React.Component<LiveProps, LiveState> {
                         showNotification: setTimeout(this.handleNotification, 2000),
                         notification: message
                     })
-                    //socket.state.sho
                 }
             }
         },
@@ -264,7 +245,6 @@ export class Live extends React.Component<LiveProps, LiveState> {
 
         const views = this.views(socket, player);
 
-        // logger.log(views, tab,);
 
         return (
             <Container className={"head-pad px-0 no-overflow-x no-overflow-y"}
@@ -273,7 +253,6 @@ export class Live extends React.Component<LiveProps, LiveState> {
                 direction={"column"}
                 align={{
                     items: "center",
-                    //content: "center"
                 }}
                 justifyContent={"between"}
                 flex={{grow:1}}
@@ -281,11 +260,6 @@ export class Live extends React.Component<LiveProps, LiveState> {
             >
 
                 <Loading visible={loading} full />
-
-                {/*<ActivityStream*/}
-                {/*    icon={<FontAwesomeIcon className={"ico"} fixedWidth icon={["fas", "lock"]}/>}*/}
-                {/*    status={"Waiting for game..."} minimized={false}*/}
-                {/*/>*/}
 
                 <ActivityStream
                     {...this.generateStatus()}
@@ -303,31 +277,9 @@ export class Live extends React.Component<LiveProps, LiveState> {
                         enter={{ position: "relative", transform: 'translateX(0px)', opacity: 1 }}
                         leave={{ position: "absolute", transform: 'translateX(-200px)', opacity: 0 }}
                     >
-                        {(view, state, index) => style => {
-                            // logger.log({loc, state, style});
-                            // logger.log({view, state, style, index});
-                            return React.createElement(view.component, {...view.props, style})
-                            // return views.map((view, key) => {
-                            //     // @ts-ignore
-                            //     return React.createElement(view.component, {...view.props, style, key})
-                            // })
-                        }}
+                        {(view, state, index) => style => React.createElement(view.component, {...view.props, style})}
                     </Transition>
                 )}
-
-                {/*<Transition*/}
-                {/*    items={content}*/}
-                {/*    from={{opacity: 0}}*/}
-                {/*    enter={{opacity: 1}}*/}
-                {/*    leave={{opacity: 0}}*/}
-                {/*>*/}
-                {/*    {show => (show && ContentComponent && !loading) && (style => (*/}
-                {/*        <ContentComponent style={style} {...content.props} />))}*/}
-                {/*</Transition>*/}
-
-
-
-                {/*{loading || typeof content.component === "undefined" ? (<div/>) : <ContentComponent {...content.props} />}*/}
 
                 {socket.state.notification && socket.state.showNotification && (
                     <Snackbar variant={"info"} position={"bottom"} onClose={this.handleNotification}>

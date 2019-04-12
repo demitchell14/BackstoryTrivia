@@ -119,16 +119,10 @@ export class SocketContainer extends Container<SocketState> {
                 this.setState({[name]: undefined})
                     .then(() => logger.log(this.state));
             }
-            // this.setState({[name]: undefined})
         }, 5000);
     }
     
     receiveState = (state?:GameStatus) => {
-        // logger.log("State Received");
-        // state.teams = state.teams.map(team => ({
-        //     name: team.name,
-        //     color: generateColor(team.name.toUpperCase().charAt(0))
-        // }))
         if (this.state.gameStatus && this.state.game && state) {
             let notification;
             if (!this.state.game.started && state.started) {
@@ -138,15 +132,8 @@ export class SocketContainer extends Container<SocketState> {
 
             const status = this.state.gameStatus;
             const game = this.state.game;
-            if (state.teams) {
-                let newTeams = state.teams.filter(team => status.teams.find(t => t.name === team.name) === null);
-                newTeams = newTeams.map(team => ({
-                    ...team,
-                    color: generateColor()
-                }));
-                delete state.teams;
-                status.teams.push.apply(status.teams, newTeams);
-            }
+
+            status.teams = state.teams;
             Object.assign(status, state);
 
             game.paused = state.paused;
@@ -208,10 +195,6 @@ export class SocketContainer extends Container<SocketState> {
         const gameId = this.state.room;
         if (this.socket && question) {
 
-            // this.socket.once(`${question._id} answered`, (args:any) => {
-            //     logger.log(args)
-            // });
-
             this.socket.emit("answer question", {
                 question,
                 teamKey,
@@ -227,21 +210,7 @@ export class SocketContainer extends Container<SocketState> {
             })
         }
 
-        // logger.log({question, answer, teamKey, gameId});
     }
-
-    // requestAnswerHistory = () => {
-    //     const {activeKey, room} = this.state;
-    //     if (activeKey && room) {
-    //         logger.log({
-    //             activeKey, room
-    //         })
-    //     }
-    // }
-    //
-    // receiveQuestionHistory = (data:AnswerResponse[]) => {
-    //     logger.log(data);
-    // }
 
 
     authenticate = (token:string, gameToken:string, teamKey?: string) => {
@@ -359,6 +328,7 @@ export interface GameStatus {
 
 export interface TeamObject {
     name: string;
+    answered?: number;
     color:Color;
 }
 
