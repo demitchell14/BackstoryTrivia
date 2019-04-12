@@ -7,7 +7,7 @@ import {
     List,
     ListItem,
     ListItemAvatar,
-    ListItemText, Paper, Theme, Typography,
+    ListItemText, Theme,
     withStyles
 } from "@material-ui/core";
 import withContainer from "../../../../containers/withContainer";
@@ -15,6 +15,8 @@ import QuestionContainer from "../../../../containers/QuestionContainer";
 import UserContainer from "../../../../containers/UserContainer";
 import GamesContainer, {GameObject} from "../../../../containers/GamesContainer";
 import {SyntheticEvent} from "react";
+import QuestionListPanel from "../../questions/QuestionListPanel";
+import {RouteProps, RouterProps, withRouter} from "react-router";
 
 const styles = (theme:Theme) => ({
     paper: {
@@ -66,16 +68,26 @@ class ListComponent extends React.Component<ListComponentProps, ListComponentSta
 
     selectGame = (id:string) => {
         return (evt:SyntheticEvent) => {
-            const {games} = this.props.containers;
-            const game = games.state.games.find(g => g._id === id);
-            if (game) {
-                this.setState({
-                    selectedGame: id,
-                    game
-                })
-            }
+            console.log(this.props, id)
+            this.props.history.push("/manage/games/" + id);
+            // const {games} = this.props.containers;
+            // const game = games.state.games.find(g => g._id === id);
+            // if (game) {
+            //     this.setState({
+            //         selectedGame: id,
+            //         game
+            //     })
+            // }
         }
     }
+
+    basicInfo = [
+        { name: "Name", variable: "name" },
+        { name: "Token", variable: "token" },
+        { name: "Description", variable: "description" },
+        { name: "Start Time", variable: "startTime" },
+        { name: "Image", variable: "image" },
+    ]
 
     public render() {
         // @ts-ignore
@@ -90,6 +102,9 @@ class ListComponent extends React.Component<ListComponentProps, ListComponentSta
                 <Grid container spacing={16}>
                     <Grid sm={4} item>
                         <List className={classes.listRoot}>
+                            <ListItem>
+
+                            </ListItem>
                             {games.state.games.length > 0 ? games.state.games.map((game, idx) => (
                                 <ListItem selected={game._id === this.state.selectedGame} key={game._id} button onClick={this.selectGame(game._id)}>
                                     <ListItemAvatar>
@@ -117,54 +132,84 @@ class ListComponent extends React.Component<ListComponentProps, ListComponentSta
                             <CardContent style={{position: "relative", display: "flex"}}>
 
                                 {game && (
-                                    <Grid container>
-                                        <Grid md={7} item>
-                                            <Paper elevation={2} style={{padding: 8}}>
-                                                <List>
-                                                    {game.questions && game.questions.map((question, idx) => question && (
-                                                        <ListItem  key={question._id}>
-                                                            <ListItemAvatar>
-                                                                <Avatar>{idx+1}</Avatar>
-                                                            </ListItemAvatar>
-                                                            <ListItemText
-                                                                primary={question.question}
-                                                                secondary={question.answer}
-                                                            />
-                                                        </ListItem>
-                                                    ))}
-                                                </List>
-                                            </Paper>
-                                        </Grid>
-                                        <Grid md={5} item>
-                                            <div className={classes.gameBasic}>
-                                                <div>
-                                                    <Typography variant={"title"} className={classes.gameText}>Game Name:</Typography>
-                                                    <Typography variant={"subtitle1"} className={classes.gameText}>{game.name || "No Name Set"}</Typography>
-                                                </div>
-                                                <div>
-                                                    <Typography variant={"title"} className={classes.gameText}>Game Token:</Typography>
-                                                    <Typography variant={"subtitle1"} className={classes.gameText}>{game.token|| "No Token Set"}</Typography>
-                                                </div>
-                                                <div>
-                                                    <Typography variant={"title"} className={classes.gameText}>Game Description:</Typography>
-                                                    <Typography variant={"subtitle1"} className={classes.gameText}>{game.description || "No Description Set"}</Typography>
-                                                </div>
-                                                <div>
-                                                    <Typography variant={"title"} className={classes.gameText}>Game Start Time:</Typography>
-                                                    <Typography
-                                                        variant={"subtitle1"} className={classes.gameText}>{game.startTime ? new Date(game.startTime).toDateString() : "No Start Set"}</Typography>
-                                                </div>
-                                                <div>
-                                                    <Typography variant={"title"} className={classes.gameText}>Game Image:</Typography>
-                                                    {game.image ? (
-                                                        <img src={game.image}/>
-                                                    ) : (
-                                                        <Typography variant={"subtitle1"} className={classes.gameText}>No Image Set</Typography>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </Grid>
-                                    </Grid>
+                                    <div>
+                                        <div>
+                                            <List component="nav">
+                                                {this.basicInfo.map(inf => (
+                                                    <ListItem key={inf.variable}>
+                                                        <ListItemText
+                                                            primary={inf.name}
+                                                            secondary={game[inf.variable] || `No ${inf.name} set`}
+                                                        />
+                                                    </ListItem>
+                                                ))}
+                                            </List>
+                                        </div>
+
+                                        <QuestionListPanel
+                                            showDetails
+                                            styles={{maxHeight: 800}}
+                                            questions={game.questions}
+                                            title={"Game Questions"}
+                                            emptyMessage={"No questions for this game."}
+                                        />
+
+                                    {/*<Grid container>*/}
+                                    {/*    <Grid md={7} item>*/}
+                                    {/*        <QuestionListPanel*/}
+                                    {/*            showDetails*/}
+                                    {/*            styles={{maxHeight: 800}}*/}
+                                    {/*            questions={game.questions}*/}
+                                    {/*            title={"Game Questions"}*/}
+                                    {/*            emptyMessage={"No questions for this game."}*/}
+                                    {/*        />*/}
+                                    {/*        /!*<Paper elevation={2} style={{padding: 8}}>*!/*/}
+                                    {/*        /!*    <List>*!/*/}
+                                    {/*        /!*        {game.questions && game.questions.map((question, idx) => question && (*!/*/}
+                                    {/*        /!*            <ListItem  key={question._id}>*!/*/}
+                                    {/*        /!*                <ListItemAvatar>*!/*/}
+                                    {/*        /!*                    <Avatar>{idx+1}</Avatar>*!/*/}
+                                    {/*        /!*                </ListItemAvatar>*!/*/}
+                                    {/*        /!*                <ListItemText*!/*/}
+                                    {/*        /!*                    primary={question.question}*!/*/}
+                                    {/*        /!*                    secondary={question.answer}*!/*/}
+                                    {/*        /!*                />*!/*/}
+                                    {/*        /!*            </ListItem>*!/*/}
+                                    {/*        /!*        ))}*!/*/}
+                                    {/*        /!*    </List>*!/*/}
+                                    {/*        /!*</Paper>*!/*/}
+                                    {/*    </Grid>*/}
+                                    {/*    <Grid md={5} item>*/}
+                                    {/*        <div className={classes.gameBasic}>*/}
+                                    {/*            <div>*/}
+                                    {/*                <Typography variant={"title"} className={classes.gameText}>Game Name:</Typography>*/}
+                                    {/*                <Typography variant={"subtitle1"} className={classes.gameText}>{game.name || "No Name Set"}</Typography>*/}
+                                    {/*            </div>*/}
+                                    {/*            <div>*/}
+                                    {/*                <Typography variant={"title"} className={classes.gameText}>Game Token:</Typography>*/}
+                                    {/*                <Typography variant={"subtitle1"} className={classes.gameText}>{game.token|| "No Token Set"}</Typography>*/}
+                                    {/*            </div>*/}
+                                    {/*            <div>*/}
+                                    {/*                <Typography variant={"title"} className={classes.gameText}>Game Description:</Typography>*/}
+                                    {/*                <Typography variant={"subtitle1"} className={classes.gameText}>{game.description || "No Description Set"}</Typography>*/}
+                                    {/*            </div>*/}
+                                    {/*            <div>*/}
+                                    {/*                <Typography variant={"title"} className={classes.gameText}>Game Start Time:</Typography>*/}
+                                    {/*                <Typography*/}
+                                    {/*                    variant={"subtitle1"} className={classes.gameText}>{game.startTime ? new Date(game.startTime).toDateString() : "No Start Set"}</Typography>*/}
+                                    {/*            </div>*/}
+                                    {/*            <div>*/}
+                                    {/*                <Typography variant={"title"} className={classes.gameText}>Game Image:</Typography>*/}
+                                    {/*                {game.image ? (*/}
+                                    {/*                    <img src={game.image}/>*/}
+                                    {/*                ) : (*/}
+                                    {/*                    <Typography variant={"subtitle1"} className={classes.gameText}>No Image Set</Typography>*/}
+                                    {/*                )}*/}
+                                    {/*            </div>*/}
+                                    {/*        </div>*/}
+                                    {/*    </Grid>*/}
+                                    {/*</Grid>*/}
+                                    </div>
                                 )}
                                 
                             </CardContent>
@@ -176,7 +221,7 @@ class ListComponent extends React.Component<ListComponentProps, ListComponentSta
     }
 }
 
-interface ListComponentProps {
+interface ListComponentProps extends RouterProps, RouteProps {
     state?: ListComponentState;
     classes?: any;
     theme: Theme;
@@ -192,5 +237,6 @@ interface ListComponentState {
     game?: GameObject;
 }
 
+const me = withRouter(ListComponent);
 // @ts-ignore
-export default withStyles(styles, {withTheme: true})(withContainer(ListComponent, [QuestionContainer, UserContainer, GamesContainer]))
+export default withStyles(styles, {withTheme: true})(withContainer(me, [QuestionContainer, UserContainer, GamesContainer]))

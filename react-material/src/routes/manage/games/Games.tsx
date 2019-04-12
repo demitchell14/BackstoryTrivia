@@ -10,6 +10,7 @@ import {match as MatchProps, RouteProps, RouterProps, withRouter} from "react-ro
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import List from "./list";
+import GameComponent from "./game";
 // const FAIcon = React.lazy(() => import("../../../FontAwesome"));
 // import {CSSTransition, TransitionGroup,} from "react-transition-group";
 
@@ -90,6 +91,12 @@ class Games extends React.Component<GamesProps, GamesState> {
             icon: ["fas", "plus-circle"],
             props: {},
             path: "/manage/games/builder"
+        },
+        {
+            name: "Game",
+            component: GameComponent,
+            props: {},
+            fallback: true,
         }
     ] as any;
 
@@ -111,18 +118,19 @@ class Games extends React.Component<GamesProps, GamesState> {
         // ]
         const {classes, match} = this.props;
 
-        const target = this.tabs.find(t => t.path === match.url);
+        const target = this.tabs.find(t => t.path === match.url || t.fallback);
         return (
             <main className={classes.content}>
                 <div className={classes.toolbar}/>
-                <Navigator style={{marginBottom: 0}}
-                           classes={classes}
-                           active={target.name}
-                           tabs={this.tabs.map(tab => ({
+                <Navigator
+                    style={{marginBottom: 0}}
+                    classes={classes}
+                    active={target.name}
+                    tabs={this.tabs.filter(t => t.fallback === undefined).map(tab => ({
                         label: tab.name,
                         icon: <FontAwesomeIcon fixedWidth className={classes.navIcon} icon={tab.icon}/>
                     }))}
-                           onChange={this.handleTabChange}
+                    onChange={this.handleTabChange}
                 />
                 <div style={{width: "100%", position: "relative"}}>
                     {target && React.createElement(target.component, {
@@ -155,13 +163,15 @@ class Games extends React.Component<GamesProps, GamesState> {
 
 const Navigator = props => {
     const {classes, tabs, active, onChange, style} = props;
+    console.log(tabs)
     if (window.innerWidth > 425) {
         return (
             <Paper elevation={1} className={classes.tabOffset}>
                 <Tabs value={active} variant={"fullWidth"} onChange={onChange}
                       classes={{scrollable: classes.scroller}} style={style}>
-                    {tabs ? tabs.map((tab, id) => <Tab key={id} value={tab.label} label={tab.label}
-                                                       icon={tab.icon}/>) : undefined}
+                    {tabs ? tabs.map((tab, id) =>
+                        <Tab key={id} value={tab.label} label={tab.label} icon={tab.icon}/>)
+                        : undefined}
                 </Tabs>
             </Paper>
         )
