@@ -11,7 +11,7 @@
     "dev": "concurrently -n TS,Server -c cyan,green \"npm:watch-ts\" \"npm:run-server\" ",
     "run-server": "nodemon --inspect --watch dist",
     "watch-ts": "tsc --watch",
-    "build-ts": "tsc -b",
+    "build-ts": "rmdir /s /Q lib & tsc -b tsconfig.prod.json",
     "e2e": "repo-tools test deploy",
     "test": "repo-tools test app",
     "cover": "nyc --cache npm test; nyc report --reporter=html",

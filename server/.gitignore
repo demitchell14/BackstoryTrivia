@@ -97,5 +97,4 @@ typings/
 # Serverless directories
 .serverless
 
-key.json.enc
-/trivia/
+lib
