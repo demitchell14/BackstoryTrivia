@@ -7,7 +7,7 @@ import * as mongoose  from "mongoose";
 
 const url = () => {
     const {baseurl, password, username, db} = MongoDetails
-    return `mongodb://${username}:${password}@${baseurl}/${db}`
+    return `mongodb+srv://${username}:${password}@${baseurl}/${db}`
 }
 
 export function Mongoose(props?:MongooseProps) {
