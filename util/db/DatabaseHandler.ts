@@ -117,7 +117,7 @@ export interface TeamObject {
     hashedPassword: string;
     hashedPin: string;
     savedUIDs: Array<string>;
-    activeKey?: string;
+    activeKey?: ObjectID;
 
     image?: string;
     players?: Array<string>;
@@ -126,8 +126,9 @@ export interface TeamObject {
 }
 
 export interface GameObject {
-    _id?: any;
-    name?: string;
+    _id: any;
+    _creator?: ObjectID;
+    name: string;
     token: string;
 
     started?: boolean;
@@ -164,7 +165,7 @@ export interface SessionObject {
 }
 
 export interface QuestionObject {
-    _id:ObjectID;
+    _id?:ObjectID;
     _creator:ObjectID;
     question: string;
     questionDetails?: string;
@@ -188,5 +189,5 @@ export interface GameParams {
 
 const url = () => {
     const {baseurl, password, username, db} = MongoDetails
-    return `mongodb://${username}:${password}@${baseurl}/${db}`
+    return `mongodb+srv://${username}:${password}@${baseurl}/${db}`
 }
