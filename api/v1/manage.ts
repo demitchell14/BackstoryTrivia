@@ -114,7 +114,7 @@ const insertGame = async function(token:string) {
     const db = new Database();
     await db.openCollection("games");
     const game = new Game({token: token, name: "Please name me!"});
-    let insertion = await db.insert(game);
+    let insertion = await db.insert((game as any));
     const res = insertion.insertedCount === 1;
     db.close();
     return res;
