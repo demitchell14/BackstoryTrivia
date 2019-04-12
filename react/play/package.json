@@ -1,8 +1,21 @@
 {
-  "name": "react-play",
-  "version": "0.2.2",
+  "name": "itrivia-play",
+  "author": "Devin Mitchell",
+  "license": "ISC",
+  "version": "0.3.0",
   "private": true,
+  "description": "This portion of iTrivia handles the Live/Public side of the app. It is what most users will end up seeing if they play the game.",
   "proxy": "http://localhost:8080/",
+  "scripts": {
+    "start": "react-scripts-ts start",
+    "start:local": "node ./scripts/start",
+    "build": "react-scripts-ts build",
+    "build:local": "node ./scripts/build",
+    "watch:scss": "sass --watch src:src",
+    "test": "react-scripts-ts test --env=jsdom",
+    "eject": "react-scripts-ts eject",
+    "postbuild": "react-snap"
+  },
   "dependencies": {
     "@fortawesome/fontawesome-pro": "^5.5.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.8",
@@ -10,7 +23,6 @@
     "@fortawesome/pro-regular-svg-icons": "^5.6.1",
     "@fortawesome/pro-solid-svg-icons": "^5.6.1",
     "@fortawesome/react-fontawesome": "^0.1.3",
-    "@types/workbox-sw": "^3.2.1",
     "@zxing/library": "^0.12.3",
     "bootstrap": "^4.1.3",
     "color": "^3.1.0",
@@ -28,18 +40,6 @@
     "unstated": "^2.1.1",
     "workbox-sw": "^4.1.1"
   },
-  "scripts": {
-    "start": "react-scripts-ts start",
-    "start:local": "node ./scripts/start",
-    "build": "react-scripts-ts build",
-    "build:local": "node ./scripts/build",
-    "watch:scss": "sass --watch src:src",
-    "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject",
-    "postbuild": "react-snap",
-    "tm2p": "ts-node ./src/util/index.ts",
-    "tmp": "nodemon --watch ./src/**/*.ts --ignore ./src/**/*.spec.ts --exec ts-node ./src/util/index.ts"
-  },
   "devDependencies": {
     "@types/bootstrap": "^4.1.3",
     "@types/color": "^3.0.0",
@@ -51,6 +51,7 @@
     "@types/react-router-dom": "^4.3.1",
     "@types/socket.io-client": "^1.4.32",
     "@types/universal-analytics": "^0.4.2",
+    "@types/workbox-sw": "^3.2.1",
     "concurrently": "^4.1.0",
     "sass-loader": "^7.1.0",
     "ts-node": "^8.0.3",
