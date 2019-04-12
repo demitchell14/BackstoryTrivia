@@ -3,13 +3,13 @@ import * as React from "react";
 export * from "./container/Container"
 
 export * from "./card/Card"
-export * from "./card/CardTitle"
-export * from "./card/CardBody"
+// export * from "./card/CardTitle"
+// export * from "./card/CardBody"
 
 export * from "./navigation/NavigationPanel"
 export * from "./navigation/NavigationTitle"
 export * from "./navigation/NavigationItems"
-export * from "./navigation/NavigationItem"
+// export * from "./navigation/NavigationItem"
 
 
 export * from "./splash/SplashOption";

@@ -5,7 +5,7 @@ import {Route, Switch, withRouter, RouteProps, RouterProps as IRouterProps} from
 import {Link} from "react-router-dom";
 import { Transition } from 'react-spring/renderprops'
 import {Subscribe} from "unstated";
-import {Container, NavigationItem, NavigationItems, NavigationPanel, NavigationTitle} from "./components";
+import {Container, NavigationItems, NavigationPanel, NavigationTitle} from "./components";
 
 import * as ReactGA from "react-ga";
 
@@ -22,7 +22,7 @@ class Router extends React.Component<RouterProps, RouterState> {
         super(props);
         this.state = {
             backgroundClass: "bg-core",
-            ready: false,
+            ready: true,
             navLink: (props:RouterProps, socket:SocketContainer) => {
                 if (props.location && props.location.pathname) {
                     const str = props.location.pathname;
@@ -47,10 +47,6 @@ class Router extends React.Component<RouterProps, RouterState> {
 
             this.applyBackground(this.props.location.pathname);
         }
-
-        import("./FontAwesome")
-            .then(fa => fa.init())
-            .then(() => this.setState({ready:true}));
     }
 
     componentWillReceiveProps(nextProps: Readonly<RouterProps>, nextContext: any): void {
@@ -146,10 +142,6 @@ class Router extends React.Component<RouterProps, RouterState> {
                             }}>Backstory Trivia</NavigationTitle>
                             {/*<NavigationSubtitle>Another String Possible?</NavigationSubtitle>*/}
                             <NavigationItems>
-                                <NavigationItem />
-                                <NavigationItem />
-                                <NavigationItem />
-                                <NavigationItem />
                                 <div onClick={this.toggleDark} className={"nav-item"}>{this.state.theme === "dark" ? "Light Mode" : "Dark Mode"}</div>
                                 <div onClick={this.handleLeave(socket, storage)} className={"nav-item"}>Leave Game Session</div>
                                 <div onClick={this.handleSignout(socket, storage)} className={"nav-item"}>Sign Out</div>

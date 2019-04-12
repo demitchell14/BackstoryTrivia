@@ -230,7 +230,11 @@ export class SocketContainer extends Container<SocketState> {
 
                 const fn = (props:SocketResponses.Authenticated) => {
                     clearTimeout(timeout);
-                    this.authenticated(props);
+                    const success = this.authenticated(props);
+
+                    if (!success) {
+                        resolve(false);
+                    }
 
                     this.socket.once("room joined", (room:any) => {
                         this.roomJoined(room)
@@ -260,11 +264,13 @@ export class SocketContainer extends Container<SocketState> {
                 status: "authenticated",
                 activeKey: props.key ? props.key : undefined
             });
+            return true
         } else {
             this.setState({
                 status: "unauthenticated",
                 activeKey: props.message ? props.message : undefined
             });
+            return false
         }
     }
 

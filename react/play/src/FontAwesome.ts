@@ -3,13 +3,13 @@ import {findIconDefinition, library} from "@fortawesome/fontawesome-svg-core";
 
 import {faLock} from "@fortawesome/pro-solid-svg-icons";
 import {faTimes, faPlay, faInfo, faUsers, faHistory} from "@fortawesome/pro-regular-svg-icons";
-import {faBars} from "@fortawesome/pro-light-svg-icons";
+import {faBars, faSpinner} from "@fortawesome/pro-light-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 
-export async function init() {
+export default function() {
     //console.debug("FontAwesome Init");
-    library.add(faBars, faTimes, faLock, faPlay, faInfo, faUsers, faHistory);
+    library.add(faBars, faTimes, faLock, faPlay, faInfo, faUsers, faHistory, faSpinner);
     //library.add(faSave, faCopy, faRedo, faListAlt);
 
     //library.add(faEdit, faTrash);
@@ -32,5 +32,3 @@ export function FAIcon (props:any) {
     }
     return React.createElement("span");
 }
-
-export default FAIcon;

@@ -261,10 +261,19 @@ export class Play extends React.Component<PlayProps, PlayState> {
             storage.clearGameID();
     }
 
-    handleSnackbar = (evt?:SyntheticEvent):any => {
+    handleSnackbar = (reset?:SyntheticEvent|boolean, resetPlayer?:boolean):any => {
         if (this.state.showError)
             clearTimeout(this.state.showError);
         this.setState({showError: false, error: undefined});
+
+        if (typeof reset === "boolean") {
+            if (reset) {
+                this.reset();
+            }
+        }
+        if (resetPlayer) {
+            this.props.containers.player.reset();
+        }
     }
 
     onGameChange = (evt:SyntheticEvent) => {
@@ -350,6 +359,19 @@ export class Play extends React.Component<PlayProps, PlayState> {
                             storage.setTeamKey(socket.state.activeKey || "");
                             this.setState({proceed: true, loading: false});
                             this.props.history.replace("/" + socket.state.room);
+                        } else {
+                            this.setState({
+                                loading: false,
+                                showError: setTimeout(() => {
+                                    if (socket.state.activeKey === "Team not found") {
+                                        this.reset();
+                                        this.props.history.push("/");
+                                        return;
+                                    }
+                                    this.handleSnackbar(true);
+                                }, 5000),
+                                error: socket.state.activeKey
+                            })
                         }
                     });
             }
