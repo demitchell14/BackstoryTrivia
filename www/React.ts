@@ -1,26 +1,20 @@
-import * as express from "express";
-import * as _ from "lodash";
 import * as path from "path";
-import app from "../app";
+import * as express from "express";
+import {Request, Response} from "express";
 
 const router = express.Router();
 
+router.get(/^((?!\/(api|static|images)|.*\.(js|css|ico|json)).*)$/, async function(req:Request , res:Response, next) {
 
-//@ts-ignore
-router.get(/^((?!\/api|\/static|\/images|\/*\.(json|ico|js)).*)$/, async function(req , res, next) {
-
-    console.log(req)
     if (process.env.PUBLIC_DIR && process.env.PLAY_DIR) {
-        if (req.headers.host.match(/^play\./)) {
-            res.sendFile(path.join(process.cwd(), `./${process.env.PLAY_DIR}/build/index.html`));
-        } else {
+        if (req.headers.host.match(/^admin\./)) {
             res.sendFile(path.join(process.cwd(), `./${process.env.PUBLIC_DIR}/build/index.html`));
+        } else {
+            res.sendFile(path.join(process.cwd(), `./${process.env.PLAY_DIR}/build/index.html`));
         }
     } else {
-        res.send("OK");
+        res.status(500).send("Use the React Development URL!");
     }
 });
-
-
 
 export default router;
