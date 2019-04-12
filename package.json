@@ -1,0 +1,91 @@
+{
+  "name": "itrivia",
+  "version": "1.0.0",
+  "description": "[Trivia Manager Repository](https://github.com/demitchell14/TriviaGameHandler)",
+  "scripts": {
+    "build:start": "npm start --prefix build",
+    "build:install": "npm install --prefix build",
+    "build:prepare": "ts-node build-tools/prepare",
+
+    "e2e": "cd build & repo-tools test deploy",
+    "test": "cd build & repo-tools test app",
+    "cover": "cd build & nyc --cache npm test; nyc report --reporter=html",
+    "deploy": "cd build & gcloud app deploy -q",
+    "deploy-no-promote": "cd build & gcloud app deploy --no-promote -q"
+  },
+  "cloud-repo-tools": {
+    "requiresKeyFile": true,
+    "requiresProjectId": true,
+    "test": {
+      "app": {
+        "args": [
+          "server/lib/www/server.js"
+        ],
+        "msg": "Hello, world!!!"
+      }
+    }
+  },
+  "build": {
+    "directories": {
+      "server": {
+        "path": "./server",
+        "exclude": [
+          "src",
+          "node_modules",
+          "/tsconfig/"
+        ]
+      },
+      "admin": {
+        "path": "./react/admin",
+        "exclude": [
+          "src",
+          "node_modules",
+          "/tsconfig/",
+          "/tslint/",
+          "/sass/",
+          "public"
+        ]
+      },
+      "play": {
+        "path": "./react/play",
+        "exclude": [
+          "src",
+          "node_modules",
+          "/tsconfig/",
+          "/tslint/",
+          "/sass/",
+          "public"
+        ]
+      }
+    },
+    "include": [
+      "app.yaml",
+      "key.json.enc",
+      ".gcloudignore",
+      ".env"
+    ],
+    "packageJson": "package.build.json",
+    "output": "build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/demitchell14/BackstoryTrivia.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/demitchell14/BackstoryTrivia/issues"
+  },
+  "homepage": "https://github.com/demitchell14/BackstoryTrivia#readme",
+  "dependencies": {
+    "@types/ncp": "^2.0.1",
+    "@types/node": "^11.13.4",
+    "@types/rimraf": "^2.0.2",
+    "ncp": "^2.0.0",
+    "nodemon": "^1.18.11",
+    "rimraf": "^2.6.3",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.4.3"
+  }
+}

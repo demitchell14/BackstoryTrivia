@@ -5,14 +5,9 @@
   "version": "0.3.0",
   "private": true,
   "description": "Websocket enabled trivia games",
-  "main": "./lib/www/server.js",
+  "main": "./server/lib/www/server.js",
   "scripts": {
-    "start:production": "set NODE_ENV=production & node ./lib/www/server.js",
-    "start": "set NODE_ENV=production & node --inspect ./lib/www/server.js",
-    "dev": "concurrently -n TS,Server -c cyan,green \"npm:watch-ts\" \"npm:run-server\" ",
-    "run-server": "nodemon --inspect --watch dist",
-    "watch-ts": "tsc --watch",
-    "build-ts": "rmdir /s /Q lib & tsc -b tsconfig.prod.json"
+    "start": "set NODE_ENV=production & node ./server/lib/www/server.js"
   },
   "browserslist": [
     "last 4 version"

@@ -8,9 +8,9 @@ router.get(/^((?!\/(api|static|images)|.*\.(js|css|ico|json)).*)$/, async functi
 
     if (process.env.PUBLIC_DIR && process.env.PLAY_DIR) {
         if (req.headers.host.match(/^admin\./)) {
-            res.sendFile(path.join(process.cwd(), `./${process.env.PUBLIC_DIR}/build/index.html`));
+            res.sendFile(path.join(process.cwd(), `../${process.env.PUBLIC_DIR}/build/index.html`));
         } else {
-            res.sendFile(path.join(process.cwd(), `./${process.env.PLAY_DIR}/build/index.html`));
+            res.sendFile(path.join(process.cwd(), `../${process.env.PLAY_DIR}/build/index.html`));
         }
     } else {
         res.status(500).send("Use the React Development URL!");
