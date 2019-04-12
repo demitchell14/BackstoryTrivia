@@ -4,7 +4,8 @@ config();
 import * as _debug from "debug";
 const debug = _debug("*");
 
-import * as http from "http";
+import * as fs from "fs";
+import * as https from "https";
 import app from "../app";
 
 /**
@@ -18,7 +19,11 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-const server = http.createServer(app);
+const server = https.createServer({
+    cert: fs.readFileSync("./server.cert", {encoding: "UTF-8"}),
+    key: fs.readFileSync("./server.key", {encoding: "UTF-8"}),
+}, app);
+
 
 /**
  * Listen on provided port, on all network interfaces.
