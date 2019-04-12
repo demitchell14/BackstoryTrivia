@@ -33,6 +33,32 @@ class GamesContainer extends Container<GamesState> {
         }
         return false;
     }
+    
+    async getGame(id: string) {
+        if (this.user) {
+            const req = await fetch(`/api/v2/games/${id}`, {
+                headers: {
+                    "Authorization": `Bearer ${await this.user.token()}`
+                }
+            });
+            
+            if (req.status === 200) {
+                const response = await req.json() as any;
+                if (response.game) {
+                    const game = response.game;
+                    const list = this.state.games.slice();
+                    const exists = list.findIndex(ga => ga._id === game._id);
+                    if (exists >= 0) {
+                        list.splice(exists, 1, game);
+                    } else {
+                        list.push(game);
+                    }
+                    this.setState({games: list});
+                }
+            }
+        }
+        return false;
+    }
 
     d() {
         if (this.user) {
