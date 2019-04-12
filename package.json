@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "[Trivia Manager Repository](https://github.com/demitchell14/TriviaGameHandler)",
   "scripts": {
-    "build:start": "npm start --prefix build",
-    "build:install": "npm install --prefix build",
+    "build:start": "cd build & npm start",
+    "build:install": "cd build & npm install",
     "build:prepare": "ts-node build-tools/prepare",
 
     "e2e": "cd build & repo-tools test deploy",
