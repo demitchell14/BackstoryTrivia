@@ -4,7 +4,7 @@ import {Database, TeamObject} from "./db/DatabaseHandler";
 import {ObjectID} from "bson";
 import {EventEmitter} from "events";
 import {getUser, generateGameState, shuffle} from "../api/v2";
-import {Question, Game, Team} from "../notrivia";
+import {Question, Game, Team} from "notrivia";
 import GameInstanceManager from "./GameInstanceManager";
 import * as rand from "seedrandom";
 

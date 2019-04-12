@@ -1,4 +1,4 @@
-import {Game, QuestionOptions} from "../notrivia";
+import {Game, QuestionOptions} from "notrivia";
 import {v4} from "uuid";
 import {AuthorizedRequest} from "../util/jwt";
 import {Middleware} from "./Mongo";

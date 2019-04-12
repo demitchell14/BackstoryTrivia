@@ -2,7 +2,7 @@ import * as uuidv1 from "uuid/v1";
 import * as express from "express";
 import * as _ from "lodash";
 import {getAllGames, loadGame, MiddlewareReq, saveGame} from "../../www/trivia";
-import {Game, GameProps} from "../../notrivia";
+import {Game, GameProps} from "notrivia";
 //import Game, {GameOptions} from "../../trivia/game/Game";
 //import Question from "../../trivia/game/Question";
 import SocketHandler from "../../www/SocketHandler";

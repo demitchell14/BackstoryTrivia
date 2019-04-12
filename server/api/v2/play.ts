@@ -11,7 +11,7 @@ import {Mongoose, Document, Types} from "mongoose";
 import {Moderators} from "../../middleware/models/UserSchema";
 import GameInstanceManager from "../../util/GameInstanceManager";
 import SocketHandler from "../../util/SocketHandler.new";
-import {Answer, Game} from "../../notrivia";
+import {Answer, Game} from "notrivia";
 
 const router = express.Router();
 

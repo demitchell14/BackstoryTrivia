@@ -12,7 +12,7 @@ import {Database, GameObject, TeamObject, UserObject} from "../../util/db/Databa
 import {AuthorizedToken} from "../../util/jwt";
 import {ObjectID} from "bson";
 import {Cursor, UpdateQuery} from "mongodb";
-import {Game} from "../../notrivia";
+import {Game} from "notrivia";
 import * as rand from "seedrandom";
 //import {A} from "./UserSchema.mongoose";
 const router = express.Router();

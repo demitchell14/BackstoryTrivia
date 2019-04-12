@@ -64,7 +64,8 @@
     "socket.io": "^2.1.1",
     "typescript": "^3.1.6",
     "seedrandom": "^3.0.1",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "notrivia": "git://github.com/demitchell14/TriviaGameHandler.git#restructure"
   },
   "devDependencies": {
     "@babel/core": "^7.1.5",

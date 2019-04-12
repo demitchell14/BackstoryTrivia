@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 import {Request, Response} from "express"
-import {Game, GameProps} from "../notrivia"
+import {Game, GameProps} from "notrivia"
 import {Socket} from "socket.io";
 import SocketHandler, {SocketHandler as SocketClass} from "./SocketHandler";
 import * as fs from "fs";

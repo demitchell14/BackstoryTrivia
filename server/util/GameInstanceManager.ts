@@ -1,4 +1,4 @@
-import {Game, QuestionOptions} from "../notrivia";
+import {Game, QuestionOptions} from "notrivia";
 import {Database, GameObject} from "./db/DatabaseHandler";
 import {ObjectID} from "bson";
 import {getGame} from "../api/v2";
