@@ -182,7 +182,11 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
                                                 </div>
                                             )}
                                             <ListItemAvatar style={{alignSelf:"center"}}>
-                                                <Avatar>{question.points || question.timeLimit || ""}</Avatar>
+                                                <Tooltip placement={"left"}
+                                                    title={question.points ? question.points + " Points" : question.timeLimit + " Seconds"}
+                                                >
+                                                    <Avatar>{question.points || question.timeLimit || ""}</Avatar>
+                                                </Tooltip>
                                             </ListItemAvatar>
                                             <ListItemText style={{alignSelf:"center"}}
                                                 primary={(
