@@ -1,11 +1,13 @@
 {
   "name": "backstorytrivia-server",
-  "version": "0.2.2",
+  "author": "Devin Mitchell",
+  "license": "ISC",
+  "version": "0.3.0",
   "private": true,
   "description": "Websocket enabled trivia games",
-  "main": "./dist/www/server.js",
+  "main": "./lib/www/server.js",
   "scripts": {
-    "start": "set NODE_ENV=production & node --inspect ./dist/www/server.js",
+    "start": "set NODE_ENV=production & node --inspect ./lib/www/server.js",
     "dev": "concurrently -n TS,Server -c cyan,green \"npm:watch-ts\" \"npm:run-server\" ",
     "run-server": "nodemon --inspect --watch dist",
     "watch-ts": "tsc --watch",
@@ -25,7 +27,7 @@
     "test": {
       "app": {
         "args": [
-          "www/server.js"
+          "lib/www/server.js"
         ],
         "msg": "Hello, world!!!"
       }
@@ -41,12 +43,7 @@
       "it"
     ]
   },
-  "author": "Devin Mitchell",
-  "license": "ISC",
   "dependencies": {
-    "@types/debug": "0.0.31",
-    "@types/socket.io": "^2.1.2",
-    "@types/webpack": "^4.4.24",
     "axios": "^0.18.0",
     "bcrypt": "^3.0.2",
     "compression": "^1.7.3",
@@ -72,6 +69,9 @@
   "devDependencies": {
     "@babel/core": "^7.1.5",
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
+    "@types/debug": "0.0.31",
+    "@types/socket.io": "^2.1.2",
+    "@types/webpack": "^4.4.24",
     "@types/axios": "^0.14.0",
     "@types/bcrypt": "^3.0.0",
     "@types/bootstrap": "^4.1.2",

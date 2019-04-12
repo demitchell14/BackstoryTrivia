@@ -21,10 +21,10 @@ export const MongoDetails = {
 };
 
 export const MongooseDetails = {
-    baseurl: "",
-    username: "",
-    password: "",
-    db: "",
+    baseurl: process.env.MONGO_URL,
+    username: process.env.MONGO_USER,
+    password: process.env.MONGO_PASS,
+    db: process.env.MONGO_DB,
 }
 
 export const JWT_SECRET = "";

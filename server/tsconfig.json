@@ -6,10 +6,10 @@
     "allowJs": false,
     "sourceMap": true,
     "declaration": true,
-    "outDir": "dist",
+    "outDir": "lib",
     "moduleResolution": "node"
   },
   "include": [
-    "bin", "routes", "app.ts", "config.ts", "www", "middleware", "api", "Functions"
+    "bin", "routes", "app.ts", "config.ts", "www", "middleware", "api", "util"
   ]
 }
