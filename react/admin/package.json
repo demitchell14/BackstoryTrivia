@@ -1,15 +1,15 @@
 {
-  "name": "react-material",
-  "version": "0.2.2",
-  "description": "",
-  "main": "index.js",
-  "author": "",
+  "name": "itrivia-admin",
+  "author": "Devin Mitchell",
   "license": "ISC",
+  "version": "0.3.0",
+  "private": true,
+  "description": "This portion of iTrivia handles the Admin side of the app. It is what the administrators and game creators will use primarily",
   "proxy": "http://localhost:8080/",
   "scripts": {
     "start": "react-scripts-ts start",
     "build": "react-scripts-ts build",
-    "build:local": "node ./scripts/build",
+    "build:local": "node scripts/build",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
     "scss": "sass --watch src:src"

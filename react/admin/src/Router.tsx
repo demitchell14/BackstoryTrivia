@@ -15,7 +15,7 @@ const Questions = React.lazy(() => import("./routes/manage/questions/Questions")
 const Games = React.lazy(() => import("./routes/manage/games/Games"));
 
 class Router extends React.Component<RouterProps, RouterState> {
-    public constructor(props) {
+    public constructor(props:any) {
         super(props);
         this.state = {} as RouterState
     }
