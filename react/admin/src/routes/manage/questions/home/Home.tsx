@@ -33,7 +33,7 @@ class Home extends React.Component<MainProps, MainState> {
         const {classes} = this.props;
         return (
             <div>
-                <ExpansionPanel elevation={4}>
+                <ExpansionPanel defaultExpanded>
                     <ExpansionPanelSummary disableRipple={false}>
                         <Typography variant={"h6"}>Creating/Changing Questions</Typography>
                     </ExpansionPanelSummary>
@@ -79,7 +79,7 @@ class Home extends React.Component<MainProps, MainState> {
                         </Grid>
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
-                <ExpansionPanel defaultExpanded>
+                <ExpansionPanel>
                     <ExpansionPanelSummary disableRipple={false}>
                         <Typography variant={"h6"}>Create / Manage Lists</Typography>
                     </ExpansionPanelSummary>
