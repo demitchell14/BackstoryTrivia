@@ -20,7 +20,13 @@ import withContainer from "../../../containers/withContainer";
 import {Api, Question} from "../../../containers";
 
 import QuestionListPanel from "./QuestionListPanel";
+
 import Builder from "./build/Builder";
+import Importer from "./import/Importer";
+
+// const Builder = React.lazy(() => import ("./build/Builder"));
+// const Importer = React.lazy(() => import ("./import/Importer"));
+
 import Home from "./home/Home";
 
 // @ts-ignore
@@ -83,10 +89,6 @@ const styles = theme => ({
 
 class Questions extends React.Component<QuestionsProps, QuestionsState> {
     private questionSubscription:any;
-    public tabs2 = [
-        Home,
-        Builder
-    ];
 
     public tabs = (self:this) => [
         {
@@ -107,8 +109,15 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
                 selectedId: self.state.selectedTarget ? self.state.selectedTarget : undefined
                 // data: this.state.builder.data,
             }
+        },
+        {
+            component: Importer,
+            label: "Import",
+            path: "/manage/questions/import",
+            props: {}
         }
     ]
+
     public constructor(props) {
         super(props);
         this.state = {
@@ -120,7 +129,6 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
             deleteModalActive: false,
         } as QuestionsState
     }
-
     
     public componentWillMount(): void {
         //console.log(this.props.containers)

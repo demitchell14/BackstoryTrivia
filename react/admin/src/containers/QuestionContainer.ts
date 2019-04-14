@@ -115,6 +115,26 @@ class QuestionContainer extends Container<QuestionState> {
         }
     };
 
+    public import = async (token: string|undefined, form:any) => {
+        const data = new FormData();
+        data.append("listName", form.listName || "")
+        data.append("csv", form.csv);
+        const req = await fetch("/function/ImportQuestionsCSVTest", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "multipart/form-data"
+            },
+            body: data
+        });
+
+        if (req.status === 200) {
+            console.log(await req.json());
+        } else {
+            console.error(await req.text())
+        }
+    }
+
 
     public buildCategoryList = async (token: any) => {
         const response = await fetch("/api/v2/questions/categories", {
