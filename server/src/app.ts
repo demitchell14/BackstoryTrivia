@@ -7,9 +7,7 @@ import * as fs from "fs";
 import * as cookieParser from "cookie-parser";
 
 import {Middleware} from "./www/trivia";
-import {Server} from "http";
-
-import {log} from "./util/logger";
+import * as proxy from "http-proxy-middleware";
 
 // -- Routes
 import ApiV1 from "./api/v1/index";
@@ -41,8 +39,26 @@ app.enable('trust proxy');
 
 //log(path.join(process.cwd(), "./react/build"))
 // app.use();
+
+const filter = (pathname, req) =>
+    pathname.match('^/function/.*');
+
 if (process.env.NODE_ENV && process.env.NODE_ENV.trim() === "production") {
+    app.use(proxy(filter, {
+        target: process.env.GCS_LAMBDA,
+        changeOrigin: true,
+        pathRewrite: {
+            '^/function/(.*)': "/$1"
+        }
+    }));
     app.use('/', React);
+} else {
+    app.use(proxy(filter, {
+        target: "http://localhost:5000",
+        pathRewrite: {
+            '^/function/(.*)': "/$1"
+        }
+    }));
 }
 
 app.use('/api/v1', Middleware(), ApiV1);

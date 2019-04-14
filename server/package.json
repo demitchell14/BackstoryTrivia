@@ -10,7 +10,7 @@
     "start:production": "set NODE_ENV=production & node ./lib/www/server.js",
     "start": "set NODE_ENV=production & node --inspect ./lib/www/server.js",
     "dev": "concurrently -n TS,Server -c cyan,green \"npm:watch-ts\" \"npm:run-server\" ",
-    "run-server": "nodemon --inspect --watch dist",
+    "run-server": "nodemon --inspect --watch lib",
     "watch-ts": "tsc --watch",
     "build-ts": "rmdir /s /Q lib & tsc -b tsconfig.prod.json"
   },
@@ -54,15 +54,14 @@
   "devDependencies": {
     "@babel/core": "^7.1.5",
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
-    "@types/debug": "0.0.31",
-    "@types/socket.io": "^2.1.2",
-    "@types/webpack": "^4.4.24",
     "@types/axios": "^0.14.0",
     "@types/bcrypt": "^3.0.0",
     "@types/bootstrap": "^4.1.2",
     "@types/compression": "0.0.36",
+    "@types/debug": "0.0.31",
     "@types/express": "^4.16.0",
     "@types/express-graphql": "^0.6.2",
+    "@types/http-proxy-middleware": "^0.19.2",
     "@types/lodash": "^4.14.118",
     "@types/mongodb": "^3.1.14",
     "@types/mongoose": "^5.3.7",
@@ -70,7 +69,10 @@
     "@types/node": "^10.12.5",
     "@types/popper.js": "^1.11.0",
     "@types/seedrandom": "^2.4.28",
+    "@types/socket.io": "^2.1.2",
+    "@types/webpack": "^4.4.24",
     "concurrently": "^4.1.0",
+    "http-proxy-middleware": "^0.19.1",
     "webpack": "^4.29.0"
   },
   "engines": {
