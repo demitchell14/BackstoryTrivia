@@ -29,13 +29,20 @@ const __db = async ():Promise<MongoClient> => {
 }
 
 const insertCollection = async (db:Collection<any>, records:Question[], list?: string) => {
-    // TODO Setup lists
-    const x = await db.insertMany(records);
-    return x;
+    // const x = await db.insertMany(records);
+    return {
+        error: "Testing - Did not insert records.",
+        insertedCount: records.length,
+        insertedIds: [],
+        list
+    }
+    // return x;
 }
 
 export async function exec(req:Request, res, next) {
-    let file, listName = "";
+    let file;
+    let listName = "";
+
     if (req.files)
         file = req.files.csv as UploadedFile;
 
@@ -117,7 +124,7 @@ export async function exec(req:Request, res, next) {
 
         insertCollection(questionDB, collection, listName)
             .then((data) => {
-                delete data.ops
+
                 res.json({
                     ...data
                     // inserted: false,

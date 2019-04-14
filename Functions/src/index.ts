@@ -6,7 +6,7 @@ en.config();
 
 // import * as fileUpload from "express-fileupload";
 const app = express()
-const port = 8080;
+const port = process.env.PORT || 8080;
 
 app.use(parser.urlencoded({extended: true}));
 // express.
@@ -20,12 +20,14 @@ app.use(parser.raw({limit: "1mb", type: "*/*"}));
 import * as HelloWorld from "./HelloWorld";
 // import GetQuestions from "./GetQuestions";
 import * as ImportQuestionsCSV from "./ImportQuestions.csv";
+import * as ImportQuestionsCSVTest from "./ImportQuestions.csv.testing";
 import * as ExportQuestionsCSV from "./ExportQuestions.csv";
 
 const Functions = {
     HelloWorld,
     // GetQuestions,
     ImportQuestionsCSV,
+    ImportQuestionsCSVTest,
     ExportQuestionsCSV,
 }
 

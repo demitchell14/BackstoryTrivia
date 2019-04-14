@@ -5,19 +5,19 @@
   "description": "Websocket enabled trivia games",
   "main": "./lib/index.js",
   "scripts": {
-    "run-functions": "nodemon --inspect --watch",
+    "run-functions": "nodemon --watch",
     "watch-ts": "tsc --watch"
   },
   "author": "Devin Mitchell",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.4",
+    "body-parser": "^1.18.3",
+    "csv-parser": "^2.2.0",
     "dotenv": "^6.2.0",
+    "express": "^4.16.4",
     "jsonwebtoken": "latest",
     "lodash": "^4.17.11",
-    "mongodb": "^3.1.9",
-    "csv-parser": "^2.2.0",
-    "body-parser": "^1.18.3"
+    "mongodb": "^3.1.9"
   },
   "devDependencies": {
     "@babel/core": "^7.1.5",
