@@ -30,6 +30,8 @@ export async function getUser(db:Database, jwt:AuthorizedToken) {
 
     await db.openCollection(jwt.type + "s");
     const file = await db.find({_id: ObjectID.createFromHexString(jwt._id)})
+
+    console.log(file);
     if (await file.count() === 1) {
         const user = (await file.toArray())[0] as UserObject;
         delete user.passwordhash;

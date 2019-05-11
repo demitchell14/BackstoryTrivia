@@ -32,6 +32,7 @@ class GamesController {
         } else {
             res.json({games: []});
         }
+        // db.close()
     }
 
     find = async (req:RequestTypes.List, res:Response) => {
@@ -53,6 +54,7 @@ class GamesController {
         } else {
             res.sendStatus(404);
         }
+        // db.close()
     }
 
     add = async (req:RequestTypes.Add, res:Response) => {
@@ -87,10 +89,12 @@ class GamesController {
             if (userUpdated) {
                 res.sendStatus(201);
                 // res.json({msg: "DD", user, game: {...game, _id: done.insertedId} });
+                // db.close();
                 return;
             }
         }
         res.json(["Failed to insert game."])
+        // db.close();
     }
 }
 

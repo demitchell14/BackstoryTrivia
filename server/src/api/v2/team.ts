@@ -30,6 +30,7 @@ class TeamRouting {
             db.find({_id}, {$set: updateData})
                 .catch (err => console.error(err));
         }
+        // db.close()
     }
 
     index =(req:IndexRequest, res, next) => {
@@ -67,7 +68,7 @@ class TeamRouting {
             return;
         }
 
-        console.log(req.body)
+        // console.log(req.body)
 
 
         delete req.body.autologin;
@@ -89,10 +90,11 @@ class TeamRouting {
             if (complete.insertedCount > 0) {
                 const token = jwt.sign({ _id: complete.insertedId, type: "team", }, autologin ? "14d" : undefined);
                 res.json({token, email});
+                // db.close()
                 return;
             }
         }
-
+        // db.close()
         res.status(400).json({error: ["Email or Team Name is currently in use."]});
     }
 
@@ -129,6 +131,7 @@ class TeamRouting {
                 const token = jwt.sign({_id, type: "team", autologin: typeof authkey.autologin === "boolean" ? authkey.autologin : authkey }, autologin ? "14d" : undefined);
                 res.json({token, email: results.email});
                 this.updateUser(req, results);
+                // db.close()
                 return;
 
             }
@@ -143,9 +146,11 @@ class TeamRouting {
                             const token = jwt.sign({_id, type: "team", autologin}, autologin ? "14d" : undefined);
                             res.json({token, email});
                             this.updateUser(req, results);
+                            // db.close()
                             return;
                         } else {
                             res.status(401).json({error: ["You entered an invalid email or password"]});
+                            // db.close()
                             return;
                         }
                     }
@@ -157,9 +162,11 @@ class TeamRouting {
                             const token = jwt.sign({_id, type: "team", autologin}, autologin ? "14d" : undefined)
                             res.json({token, email});
                             this.updateUser(req, results);
+                            // db.close()
                             return;
                         } else {
                             res.status(401).json({error: ["You entered an invalid pin."]});
+                            // db.close()
                             return;
                         }
                     }
@@ -203,10 +210,12 @@ class TeamRouting {
                 } else {
                     res.sendStatus(401);
                 }
+                // db.close()
                 return;
             } else {
                 // -- Account doesn't exist in database. Cannot edit
                 res.sendStatus(500);
+                // db.close()
                 return;
             }
         }

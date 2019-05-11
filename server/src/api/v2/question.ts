@@ -37,6 +37,7 @@ class QuestionRoute implements QuestionRoute{
             await db.openCollection("questions");
             const response = await db.insert(insertable)
             res.status(201).json({questionObj, decoded, response});
+            // db.close()
             return;
         }
         res.status(500).json({error: "Missing important information"})
@@ -63,23 +64,19 @@ class QuestionRoute implements QuestionRoute{
                 delete response.filtered._id;
                 delete response.filtered._creator;
                 if (Object.keys(response.filtered).length > 0) {
-                    console.log(response.filtered);
-                    console.log(question);
+                    // console.log(response.filtered);
+                    // console.log(question);
                     const update = await qDoc.update({_id, _creator}, {$set: response.filtered});
 
-                    console.log(update);
+                    // console.log(update);
                 }
                 //console.log(response.filtered);
             }
-
-
-
-
-
             res.json(response);
         } else {
             res.status(404).json({error: "No question index sent"});
         }
+        // db.close()
     }
 
     delete = async (req:RequestTypes.Delete, res) => {
@@ -92,13 +89,14 @@ class QuestionRoute implements QuestionRoute{
             if (await exists.count() === 1) {
                 const deleted = await db.delete({_id, _creator});
                 res.json(deleted);
-                db.close();
+                // db.close()
             } else {
                 res.status(404).json({error: "Question does not exist"});
             }
         } else {
             res.status(404).json({error: "A target is required to delete"});
         }
+        // db.close()
     }
 
     list_mongoosetest = async (req:RequestTypes.List, res, next) => {
@@ -124,15 +122,30 @@ class QuestionRoute implements QuestionRoute{
     }
 
     list = async(req:RequestTypes.List, res, next) => {
+        const response = {filters: []} as any;
         const {db, decoded} = req;
         const requestQuery = req.query;
         const _creator = ObjectID.createFromHexString(decoded._id);
         await db.openCollection("questions");
-        const query = db.find({_creator});
-        const response = {} as any;
-        response.filters = [];
+        await db.index("question", "text")
+
+
+        const searchQuery = {_creator} as any
+        if (requestQuery.query) {
+            // const regex = new RegExp(`.*${requestQuery.query}.*`, "i");
+            searchQuery["$text"] = {$search: requestQuery.query}
+            // query.filter({ question: {$regex: regex}})
+            response.filters.push({filter: "question", value: requestQuery.query})
+        }
+
+        const query = db.find(searchQuery);
+        const totalQuestions = await query.count();
         if (requestQuery.limit) {
-            query.limit(Number.parseInt(requestQuery.limit + ""));
+            const limit = Number.parseInt(requestQuery.limit + "");
+            if (totalQuestions > limit) {
+                query.skip(totalQuestions - limit);
+            }
+            query.limit(limit);
             response.filters.push({filter: "limit", value: requestQuery.limit});
         }
         if (requestQuery.category) {
@@ -143,7 +156,7 @@ class QuestionRoute implements QuestionRoute{
         }
 
 
-        if (await query.count() > 0) {
+        if (totalQuestions > 0) {
             const questions = await query.toArray() as QuestionObject[];
             questions.map(q => delete q._creator);
 
@@ -169,7 +182,7 @@ class QuestionRoute implements QuestionRoute{
         } else {
             response.questions = [];
         }
-
+        // db.close()
         res.json(response);
     }
 
@@ -203,6 +216,7 @@ declare namespace RequestTypes {
         query: {
             limit?: number;
             category?: string;
+            query?: string;
             full?:any;
         }
     }

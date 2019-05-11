@@ -31,6 +31,7 @@ class UserRouting {
             db.find({_id}, {$set: updateData})
                 .catch (err => console.error(err));
         }
+        // db.close()
     }
 
     defaultRoute = async (req:AuthorizedRequest, res, next) => {
@@ -39,6 +40,7 @@ class UserRouting {
         res.send ({decoded: req.decoded})
         const db = await req.app.get("database") as Mongoose;
         //console.log();
+
     };
 
     loginRoute = async (req: LoginBody, res, next) => {
@@ -92,6 +94,7 @@ class UserRouting {
                 res.json({token, email, name, type});
                 this.updateUser(req, data);
             }
+            // db.close()
             return;
         } else {
             if (email) {
@@ -103,6 +106,7 @@ class UserRouting {
                         const token = jwt.sign({_id, type: "moderator", autologin}, autologin ? "14d" : undefined);
                         res.json({token, email, name, type});
                         this.updateUser(req, results);
+                        // db.close()
                         return;
                     }
                 } else if (pin) {
@@ -112,17 +116,17 @@ class UserRouting {
                         const token = jwt.sign({_id, type: "moderator", autologin}, autologin ? "14d" : undefined)
                         res.json({token, email, name, type});
                         this.updateUser(req, results);
+                        // db.close()
                         return;
                     }
                 }
             }
         }
         res.sendStatus(500);
+        // db.close()
     }
 
     registerRoute = async (req: RegisterBody, res, next) => {
-
-
         const db = req.db;
         const {email, password, pin, autologin} = req.body;
         await db.openCollection("moderators");
@@ -141,11 +145,13 @@ class UserRouting {
             if (complete.insertedCount > 0) {
                 const token = jwt.sign({ _id: complete.insertedId, type: "moderator", }, autologin ? "14d" : undefined);
                 res.json({token, email});
+                // db.close()
                 return;
             }
         }
 
         res.sendStatus(500);
+        // db.close()
     }
 
 }
