@@ -31,12 +31,12 @@ class QuestionContainer extends Container<QuestionState> {
         })
     };
 
-    public get = async (force?:boolean) => {
+    public get = async (limit: number = 0, query?: any, force?:boolean) => {
         if (force !== true && this.state.currentQuestions) {
             this.setState({currentQuestions: this.state.currentQuestions});
             return this.state.currentQuestions;
         }
-        return await this.load();
+        return await this.load(limit, query);
     };
 
     public create = async (data: Partial<Question>) => {
@@ -60,7 +60,7 @@ class QuestionContainer extends Container<QuestionState> {
         const raw = await response.text();
         if (response.status === 201) {
             //const json = JSON.parse(raw) as Api.QuestionInsertResponse
-            this.load();
+            this.load(20, undefined);
         } else {
             console.log(raw);
         }
@@ -88,7 +88,7 @@ class QuestionContainer extends Container<QuestionState> {
         return;
         if (response.status === 201) {
             //const json = JSON.parse(raw) as Api.QuestionInsertResponse
-            this.load();
+            this.load(20, undefined);
         } else {
             console.log(raw);
         }
@@ -107,7 +107,7 @@ class QuestionContainer extends Container<QuestionState> {
         const raw = await response.text();
         if (response.status === 200) {
             //const json = JSON.parse(raw);
-            this.load();
+            this.load(20, undefined);
             return true;
         } else {
             console.log(raw);
@@ -153,9 +153,15 @@ class QuestionContainer extends Container<QuestionState> {
     
 
 
-    private load = async () => {
+    private load = async (limit:number, query:any) => {
         const t = this.state.token;
-        const response =  await fetch("/api/v2/question/list?full", {
+        let url = "/api/v2/question/list?full";
+        if (limit > 0)
+            url += "&limit=" + limit;
+        if (typeof query !== "undefined")
+            url += "&query=" + query;
+
+        const response =  await fetch(url, {
             method: "GET",
             headers: {"Authorization": `Bearer ${t}`}
         });

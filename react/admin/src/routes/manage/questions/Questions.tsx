@@ -138,8 +138,6 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
             if (user && question) {
                 question.init({token: user.token()})
                     .then(() => {
-                        question.get(true);
-
                         const func = () => {
                             const {currentQuestions} = question.state;
                             const questions = {
@@ -153,7 +151,7 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
                         this.questionSubscription = func;
 
                         question.subscribe(func);
-                    })
+                    }).then(() => question.get(20,undefined, true))
                 //console.log(user, question);
             }
         }
@@ -311,6 +309,7 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
                                 onSelected={this.questionSelected}
                                 onDeleted={this.questionDeleted}
                                 onCloned={this.questionCloned}
+                                onFilterQuestions={this.filterQuestions}
                                 questions={this.state.questions}
                             />
                         </Drawer>
@@ -329,6 +328,14 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
         } else {
             return (<span />)
         }
+    }
+
+    filterQuestions = (evt, query) => {
+        const {question} = this.props.containers;
+        if (question) {
+            question.get(20, query, true)
+        }
+        console.log(query);
     }
 
     handleTabChange = (evt, n) => {
@@ -519,7 +526,7 @@ class Questions extends React.Component<QuestionsProps, QuestionsState> {
 
 interface QuestionsProps extends RouterProps, RouteProps {
     state?: QuestionsState;
-    containers?: {
+    containers: {
         question:QuestionContainer;
         user:UserContainer;
     }

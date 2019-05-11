@@ -110,7 +110,17 @@ class QuestionListPanel extends React.Component<QuestionListPanelProps, Question
         const target = evt.currentTarget as HTMLInputElement;
         const {filter} = this.state;
         filter.question = target.value.toLowerCase();
-        this.setState({filter});
+        if (this.state.requestTimeout)
+            clearTimeout(this.state.requestTimeout);
+        this.setState({
+            filter,
+            requestTimeout: setTimeout(() => {
+                if (this.props.onFilterQuestions) {
+                    this.props.onFilterQuestions(evt, filter.question)
+                }
+                this.setState({requestTimeout: null});
+            }, 250)
+        });
     };
 
     public render() {
@@ -346,6 +356,7 @@ interface QuestionListPanelProps {
     onDeleted?: (evt: SyntheticEvent, target: any) => any;
     onCloned?: (evt: SyntheticEvent, target: any) => any;
     onUpdateDetails?: (evt:SyntheticEvent, target: any, value: any) => any;
+    onFilterQuestions?: (evt:SyntheticEvent, query: any) => any;
     styles?: React.CSSProperties;
     contentStyles?: React.CSSProperties;
     maxHeight?: string | number;
@@ -358,6 +369,7 @@ interface QuestionListPanelState {
         question?: string;
     }
     order?: string[];
+    requestTimeout?: any;
 }
 
 //@ts-ignore

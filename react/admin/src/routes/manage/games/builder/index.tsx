@@ -21,6 +21,7 @@ import {Question} from "../../../../containers";
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import InputAdornment from "@material-ui/core/InputAdornment";
+import GamesContainer from "../../../../containers/GamesContainer";
 // const FAIcon = React.lazy(() => import("../../../../FontAwesome"));
 
 const styles = theme => ({
@@ -127,10 +128,11 @@ class Builder extends React.Component<BuilderProps, BuilderState> {
         );
     }
 
-    public sendGame = (evt: SyntheticEvent) => {
-
-        console.log(this.state.forms);
-        console.log("Saving Game Here!")
+    public sendGame = async (evt: SyntheticEvent) => {
+        const {games} = this.props.containers;
+        const {questions, basic} = this.state.forms;
+        const game = await games.createGame(basic, questions);
+        console.log(game);
     };
 
     public setStage = (evt: SyntheticEvent) => {
@@ -492,6 +494,7 @@ interface BuilderProps {
     containers: {
         question: QuestionContainer;
         user: UserContainer;
+        games: GamesContainer;
     }
 }
 
@@ -512,4 +515,4 @@ interface IBasicForm {
 }
 
 // @ts-ignore
-export default withStyles(styles, {withTheme: true})(withContainer(Builder, [QuestionContainer, UserContainer]))
+export default withStyles(styles, {withTheme: true})(withContainer(Builder, [GamesContainer, QuestionContainer, UserContainer]))

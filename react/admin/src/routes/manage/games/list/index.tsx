@@ -7,7 +7,8 @@ import {
     List,
     ListItem,
     ListItemAvatar,
-    ListItemText, Theme,
+    ListItemText,
+    Theme,
     withStyles
 } from "@material-ui/core";
 import withContainer from "../../../../containers/withContainer";
@@ -89,6 +90,7 @@ class ListComponent extends React.Component<ListComponentProps, ListComponentSta
         { name: "Image", variable: "image" },
     ]
 
+
     public render() {
         // @ts-ignore
         const {classes, theme} = this.props;
@@ -105,17 +107,19 @@ class ListComponent extends React.Component<ListComponentProps, ListComponentSta
                             <ListItem>
 
                             </ListItem>
-                            {games.state.games.length > 0 ? games.state.games.map((game, idx) => (
-                                <ListItem selected={game._id === this.state.selectedGame} key={game._id} button onClick={this.selectGame(game._id)}>
-                                    <ListItemAvatar>
-                                        <Avatar>{idx+1}</Avatar>
-                                    </ListItemAvatar>
-                                    <ListItemText
-                                        primary={game.name}
-                                        secondary={game.description || "No description"}
-                                    />
-                                </ListItem>
-                            )) : (
+                            {games.state.games.length > 0 ? games.state.games.map((game, idx) => {
+                                return (
+                                    <ListItem selected={game._id === this.state.selectedGame} key={game._id} button onClick={this.selectGame(game._id)}>
+                                        <ListItemAvatar>
+                                            <Avatar>{idx+1}</Avatar>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={game.name}
+                                            secondary={game.description || "No description"}
+                                        />
+                                    </ListItem>
+                                )
+                            }) : (
                                 <ListItem button>
                                     {/*<ListItemAvatar>*/}
                                     {/*    <Avatar>1</Avatar>*/}
@@ -235,6 +239,7 @@ interface ListComponentProps extends RouterProps, RouteProps {
 interface ListComponentState {
     selectedGame: string;
     game?: GameObject;
+    menu: null|any;
 }
 
 const me = withRouter(ListComponent);

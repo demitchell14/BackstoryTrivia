@@ -200,8 +200,8 @@ class AutoSelect extends React.Component<AutoSelectProps, AutoSelectState> {
     }
 
     componentDidUpdate(prevProps: Readonly<AutoSelectProps>, prevState: Readonly<AutoSelectState>, snapshot?: any): void {
-        console.log(this.state);
-        console.log(this.props);
+        // console.log(this.state);
+        // console.log(this.props);
     }
 
     render() {

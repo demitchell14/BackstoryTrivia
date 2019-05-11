@@ -6,26 +6,38 @@ import {Answer, GameProps} from "notrivia";
 import {FindAndModifyWriteOpResultObject} from "mongodb";
 
 export class Database {
+    static client:Promise<MongoClient>;
 
-    readonly client:Promise<MongoClient>;
+    // private client:Promise<MongoClient>;
     private collection:Collection;
     private _collection:string;
     private autoTimeout:any;
     private timeout:number;
     public constructor(opts?:any) {
-        this.client = mongo.MongoClient.connect(url(), {
-            useNewUrlParser: true, poolSize: 5
-        });
         if (opts && opts.timeout !== false) {
             this.timeout = 5 * 1000; // 60 seconds
         }
         this.resetTimeout();
+        if (typeof Database.client === "undefined") {
+            Database.client = mongo.MongoClient.connect(url(), {
+                useNewUrlParser: true, poolSize: 10,
+            });
+        }
+    }
+
+    public async index(name, field) {
+        const client = await Database.client;
+        //console.log(await this.collection.listIndexes().toArray())
+        if (await this.collection.indexExists("question_text")) {
+            await this.collection.dropIndex("question_text")
+        }
+        await this.collection.createIndex({"question": "text"});
+        // this.collection.createIndex(name, field)
     }
 
     public async openCollection(collection:string) {
         this.resetTimeout();
-        const client = await this.client;
-
+        const client = await Database.client;
         this.collection = client.db(MongoDetails.db).collection(collection)
         this._collection = collection;
         return this;
@@ -80,14 +92,14 @@ export class Database {
 
     public close() {
         clearTimeout(this.autoTimeout);
-        this.client.then(c => c.close());
+        // Database.client.then(c => c.close());
     }
 
     private resetTimeout() {
         if (typeof this.timeout === "number") {
             clearTimeout(this.autoTimeout);
             this.autoTimeout = setTimeout(() => {
-                this.close();
+                // this.close();
             }, this.timeout)
         }
     }
@@ -184,7 +196,6 @@ export interface GameParams {
     _id: ObjectID;
     token: string;
 }
-
 
 const url = () => {
     const {baseurl, password, username, db} = MongoDetails

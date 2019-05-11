@@ -1,5 +1,6 @@
 import {Container} from "unstated";
 import UserContainer from "./UserContainer";
+import {Question} from "./index";
 // import {Api,} from "./index";
 
 class GamesContainer extends Container<GamesState> {
@@ -15,6 +16,27 @@ class GamesContainer extends Container<GamesState> {
     
     attachUser(user:UserContainer) {
         this.user = user;
+    }
+
+    async createGame(form:{[T:string]:any}, questions:Array<Partial<Question>>) {
+        if (this.user) {
+            const token = await this.user.token()
+            if (token && questions.length > 0) {
+                form.questions = questions.map(q => q._id);
+                const response = await fetch("/api/v2/games", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                })
+
+                if (response.status === 200) {
+                    const json = await response.json();
+
+                    console.log(json);
+                }
+            }
+        }
     }
 
     async getGames():Promise<GameObject[]|false|undefined> {

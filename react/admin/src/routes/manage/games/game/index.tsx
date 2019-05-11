@@ -1,11 +1,27 @@
 import * as React from "react";
-import {useState, ComponentState, useEffect} from "react";
-import {Grid, List, ListItem, ListItemText, ListItemSecondaryAction, Paper, IconButton} from "@material-ui/core";
+import {useState, useEffect} from "react";
+import {
+    Grid,
+    List,
+    ListItem,
+    ListItemText,
+    ListItemSecondaryAction,
+    Paper,
+    IconButton,
+    Button, Theme, withStyles
+} from "@material-ui/core";
 import QuestionListPanel from "../../questions/QuestionListPanel";
 import withContainer from "../../../../containers/withContainer";
-import GamesContainer from "../../../../containers/GamesContainer";
+import GamesContainer, {GameObject} from "../../../../containers/GamesContainer";
 import {RouteProps, RouterProps, withRouter} from "react-router";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {Classes} from "jss";
+
+const styles = (theme: Theme) => ({
+    spaced: {
+        margin: `0 ${theme.spacing.unit * 2}px`
+    }
+});
 
 const info = [
     { name: "Name", variable: "name" },
@@ -16,7 +32,8 @@ const info = [
 ];
 
 function GameComponent(props:GameCompProps) {
-    const [state, setState] = useState({}) as ComponentState;
+    const [state, setState] = useState({} as GameState);
+    const {classes} = props;
 
     useEffect(() => {
         if (props.containers.games.state.games.length > 0) {
@@ -31,9 +48,15 @@ function GameComponent(props:GameCompProps) {
         }
     });
 
+
     if (state.game) {
         return (
             <Grid container spacing={16}>
+                <Grid md={12} item>
+                    <Button className={classes.spaced} variant={"contained"} color={"primary"}>Start Game</Button>
+                    <Button className={classes.spaced} variant={"contained"} color={"default"}>Clone Game</Button>
+                    <Button className={classes.spaced} variant={"contained"} color={"secondary"}>Delete Game</Button>
+                </Grid>
                 <Grid md={5} item>
                     <Paper elevation={1}>
                         <List>
@@ -72,10 +95,15 @@ interface GameCompProps extends RouterProps, RouteProps {
     }
     match: any;
     game: any;
+    classes: Classes
+}
+
+interface GameState {
+    game?: GameObject|any;
 }
 
 // @ts-ignore
-export default withContainer(withRouter(GameComponent), [GamesContainer]);
+export default withStyles(styles, {withTheme: true})(withContainer(withRouter(GameComponent), [GamesContainer]));
 
 // class GameComponent extends React.Component<GameComponentProps, GameComponentState> {
 //     public constructor(props) {

@@ -61,7 +61,7 @@ class InstanceManager {
                 return raw ? cached.raw : cached.game;
             }
         }
-        console.log((await this.db.client).isConnected())
+        // console.log((await this.db.client).isConnected())
         // If we get here, game is not cached, so we need to look it up in the database to add to cache
         const game = await getGame(this.db, typeof search === "string" ? search : search.toHexString())
             .catch(err => console.error(err));
@@ -76,6 +76,7 @@ class InstanceManager {
         }
 
         console.error(`Game ${typeof search === "string" ? search : search.toHexString()} could not be found`)
+
         return undefined;
     }
 
